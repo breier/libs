@@ -58,7 +58,7 @@ class ExtendedArray extends ArrayIterator
      * @param array $array To be parsed into properties
      * @param int   $flags (STD_PROP_LIST | ARRAY_AS_PROPS)
      */
-    public function __construct($array = null, int $flags = 2): void
+    public function __construct($array = null, int $flags = 2)
     {
         if ($array instanceof ArrayIterator || $array instanceof ArrayObject) {
             $array = $array->getArrayCopy();

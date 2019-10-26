@@ -14,6 +14,7 @@
 namespace Test;
 
 use PHPUnit\Framework\TestCase;
+use InvalidArgumentException;
 use TypeError;
 use Breier\ExtendedArray;
 
@@ -26,7 +27,7 @@ use Breier\ExtendedArray;
  * @license  GPLv3 https://www.gnu.org/licenses/gpl-3.0.en.html
  * @link     php vendor/phpunit/phpunit/phpunit tests/ExtendedArrayTest.php
  */
-class ElementArrayTest extends TestCase
+class ExtendedArrayTest extends TestCase
 {
     protected $plainArray;
     protected $extendedArray;
@@ -49,29 +50,27 @@ class ElementArrayTest extends TestCase
     }
 
     /**
-     * Test constants have expected values
+     * Test array can be reverted with same values
      *
-     * @test   constants have expected values
+     * @test   array can be reverted with same values
      * @return null
      */
-    public function constantsAreSetAsExpected(): void
+    public function constantsArrayCanBeReverted(): void
     {
-        $this->assertSame(1, ElementArray::RANDOM_FIRST);
-
-        $this->assertSame(500, ElementArray::RANDOM_LAST);
+        $this->assertSame($this->plainArray, $this->extendedArray->getArrayCopy());
     }
 
     /**
-     * Test throw TypeError Exception for non-arrays
+     * Test throw InvalidArgumentException Exception for non-arrays
      *
-     * @test   throw TypeError Exception for non-arrays
+     * @test   throw InvalidArgumentException Exception for non-arrays
      * @return null
      */
     public function throwsForNonArrays(): void
     {
-        $this->expectException(TypeError::class);
+        $this->expectException(InvalidArgumentException::class);
 
-        ElementArray::getMissingValues("Definitely not an Array ... =P");
+        $test = new ExtendedArray('not an array');
     }
 
     /**
@@ -79,7 +78,7 @@ class ElementArrayTest extends TestCase
      *
      * @test   returned the correct array
      * @return null
-     */
+     /
     public function returnsCorrectArray(): void
     {
         $result = ElementArray::process();
@@ -93,7 +92,7 @@ class ElementArrayTest extends TestCase
      *
      * @test   returned the correct incomplete_array as JSON
      * @return null
-     */
+     /
     public function returnedIncompleteArrayIsJSON(): void
     {
         $result = ElementArray::process();
@@ -112,7 +111,7 @@ class ElementArrayTest extends TestCase
      *
      * @test   returned the correct missing_values as string
      * @return null
-     */
+     /
     public function returnedMissingValuesIsString(): void
     {
         $result = ElementArray::process();
@@ -125,7 +124,7 @@ class ElementArrayTest extends TestCase
      *
      * @test   returned the correct missing value
      * @return null
-     */
+     /
     public function returnsCorrectMissingValue(): void
     {
         $baseArray = ElementArray::getBaseArray();
@@ -144,6 +143,7 @@ class ElementArrayTest extends TestCase
 
         $this->assertSame(implode(", ", $missingValues), $result["missing_values"]);
     }
+    */
 
     /**
      * Test 1000 ElementArray takes less than 50ms
@@ -154,7 +154,13 @@ class ElementArrayTest extends TestCase
     public function executionTimeIsAcceptable(): void
     {
         $startTime = microtime(true);
-        ElementArray::process();
+
+        $this->extendedArray->map(
+            function ($item) {
+                return is_string($item);
+            }
+        )->filter();
+
         $timeTaken = microtime(true) - $startTime;
 
         $this->assertLessThan(0.05, $timeTaken);

@@ -1,6 +1,13 @@
 {
     "name": "breier/libs",
     "description": "An Extended Array Library to use everywhere",
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Andre Breier",
+            "email": "breier.de@gmail.com"
+        }
+    ],
     "require": {
         "php": "^7.2",
         "ext-json": "*"
@@ -17,12 +24,5 @@
         "psr-4": {
             "Test\\": "tests/"
         }
-    },
-    "license": "GPLv3",
-    "authors": [
-        {
-            "name": "Andre Breier",
-            "email": "andre@breier.net.br"
-        }
-    ]
+    }
 }
