@@ -11,12 +11,12 @@
  * @link     php vendor/phpunit/phpunit/phpunit tests/ExtendedArrayTest.php
  */
 
-namespace Test;
+namespace Test\ExtendedArray;
 
+use Breier\ExtendedArray\ExtendedArray;
 use PHPUnit\Framework\TestCase;
 use InvalidArgumentException;
 use TypeError;
-use Breier\ExtendedArray;
 
 /**
  * Class ExtendedArrayTest
@@ -74,76 +74,44 @@ class ExtendedArrayTest extends TestCase
     }
 
     /**
-     * Test returned the correct array
+     * Test returned the correct array as JSON
      *
-     * @test   returned the correct array
+     * @test   returned the correct array as JSON
      * @return null
-     /
-    public function returnsCorrectArray(): void
+     */
+    public function returnedArrayIsJSON(): void
     {
-        $result = ElementArray::process();
+        $plainArrayJSON = json_encode($this->plainArray);
+        $extendedArrayJSON = $this->extendedArray->jsonSerialize();
 
-        $this->assertArrayHasKey("incomplete_array", $result);
-        $this->assertArrayHasKey("missing_values", $result);
+        //$this->assertTrue(is_array($incompleteArray));
+        $this->assertSame($plainArrayJSON, $extendedArrayJSON);
     }
 
     /**
-     * Test returned the correct incomplete_array as JSON
+     * Test returned the correct sorted array
      *
-     * @test   returned the correct incomplete_array as JSON
+     * @test   returned the correct sorted array
      * @return null
-     /
-    public function returnedIncompleteArrayIsJSON(): void
+     */
+    public function returnsCorrectSortedArray(): void
     {
-        $result = ElementArray::process();
+        asort($this->plainArray);
+        $this->extendedArray->asort();
+        $this->assertSame($this->plainArray, $this->extendedArray->getArrayCopy());
 
-        try {
-            $incompleteArray = json_decode($result["incomplete_array"], true);
-        } catch (\Exception|\Throwable $e) {
-            $incompleteArray = "Definitely not an Array ... =P";
-        }
+        arsort($this->plainArray);
+        $this->extendedArray->arsort();
+        $this->assertSame($this->plainArray, $this->extendedArray->getArrayCopy());
 
-        $this->assertTrue(is_array($incompleteArray));
+        ksort($this->plainArray);
+        $this->extendedArray->ksort();
+        $this->assertSame($this->plainArray, $this->extendedArray->getArrayCopy());
+
+        krsort($this->plainArray);
+        $this->extendedArray->krsort();
+        $this->assertSame($this->plainArray, $this->extendedArray->getArrayCopy());
     }
-
-    /**
-     * Test returned the correct missing_values as string
-     *
-     * @test   returned the correct missing_values as string
-     * @return null
-     /
-    public function returnedMissingValuesIsString(): void
-    {
-        $result = ElementArray::process();
-
-        $this->assertTrue(is_string($result["missing_values"]));
-    }
-
-    /**
-     * Test returned the correct missing value
-     *
-     * @test   returned the correct missing value
-     * @return null
-     /
-    public function returnsCorrectMissingValue(): void
-    {
-        $baseArray = ElementArray::getBaseArray();
-
-        $result = ElementArray::process();
-
-        $incompleteArray = json_decode($result["incomplete_array"], true);
-
-        $missingValues = [];
-
-        foreach ($baseArray as $value) {
-            if (array_search($value, $incompleteArray) === false) {
-                array_push($missingValues, $value);
-            }
-        }
-
-        $this->assertSame(implode(", ", $missingValues), $result["missing_values"]);
-    }
-    */
 
     /**
      * Test 1000 ElementArray takes less than 50ms

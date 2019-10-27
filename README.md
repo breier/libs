@@ -1,2 +1,2 @@
-# libs
-Classes to expose via packagist
+# Breier Libs
+A collection of classes to expose via packagist.org
