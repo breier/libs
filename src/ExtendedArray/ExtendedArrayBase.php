@@ -93,7 +93,17 @@ abstract class ExtendedArrayBase extends ArrayIterator
      */
     public function asort(): void
     {
-        parent::asort();
+        $this->uasort(
+            function ($a, $b) {
+                if (static::isArrayObject($a)) {
+                    $a = $a->getArrayCopy();
+                }
+                if (static::isArrayObject($b)) {
+                    $b = $b->getArrayCopy();
+                }
+                return $a <=> $b;
+            }
+        );
 
         $this->updatePositionMap();
     }
