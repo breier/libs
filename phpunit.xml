@@ -26,4 +26,9 @@
             <directory>./src/</directory>
         </whitelist>
     </filter>
+
+    <logging>
+        <log type="coverage-clover" target="cov.xml"/>
+        <log type="coverage-html" target="tests/coverage"/>
+    </logging>
 </phpunit>
