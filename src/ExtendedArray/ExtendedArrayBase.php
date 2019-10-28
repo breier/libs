@@ -27,12 +27,13 @@ use \ArrayObject;
  *
  * @method null append(mixed $value); Append an element to the object
  * @method int count(); The amount of elements
- * @method array getArrayCopy(); Back to good and old array
+ * @method mixed current(); Get the element under the cursor
  * @method int getFlags(); Get behaviour flags of the ArrayIterator
  * @method mixed key(); Current position element index
  * @method null natcasesort(); Sort elements using case insensitive "natural order"
  * @method null natsort(); Sort elements using "natural order"
  * @method bool offsetExists(mixed $index); Validate element index
+ * @method mixed offsetGet(mixed $index); Get element in given index
  * @method string serialize(); Applies PHP serialization to the object
  * @method null setFlags(string $flags); Set behaviour flags of the ArrayIterator
  * @method null uasort(callable $cmp_function); Sort by elements using given function
@@ -73,6 +74,12 @@ abstract class ExtendedArrayBase extends ArrayIterator
             $array = [];
         }
 
+        foreach ($array as &$item) {
+            if (is_array($item)) {
+                $item = new static($item);
+            }
+        }
+
         parent::__construct($array, $flags);
 
         $this->updatePositionMap();
@@ -89,20 +96,6 @@ abstract class ExtendedArrayBase extends ArrayIterator
         parent::asort();
 
         $this->updatePositionMap();
-    }
-
-    /**
-     * Extending Current Method to return ExtendedArray instead of array
-     *
-     * @return mixed
-     */
-    public function current()
-    {
-        $item = parent::current();
-
-        return is_array($item)
-            ? new static($item)
-            : $item;
     }
 
     /**
@@ -140,6 +133,40 @@ abstract class ExtendedArrayBase extends ArrayIterator
     }
 
     /**
+     * Extending Get Array Copy to convert sub-items to array
+     *
+     * @return array
+     */
+    public function getArrayCopy(): array
+    {
+        $plainArray = parent::getArrayCopy();
+
+        foreach ($plainArray as &$item) {
+            if ($item instanceof ExtendedArrayBase) {
+                $item = $item->getArrayCopy();
+            }
+        }
+
+        return $plainArray;
+    }
+
+    /**
+     * Is Array Object identifies usable classes
+     *
+     * @param mixed $array The object to be validated
+     *
+     * @return bool
+     */
+    public static function isArrayObject($array): bool
+    {
+        return (
+            $array instanceof ExtendedArrayBase
+            || $array instanceof ArrayIterator
+            || $array instanceof ArrayObject
+        );
+    }
+
+    /**
      * Extending KSort Method to update position map
      * Sort ascending by element indexes
      *
@@ -172,22 +199,6 @@ abstract class ExtendedArrayBase extends ArrayIterator
         parent::next();
 
         return $this;
-    }
-
-    /**
-     * Extending OffsetGet Method to return ExtendedArray instead of array
-     *
-     * @param int|string $key Property to Get
-     *
-     * @return mixed
-     */
-    public function offsetGet($key)
-    {
-        $item = parent::offsetGet($key);
-
-        return is_array($item)
-            ? new static($item)
-            : $item;
     }
 
     /**
