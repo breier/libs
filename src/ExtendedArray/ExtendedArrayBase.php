@@ -306,6 +306,16 @@ abstract class ExtendedArrayBase extends ArrayIterator
     }
 
     /**
+     * Get Position Map
+     *
+     * @return array
+     */
+    protected function getPositionMap(): array
+    {
+        return $this->_positionMap;
+    }
+
+    /**
      * Save Current Cursor Position so it can be restored
      *
      * @return void

@@ -162,7 +162,7 @@ class ExtendedArray extends ExtendedArrayBase
      */
     public function keys(): ExtendedArray
     {
-        return new static($this->_positionMap);
+        return new static($this->getPositionMap());
     }
 
     /**
