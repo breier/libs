@@ -146,9 +146,7 @@ class ExtendedArray extends ExtendedArrayBase
     {
         return (
             is_array($element)
-            || $element instanceof ExtendedArray
-            || $element instanceof ArrayIterator
-            || $element instanceof ArrayObject
+            || static::isArrayObject($element)
             || $element instanceof SplFixedArray
         );
     }

@@ -121,9 +121,9 @@ abstract class ExtendedArrayBase extends ArrayIterator
     /**
      * Move the Cursor to the End, poly-fill for `end`
      *
-     * @return ExtendedArray
+     * @return ExtendedArrayBase
      */
-    public function end(): ExtendedArray
+    public function end(): ExtendedArrayBase
     {
         if ($this->count()) {
             $this->seek($this->count() -1);
@@ -135,9 +135,9 @@ abstract class ExtendedArrayBase extends ArrayIterator
     /**
      * First is an alias for Rewind
      *
-     * @return ExtendedArray
+     * @return ExtendedArrayBase
      */
-    public function first(): ExtendedArray
+    public function first(): ExtendedArrayBase
     {
         return $this->rewind();
     }
@@ -192,19 +192,19 @@ abstract class ExtendedArrayBase extends ArrayIterator
     /**
      * Last is an alias to End
      *
-     * @return ExtendedArray
+     * @return ExtendedArrayBase
      */
-    public function last(): ExtendedArray
+    public function last(): ExtendedArrayBase
     {
         return $this->end();
     }
 
     /**
-     * Extending next Method to return ExtendedArray instead of void
+     * Extending next Method to return ExtendedArrayBase instead of void
      *
-     * @return ExtendedArray
+     * @return ExtendedArrayBase
      */
-    public function next(): ExtendedArray
+    public function next(): ExtendedArrayBase
     {
         parent::next();
 
@@ -263,9 +263,9 @@ abstract class ExtendedArrayBase extends ArrayIterator
     /**
      * Move the Cursor to Previous element
      *
-     * @return ExtendedArray
+     * @return ExtendedArrayBase
      */
-    public function prev(): ExtendedArray
+    public function prev(): ExtendedArrayBase
     {
         $currentPosition = $this->pos();
 
@@ -277,12 +277,12 @@ abstract class ExtendedArrayBase extends ArrayIterator
     }
 
     /**
-     * Extending Rewind Method to return ExtendedArray instead of void
+     * Extending Rewind Method to return ExtendedArrayBase instead of void
      * Move the cursor to initial position
      *
-     * @return ExtendedArray
+     * @return ExtendedArrayBase
      */
-    public function rewind(): ExtendedArray
+    public function rewind(): ExtendedArrayBase
     {
         parent::rewind();
 
@@ -290,13 +290,13 @@ abstract class ExtendedArrayBase extends ArrayIterator
     }
 
     /**
-     * Extending Seek Method to return ExtendedArray instead of void
+     * Extending Seek Method to return ExtendedArrayBase instead of void
      *
      * @param int $position To seek
      *
-     * @return ExtendedArray
+     * @return ExtendedArrayBase
      */
-    public function seek($position): ExtendedArray
+    public function seek($position): ExtendedArrayBase
     {
         parent::seek($position);
 
@@ -308,10 +308,10 @@ abstract class ExtendedArrayBase extends ArrayIterator
      *
      * @param int|string $key Property to seek
      *
-     * @return ExtendedArray
+     * @return ExtendedArrayBase
      * @throws ExtendedArrayException
      */
-    public function seekKey($key): ExtendedArray
+    public function seekKey($key): ExtendedArrayBase
     {
         if (!$this->offsetExists($key)) {
             throw new ExtendedArrayException("Key '{$key}' doesn't exist!");
