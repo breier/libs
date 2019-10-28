@@ -13,6 +13,10 @@
 
 namespace Breier\ExtendedArray;
 
+use ArrayIterator;
+use ArrayObject;
+use SplFixedArray;
+
 /**
  * Extended Array Class
  *
@@ -136,8 +140,9 @@ class ExtendedArray extends ExtendedArrayBase
     {
         return (
             is_array($element)
-            || $element instanceof ArrayObject
+            || $element instanceof ExtendedArray
             || $element instanceof ArrayIterator
+            || $element instanceof ArrayObject
             || $element instanceof SplFixedArray
         );
     }
