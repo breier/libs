@@ -78,7 +78,17 @@ abstract class ExtendedArrayBase extends ArrayIterator
 
         parent::__construct($array, $flags);
 
-        $this->updatePositionMap();
+        $this->_updatePositionMap();
+    }
+
+    /**
+     * Converts the Extended Array to JSON String
+     *
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->jsonSerialize();
     }
 
     /**
