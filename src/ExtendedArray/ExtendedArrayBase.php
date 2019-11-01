@@ -30,8 +30,6 @@ use \ArrayObject;
  * @method mixed current(); Get the element under the cursor
  * @method int getFlags(); Get behaviour flags of the ArrayIterator
  * @method mixed key(); Current position element index
- * @method null natcasesort(); Sort elements using case insensitive "natural order"
- * @method null natsort(); Sort elements using "natural order"
  * @method bool offsetExists(mixed $index); Validate element index
  * @method mixed offsetGet(mixed $index); Get element in given index
  * @method string serialize(); Applies PHP serialization to the object
@@ -206,6 +204,32 @@ abstract class ExtendedArrayBase extends ArrayIterator
     public function last(): ExtendedArrayBase
     {
         return $this->end();
+    }
+
+    /**
+     * Extending NatCaseSort Method to update position map
+     * Sort elements using case insensitive "natural order"
+     *
+     * @return null
+     */
+    public function natcasesort(): void
+    {
+        parent::natcasesort();
+
+        $this->_updatePositionMap();
+    }
+
+    /**
+     * Extending NatSort Method to update position map
+     * Sort elements using "natural order"
+     *
+     * @return null
+     */
+    public function natsort(): void
+    {
+        parent::natsort();
+
+        $this->_updatePositionMap();
     }
 
     /**
