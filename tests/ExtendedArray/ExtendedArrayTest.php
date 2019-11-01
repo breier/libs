@@ -53,9 +53,9 @@ class ExtendedArrayTest extends TestCase
             7 => 'four',
             'five',
             'six' => [
-                'temp' => 'long string that\'s not so long' ,
+                'temp' => 'long string that\'s not so long',
                 'empty' => null
-            ]
+            ],
         ];
 
         $this->extendedArray = new ExtendedArray($this->plainArray);
@@ -597,6 +597,56 @@ class ExtendedArrayTest extends TestCase
     }
 
     /**
+     * Test returned correct filtered array
+     *
+     * @return null
+     * @test   returned correct filtered array
+     */
+    public function returnedCorrectFilteredArray(): void
+    {
+        /**
+         * Is Array Filter
+        */
+        $isArrayFilter = function ($item) {
+            return ExtendedArray::isArray($item);
+        };
+        $this->assertSame(
+            array_filter($this->plainArray, $isArrayFilter),
+            $this->extendedArray->filter($isArrayFilter)->getArrayCopy()
+        );
+
+        /**
+         * Is String Filter
+        */
+        $isStringFilter = function ($item) {
+            return is_string($item);
+        };
+        $this->assertSame(
+            array_filter($this->plainArray, $isStringFilter),
+            $this->extendedArray->filter($isStringFilter)->getArrayCopy()
+        );
+
+        /**
+         * All False Filter
+        */
+        $allFalseFilter = function ($item) {
+            return false;
+        };
+        $this->assertSame(
+            array_filter($this->plainArray, $allFalseFilter),
+            $this->extendedArray->filter($allFalseFilter)->getArrayCopy()
+        );
+
+        /**
+         * Empty Filter on sub-array
+        */
+        $this->assertSame(
+            array_filter($this->plainArray['six']),
+            $this->extendedArray->six->filter()->getArrayCopy()
+        );
+    }
+
+    /**
      * Test returned the correct array as JSON
      *
      * @return null
@@ -650,6 +700,72 @@ class ExtendedArrayTest extends TestCase
         $this->assertFalse(
             ExtendedArray::isArray($this->extendedArray->jsonSerialize())
         );
+    }
+
+    /**
+     * Test returned correct mapped array
+     *
+     * @return null
+     * @test   returned correct mapped array
+     */
+    public function returnedCorrectMappedArray(): void
+    {
+        /**
+         * String Length Mapping
+        */
+        $strlenMap = function ($item) {
+            if (is_array($item)) {
+                $item = json_encode($item);
+            }
+            return strlen($item);
+        };
+        $this->assertSame(
+            array_map($strlenMap, $this->plainArray),
+            $this->extendedArray->map($strlenMap)->getArrayCopy()
+        );
+
+        /**
+         * String Conversion Mapping
+        */
+        $toStringMap = function ($item) {
+            if (is_array($item)) {
+                $item = json_encode($item);
+            }
+            return (string) $item;
+        };
+        $this->assertSame(
+            array_map($toStringMap, $this->plainArray),
+            $this->extendedArray->map($toStringMap)->getArrayCopy()
+        );
+
+        /**
+         * Cube Mapping
+        */
+        $cubeMap = function ($item) {
+            if (ExtendedArray::isArray($item)) {
+                $item = (new ExtendedArray($item))->count();
+            }
+            if (!is_int($item)) {
+                $item = intval($item);
+            }
+            return $item * $item * $item;
+        };
+        $this->assertSame(
+            array_map($cubeMap, $this->plainArray),
+            $this->extendedArray->map($cubeMap)->getArrayCopy()
+        );
+
+        /**
+         * Is Array Map
+        */
+        $isArrayMap = function ($item) {
+            return ExtendedArray::isArray($item);
+        };
+        $this->assertSame(
+            array_map($isArrayMap, $this->plainArray),
+            $this->extendedArray->map($isArrayMap)->getArrayCopy()
+        );
+
     }
 
     /**
