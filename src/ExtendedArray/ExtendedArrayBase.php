@@ -173,6 +173,19 @@ abstract class ExtendedArrayBase extends ArrayIterator
     }
 
     /**
+     * JSON Serialize
+     *
+     * @param int $options (JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | ...)
+     * @param int $depth   Recursion level
+     *
+     * @return string
+     */
+    public function jsonSerialize(int $options = 0, $depth = 512): string
+    {
+        return json_encode($this, $options, $depth);
+    }
+
+    /**
      * Extending KSort Method to update position map
      * Sort ascending by element indexes
      *

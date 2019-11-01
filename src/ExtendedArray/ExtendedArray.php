@@ -150,19 +150,6 @@ class ExtendedArray extends ExtendedArrayBase
     }
 
     /**
-     * JSON Serialize
-     *
-     * @param int $options (JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | ...)
-     * @param int $depth   Recursion level
-     *
-     * @return string
-     */
-    public function jsonSerialize(int $options = 0, $depth = 512): string
-    {
-        return json_encode($this, $options, $depth);
-    }
-
-    /**
      * Extended Array Keys, poly-fill for `array_keys`
      *
      * @return ExtendedArray
