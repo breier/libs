@@ -221,9 +221,7 @@ class ExtendedArray extends ExtendedArrayBase
 
         $this->restoreCursor();
 
-        return is_array($firstItem)
-            ? new static($firstItem)
-            : $firstItem;
+        return $firstItem;
     }
 
     /**
