@@ -102,8 +102,6 @@ abstract class ExtendedArrayBase extends ArrayIterator
                 return $a < $b ? -1 : 1;
             }
         );
-
-        $this->updatePositionMap();
     }
 
     /**
@@ -184,7 +182,7 @@ abstract class ExtendedArrayBase extends ArrayIterator
     {
         parent::ksort();
 
-        $this->updatePositionMap();
+        $this->_updatePositionMap();
     }
 
     /**
@@ -241,7 +239,7 @@ abstract class ExtendedArrayBase extends ArrayIterator
     {
         parent::offsetUnset($index);
 
-        $this->updatePositionMap();
+        $this->_updatePositionMap();
     }
 
     /**
@@ -391,7 +389,7 @@ abstract class ExtendedArrayBase extends ArrayIterator
      *
      * @return null
      */
-    protected function updatePositionMap(): void
+    private function _updatePositionMap(): void
     {
         $this->_positionMap = [];
 
