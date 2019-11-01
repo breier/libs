@@ -265,7 +265,9 @@ abstract class ExtendedArrayBase extends ArrayIterator
      */
     public function offsetSet($index, $newval): void
     {
-        $isAppend = !$this->offsetExists($index);
+        $isAppend = !is_null($index)
+            ? !$this->offsetExists($index)
+            : true;
 
         parent::offsetSet($index, $newval);
 
