@@ -17,6 +17,7 @@ use Breier\ExtendedArray\ExtendedArray;
 use PHPUnit\Framework\TestCase;
 
 use Breier\ExtendedArray\ExtendedArrayException;
+use JsonException;
 
 use ArrayIterator;
 use ArrayObject;
@@ -127,6 +128,34 @@ class ExtendedArrayTest extends TestCase
         $this->assertSame(
             $this->splFixedArray->toArray(),
             (new ExtendedArray($this->splFixedArray))->getArrayCopy()
+        );
+    }
+
+    /**
+     * Test throws for invalid JSON
+     *
+     * @return null
+     * @test   throws for invalid JSON
+     */
+    public function throwsForInvalidJSON(): void
+    {
+        $this->expectException(JsonException::class);
+
+        ExtendedArray::fromJSON('invalid');
+    }
+
+    /**
+     * Test throws for broken JSON
+     *
+     * @return null
+     * @test   throws for broken JSON
+     */
+    public function throwsForBrokenJSON(): void
+    {
+        $this->expectException(JsonException::class);
+
+        ExtendedArray::fromJSON(
+            substr($this->extendedArray->jsonSerialize(), 0, 50)
         );
     }
 

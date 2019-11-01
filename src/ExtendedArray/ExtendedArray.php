@@ -64,9 +64,9 @@ class ExtendedArray extends ExtendedArrayBase
             ? function ($a, $b) {
                 return $a === $b;
             }
-            : function ($a, $b) {
-                return (object) $a == (object) $b;
-            };
+        : function ($a, $b) {
+            return (object) $a == (object) $b;
+        };
 
         $isContained = false;
 
@@ -117,19 +117,16 @@ class ExtendedArray extends ExtendedArrayBase
     /**
      * ExtendedArray from JSON
      *
-     * @param string $json    To parse
-     * @param int    $depth   Recursion level
-     * @param int    $options (JSON_THROW_ON_ERROR | JSON_BIGINT_AS_STRING | ...)
+     * @param string $json  To parse
+     * @param int    $depth Recursion level
      *
      * @return ExtendedArray
+     * @throws JsonException
      */
-    public static function fromJSON(
-        string $json,
-        int $depth = 512,
-        int $options = 0
-    ): ExtendedArray {
+    public static function fromJSON(string $json, int $depth = 512): ExtendedArray
+    {
         return new static(
-            json_decode($json, true, $depth, $options)
+            json_decode($json, true, $depth, JSON_THROW_ON_ERROR)
         );
     }
 
