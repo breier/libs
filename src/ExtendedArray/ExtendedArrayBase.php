@@ -36,8 +36,6 @@ use \ArrayObject;
  * @method mixed offsetGet(mixed $index); Get element in given index
  * @method string serialize(); Applies PHP serialization to the object
  * @method null setFlags(string $flags); Set behaviour flags of the ArrayIterator
- * @method null uasort(callable $cmp_function); Sort by elements using given function
- * @method null uksort(callable $cmp_function); Sort by indexes using given function
  * @method null unserialize(string $serialized); Populates self using PHP unserialize
  * @method bool valid(); Validate element in the current position
  *
@@ -324,6 +322,36 @@ abstract class ExtendedArrayBase extends ArrayIterator
         );
 
         return $this->seek($keyPosition);
+    }
+
+    /**
+     * Extending UAsort Method to update position map
+     * Sort by elements using given function
+     *
+     * @param callable $cmp_function to compare
+     *
+     * @return null
+     */
+    public function uasort($cmp_function): void
+    {
+        parent::uasort($cmp_function);
+
+        $this->_updatePositionMap();
+    }
+
+    /**
+     * Extending UKsort Method to update position map
+     * Sort by indexes using given function
+     *
+     * @param callable $cmp_function to compare
+     *
+     * @return null
+     */
+    public function uksort($cmp_function): void
+    {
+        parent::uksort($cmp_function);
+
+        $this->_updatePositionMap();
     }
 
     /**

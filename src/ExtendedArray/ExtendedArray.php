@@ -46,8 +46,6 @@ class ExtendedArray extends ExtendedArrayBase
                 return $a < $b ? 1 : -1;
             }
         );
-
-        $this->updatePositionMap();
     }
 
     /**
@@ -186,8 +184,6 @@ class ExtendedArray extends ExtendedArrayBase
                 return $a < $b ? 1 : -1;
             }
         );
-
-        $this->updatePositionMap();
     }
 
     /**
@@ -276,7 +272,5 @@ class ExtendedArray extends ExtendedArrayBase
                 return rand(-1, 1);
             }
         );
-
-        $this->updatePositionMap();
     }
 }
