@@ -86,7 +86,7 @@ abstract class ExtendedArrayBase extends ArrayIterator
     }
 
     /**
-     * Extending ASort Method to update position map
+     * Extending ASort Method to support sub-arrays
      * Sort ascending by elements
      *
      * @return null
@@ -101,7 +101,7 @@ abstract class ExtendedArrayBase extends ArrayIterator
                 if (static::isArrayObject($b)) {
                     $b = $b->getArrayCopy();
                 }
-                return $a <=> $b;
+                return $a < $b ? -1 : 1;
             }
         );
 

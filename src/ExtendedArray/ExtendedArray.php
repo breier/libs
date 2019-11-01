@@ -43,7 +43,7 @@ class ExtendedArray extends ExtendedArrayBase
                 if (static::isArrayObject($b)) {
                     $b = $b->getArrayCopy();
                 }
-                return $b <=> $a;
+                return $a < $b ? 1 : -1;
             }
         );
 
@@ -183,11 +183,7 @@ class ExtendedArray extends ExtendedArrayBase
     {
         $this->uksort(
             function ($a, $b) {
-                if (is_numeric($b) ^ is_numeric($a)) {
-                    return is_numeric($b) <=> is_numeric($a);
-                }
-
-                return $b <=> $a;
+                return $a < $b ? 1 : -1;
             }
         );
 
