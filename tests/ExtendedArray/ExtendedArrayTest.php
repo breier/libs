@@ -616,14 +616,21 @@ class ExtendedArrayTest extends TestCase
         );
 
         /**
-         * Is String Filter
+         * Is String Key Filter
         */
         $isStringFilter = function ($item) {
             return is_string($item);
         };
         $this->assertSame(
-            array_filter($this->plainArray, $isStringFilter),
-            $this->extendedArray->filter($isStringFilter)->getArrayCopy()
+            array_filter(
+                $this->plainArray,
+                $isStringFilter,
+                ARRAY_FILTER_USE_KEY
+            ),
+            $this->extendedArray->filter(
+                $isStringFilter,
+                ARRAY_FILTER_USE_KEY
+            )->getArrayCopy()
         );
 
         /**
@@ -643,6 +650,24 @@ class ExtendedArrayTest extends TestCase
         $this->assertSame(
             array_filter($this->plainArray['six']),
             $this->extendedArray->six->filter()->getArrayCopy()
+        );
+
+        /**
+         * Key and Value Filter
+         */
+        $keyValueFilter = function ($value, $key) {
+            return (is_numeric($key) && ExtendedArray::isArray($value));
+        };
+        $this->assertSame(
+            array_filter(
+                $this->plainArray,
+                $isStringFilter,
+                ARRAY_FILTER_USE_BOTH
+            ),
+            $this->extendedArray->filter(
+                $isStringFilter,
+                ARRAY_FILTER_USE_BOTH
+            )->getArrayCopy()
         );
     }
 

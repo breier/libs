@@ -86,16 +86,19 @@ class ExtendedArray extends ExtendedArrayBase
 
     /**
      * Filter, poly-fill for `array_filter`
+     * When using flag "both", $value goes first, then $key.
      *
      * @param callable $callback Function to use
+     * @param int      $flag     (ARRAY_FILTER_USE_KEY, ARRAY_FILTER_USE_BOTH)
      *
      * @return ExtendedArray
      */
-    public function filter(callable $callback = null): ExtendedArray
+    public function filter(callable $callback = null, int $flag = 0): ExtendedArray
     {
         if (is_null($callback)) {
-            $callback = function ($item) {
-                return !empty($item);
+            $flag = 0;
+            $callback = function ($value) {
+                return !empty($value);
             };
         }
 
@@ -104,7 +107,11 @@ class ExtendedArray extends ExtendedArrayBase
         $filteredArray = new static();
 
         foreach ($this as $key => $value) {
-            if ($callback($value)) {
+            $params = ($flag !== ARRAY_FILTER_USE_BOTH)
+                ? ($flag === ARRAY_FILTER_USE_KEY) ? [$key] : [$value]
+                : [$value, $key];
+
+            if (call_user_func_array($callback, $params)) {
                 $filteredArray->offsetSet($key, $value);
             }
         }
