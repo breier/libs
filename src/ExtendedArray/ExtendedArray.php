@@ -172,19 +172,36 @@ class ExtendedArray extends ExtendedArrayBase
 
     /**
      * Map, poly-fill for `array_map`
+     * This method  is slower  then plain  `array_map`
+     * because it supports internal objects being used
+     * in  the  callback function.  Use  it only  when
+     * necessary.
      *
-     * @param callable $callback Function to use
+     * @param callable $callback  Function to use
+     * @param array    ...$params Extra params to callback
      *
      * @return ExtendedArray
      */
-    public function map(callable $callback): ExtendedArray
+    public function map(callable $callback, array ...$params): ExtendedArray
     {
         $this->saveCursor();
 
+        $preparedParams = $this->_prepareMapParams($params);
+
         $mappedArray = new static();
 
-        foreach ($this as $key => $value) {
-            $mappedArray->offsetSet($key, $callback($value));
+        for (
+            $this->first(), $preparedParams->first();
+            $this->valid(), $preparedParams->valid();
+            $this->next(), $preparedParams->next()
+        ) {
+            $mappedArray->offsetSet(
+                $this->key(),
+                call_user_func_array(
+                    $callback,
+                    $preparedParams->element()
+                )
+            );
         }
 
         $this->restoreCursor();
