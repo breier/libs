@@ -60,20 +60,13 @@ class ExtendedArray extends ExtendedArrayBase
      */
     public function contains($needle, $strict = false): bool
     {
-        $compare = $strict
-            ? function ($a, $b) {
-                return $a === $b;
-            }
-        : function ($a, $b) {
-            return (object) $a == (object) $b;
-        };
-
+        $compare = $this->_getCompareFunction($strict);
         $isContained = false;
 
         $this->saveCursor();
 
         foreach ($this as $element) {
-            if ($compare($element, $needle)) {
+            if (call_user_func_array($compare, [$element, $needle])) {
                 $isContained = true;
                 break;
             }
@@ -246,5 +239,25 @@ class ExtendedArray extends ExtendedArrayBase
                 return rand(-1, 1);
             }
         );
+    }
+
+    /**
+     * Get Compare Function
+     *
+     * @param bool $strict or not
+     *
+     * @return callable
+     */
+    private function _getCompareFunction(bool $strict = false): callable
+    {
+        if ($strict) {
+            return function ($a, $b) {
+                return $a === $b;
+            };
+        }
+
+        return function ($a, $b) {
+            return (object) $a == (object) $b;
+        };
     }
 }
