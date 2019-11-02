@@ -291,10 +291,19 @@ class ExtendedArrayTest extends TestCase
         $jsonStringifiedArray[0] = json_encode($jsonStringifiedArray[0]);
         $jsonStringifiedArray['six'] = json_encode($jsonStringifiedArray['six']);
         natcasesort($jsonStringifiedArray);
-        $jsonStringifiedArray['six'] = json_decode($jsonStringifiedArray['six'], true);
-        $jsonStringifiedArray[0] = json_decode($jsonStringifiedArray[0], true);
+        $jsonStringifiedArray['six'] = json_decode(
+            $jsonStringifiedArray['six'],
+            true
+        );
+        $jsonStringifiedArray[0] = json_decode(
+            $jsonStringifiedArray[0],
+            true
+        );
         $this->extendedArray->natcasesort();
-        $this->assertSame($jsonStringifiedArray, $this->extendedArray->getArrayCopy());
+        $this->assertSame(
+            $jsonStringifiedArray,
+            $this->extendedArray->getArrayCopy()
+        );
         $this->assertSame(
             array_keys($jsonStringifiedArray),
             $this->extendedArray->keys()->getArrayCopy()
@@ -313,10 +322,19 @@ class ExtendedArrayTest extends TestCase
         $jsonStringifiedArray[0] = json_encode($jsonStringifiedArray[0]);
         $jsonStringifiedArray['six'] = json_encode($jsonStringifiedArray['six']);
         natsort($jsonStringifiedArray);
-        $jsonStringifiedArray['six'] = json_decode($jsonStringifiedArray['six'], true);
-        $jsonStringifiedArray[0] = json_decode($jsonStringifiedArray[0], true);
+        $jsonStringifiedArray['six'] = json_decode(
+            $jsonStringifiedArray['six'],
+            true
+        );
+        $jsonStringifiedArray[0] = json_decode(
+            $jsonStringifiedArray[0],
+            true
+        );
         $this->extendedArray->natsort();
-        $this->assertSame($jsonStringifiedArray, $this->extendedArray->getArrayCopy());
+        $this->assertSame(
+            $jsonStringifiedArray,
+            $this->extendedArray->getArrayCopy()
+        );
         $this->assertSame(
             array_keys($jsonStringifiedArray),
             $this->extendedArray->keys()->getArrayCopy()
