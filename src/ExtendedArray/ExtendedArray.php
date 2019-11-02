@@ -173,19 +173,23 @@ class ExtendedArray extends ExtendedArrayBase
     /**
      * Map, poly-fill for `array_map`
      *
-     * @param callable $callback  Function to use
-     * @param array    ...$params Extra parameters for the callback
+     * @param callable $callback Function to use
      *
      * @return ExtendedArray
      */
-    public function map(callable $callback, array ...$params): ExtendedArray
+    public function map(callable $callback): ExtendedArray
     {
-        return new static(
-            call_user_func_array(
-                "array_map",
-                array_merge([$callback, $this->getArrayCopy()], $params)
-            )
-        );
+        $this->saveCursor();
+
+        $mappedArray = new static();
+
+        foreach ($this as $key => $value) {
+            $mappedArray->offsetSet($key, $callback($value));
+        }
+
+        $this->restoreCursor();
+
+        return $mappedArray;
     }
 
     /**
