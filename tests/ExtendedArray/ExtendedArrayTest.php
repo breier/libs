@@ -847,6 +847,20 @@ class ExtendedArrayTest extends TestCase
     }
 
     /**
+     * Test array values return as expected
+     *
+     * @return null
+     * @test   array values return as expected
+     */
+    public function returnedValuesAsExpected(): void
+    {
+        $this->assertSame(
+            array_values($this->plainArray),
+            $this->extendedArray->values()->getArrayCopy()
+        );
+    }
+
+    /**
      * Test 1000 ElementArray takes less than 50ms
      *
      * @return null

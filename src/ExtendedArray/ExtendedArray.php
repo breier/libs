@@ -275,4 +275,82 @@ class ExtendedArray extends ExtendedArrayBase
             return (object) $a == (object) $b;
         };
     }
+
+    /**
+     * Get Values in a numbered key array, poly-fill for `array_values`
+     *
+     * @return ExtendedArray
+     */
+    public function values(): ExtendedArray
+    {
+        $this->saveCursor();
+
+        $valuesArray = new static();
+
+        for ($this->first(); $this->valid(); $this->next()) {
+            $valuesArray->append($this->element());
+        }
+
+        $this->restoreCursor();
+
+        return $valuesArray;
+    }
+
+    /**
+     * Prepare Map Params
+     *
+     * @param array $params To be mapped
+     *
+     * @return ExtendedArray
+     */
+    private function _prepareMapParams(array $params = null): ExtendedArray
+    {
+        $preparedParams = $this->values();
+
+        foreach ($params as $array) {
+            $preparedParams->_mergePush($array);
+        }
+
+        foreach ($preparedParams as &$element) {
+            if (!is_array($element)) {
+                $element = [$element];
+            }
+        }
+
+        return $preparedParams;
+    }
+
+    /**
+     * Merge Push adds values from another array into this.
+     *
+     * @param mixed $array To merge push
+     *
+     * @return null
+     */
+    private function _mergePush($array): void
+    {
+        $tempArray = new static($array);
+
+        for (
+            $this->first(), $tempArray->first();
+            $this->valid(), $tempArray->valid();
+            $this->next(), $tempArray->next()
+        ) {
+            if (!is_array($this->element())) {
+                $this->offsetSet(
+                    $this->key(),
+                    [$this->element(), $tempArray->element()]
+                );
+                continue;
+            }
+
+            $this->offsetSet(
+                $this->key(),
+                array_merge(
+                    $this->element(),
+                    [$tempArray->element()]
+                )
+            );
+        }
+    }
 }
