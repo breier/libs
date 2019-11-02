@@ -95,12 +95,23 @@ class ExtendedArray extends ExtendedArrayBase
             };
         }
 
-        return new static(
-            call_user_func_array(
-                "array_filter",
-                [$this->getArrayCopy(), $callback, $flag]
-            )
-        );
+        $this->saveCursor();
+
+        $filteredArray = new static();
+
+        foreach ($this as $key => $value) {
+            $params = ($flag !== ARRAY_FILTER_USE_BOTH)
+                ? ($flag === ARRAY_FILTER_USE_KEY) ? [$key] : [$value]
+                : [$value, $key];
+
+            if (call_user_func_array($callback, $params)) {
+                $filteredArray->offsetSet($key, $value);
+            }
+        }
+
+        $this->restoreCursor();
+
+        return $filteredArray;
     }
 
     /**
