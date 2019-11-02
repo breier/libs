@@ -744,10 +744,13 @@ class ExtendedArrayTest extends TestCase
             }
             return strlen($item);
         };
+        next($this->plainArray);
+        $this->extendedArray->next();
         $this->assertSame(
             array_map($strlenMap, $this->plainArray),
             $this->extendedArray->map($strlenMap)->getArrayCopy()
         );
+        $this->assertSame(key($this->plainArray), $this->extendedArray->key());
 
         /**
          * String Conversion Mapping
@@ -758,10 +761,13 @@ class ExtendedArrayTest extends TestCase
             }
             return (string) $item;
         };
+        next($this->plainArray);
+        $this->extendedArray->next();
         $this->assertSame(
             array_map($toStringMap, $this->plainArray),
             $this->extendedArray->map($toStringMap)->getArrayCopy()
         );
+        $this->assertSame(key($this->plainArray), $this->extendedArray->key());
 
         /**
          * Cube Mapping
@@ -775,10 +781,13 @@ class ExtendedArrayTest extends TestCase
             }
             return $item * $item * $item;
         };
+        next($this->plainArray);
+        $this->extendedArray->next();
         $this->assertSame(
             array_map($cubeMap, $this->plainArray),
             $this->extendedArray->map($cubeMap)->getArrayCopy()
         );
+        $this->assertSame(key($this->plainArray), $this->extendedArray->key());
 
         /**
          * Is Array Map
@@ -786,11 +795,37 @@ class ExtendedArrayTest extends TestCase
         $isArrayMap = function ($item) {
             return ExtendedArray::isArray($item);
         };
+        next($this->plainArray);
+        $this->extendedArray->next();
         $this->assertSame(
             array_map($isArrayMap, $this->plainArray),
             $this->extendedArray->map($isArrayMap)->getArrayCopy()
         );
+        $this->assertSame(key($this->plainArray), $this->extendedArray->key());
 
+        /**
+         * Extra Params Map
+         */
+        $extraParamsMap = function ($item, $name, $city) {
+            return [$item => [$name => $city]];
+        };
+        $itemArray = [99, 27, 43, 56];
+        $nameArray = ['Umbrela', 'Lolypop', 'Tire', 'Cap'];
+        $cityArray = ['Dublin', 'Paris', 'Alabama', 'Chicago'];
+        $extendedItems = new ExtendedArray($itemArray);
+        $this->assertSame(
+            array_map(
+                $extraParamsMap,
+                $itemArray,
+                $nameArray,
+                $cityArray
+            ),
+            $extendedItems->map(
+                $extraParamsMap,
+                $nameArray,
+                $cityArray
+            )->getArrayCopy()
+        );
     }
 
     /**
