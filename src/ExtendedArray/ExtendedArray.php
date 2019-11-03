@@ -31,9 +31,9 @@ class ExtendedArray extends ExtendedArrayBase
     /**
      * Reverse Sort by element, poly-fill for `arsort`
      *
-     * @return void
+     * @return ExtendedArray
      */
-    public function arsort(): void
+    public function arsort(): ExtendedArray
     {
         $this->uasort(
             function ($a, $b) {
@@ -46,6 +46,8 @@ class ExtendedArray extends ExtendedArrayBase
                 return $a < $b ? 1 : -1;
             }
         );
+
+        return $this;
     }
 
     /**
@@ -159,15 +161,17 @@ class ExtendedArray extends ExtendedArrayBase
     /**
      * Reverse Sort by index, poly-fill for `krsort`
      *
-     * @return void
+     * @return ExtendedArray
      */
-    public function krsort(): void
+    public function krsort(): ExtendedArray
     {
         $this->uksort(
             function ($a, $b) {
                 return $a < $b ? 1 : -1;
             }
         );
+
+        return $this;
     }
 
     /**
@@ -262,35 +266,17 @@ class ExtendedArray extends ExtendedArrayBase
     /**
      * Shuffle Elements Randomly, poly-fill for `shuffle`
      *
-     * @return void
+     * @return ExtendedArray
      */
-    public function shuffle(): void
+    public function shuffle(): ExtendedArray
     {
         $this->uasort(
             function ($a, $b) {
                 return rand(-1, 1);
             }
         );
-    }
 
-    /**
-     * Get Compare Function
-     *
-     * @param bool $strict or not
-     *
-     * @return callable
-     */
-    private function _getCompareFunction(bool $strict = false): callable
-    {
-        if ($strict) {
-            return function ($a, $b) {
-                return $a === $b;
-            };
-        }
-
-        return function ($a, $b) {
-            return (object) $a == (object) $b;
-        };
+        return $this;
     }
 
     /**
@@ -314,60 +300,22 @@ class ExtendedArray extends ExtendedArrayBase
     }
 
     /**
-     * Prepare Map Params
+     * Get Compare Function
      *
-     * @param array $params To be mapped
+     * @param bool $strict or not
      *
-     * @return ExtendedArray
+     * @return callable
      */
-    private function _prepareMapParams(array $params = null): ExtendedArray
+    private function _getCompareFunction(bool $strict = false): callable
     {
-        $preparedParams = $this->values();
-
-        foreach ($params as $array) {
-            $preparedParams->_mergePush($array);
+        if ($strict) {
+            return function ($a, $b) {
+                return $a === $b;
+            };
         }
 
-        foreach ($preparedParams as &$element) {
-            if (!is_array($element)) {
-                $element = [$element];
-            }
-        }
-
-        return $preparedParams;
-    }
-
-    /**
-     * Merge Push adds values from another array into this.
-     *
-     * @param mixed $array To merge push
-     *
-     * @return null
-     */
-    private function _mergePush($array): void
-    {
-        $tempArray = new static($array);
-
-        for (
-            $this->first(), $tempArray->first();
-            $this->valid(), $tempArray->valid();
-            $this->next(), $tempArray->next()
-        ) {
-            if (!is_array($this->element())) {
-                $this->offsetSet(
-                    $this->key(),
-                    [$this->element(), $tempArray->element()]
-                );
-                continue;
-            }
-
-            $this->offsetSet(
-                $this->key(),
-                array_merge(
-                    $this->element(),
-                    [$tempArray->element()]
-                )
-            );
-        }
+        return function ($a, $b) {
+            return (object) $a == (object) $b;
+        };
     }
 }
