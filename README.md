@@ -6,3 +6,9 @@ A class that extends from PHP-SPL ArrayIterator and implements
 loads of functionalities from PHP plain array handling.
 
 Documentation can be found [here](./src/ExtendedArray/README.md).
+
+## Author
+Andre Breier <breier.de@gmail.com>
+
+## License
+GNU Public License v3 - Refer to [LICENSE](./LICENSE)
