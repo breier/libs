@@ -261,7 +261,7 @@ abstract class ExtendedArrayBase extends ArrayIterator
      * Set an element with index name
      *
      * @param int|string $index  Key of the item
-     * @param mixed      $newval to be set
+     * @param mixed      $newval To be set
      *
      * @return null
      */
@@ -270,6 +270,13 @@ abstract class ExtendedArrayBase extends ArrayIterator
         $isAppend = !is_null($index)
             ? !$this->offsetExists($index)
             : true;
+
+        if (is_array($newval)
+            || self::isArrayObject($newval)
+            || $newval instanceof SplFixedArray
+        ) {
+            $newval = new static($newval);
+        }
 
         parent::offsetSet($index, $newval);
 
