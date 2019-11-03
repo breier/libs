@@ -60,7 +60,7 @@ class ExtendedArray extends ExtendedArrayBase
      *
      * @TO-DO review once array_search is implemented
      */
-    public function contains($needle, $strict = false): bool
+    public function contains($needle, bool $strict = false): bool
     {
         $compare = $this->_getCompareFunction($strict);
         $isContained = false;
