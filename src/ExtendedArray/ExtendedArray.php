@@ -96,6 +96,32 @@ class ExtendedArray extends ExtendedArrayBase
                 return !empty($value);
             };
         }
+        return new static(
+            call_user_func_array(
+                "array_filter",
+                [$this->getArrayCopy(), $callback, $flag]
+            )
+        );
+    }
+
+    /**
+     * Extending Filter to support objects
+     *
+     * @param callable $callback Function to use
+     * @param int      $flag     (ARRAY_FILTER_USE_KEY, ARRAY_FILTER_USE_BOTH)
+     *
+     * @return ExtendedArray
+     */
+    public function filterWithObjects(
+        callable $callback = null,
+        int $flag = 0
+    ): ExtendedArray {
+        if (is_null($callback)) {
+            $flag = 0;
+            $callback = function ($value) {
+                return !empty($value);
+            };
+        }
 
         $this->saveCursor();
 
