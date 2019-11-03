@@ -53,7 +53,7 @@ abstract class ExtendedArrayBase extends ArrayIterator
     /**
      * Instantiate an Extended Array
      *
-     * @param array $array To be parsed into properties
+     * @param mixed $array To be parsed into properties
      * @param int   $flags (STD_PROP_LIST | ARRAY_AS_PROPS)
      */
     public function __construct($array = null, int $flags = 2)
@@ -190,7 +190,7 @@ abstract class ExtendedArrayBase extends ArrayIterator
      *
      * @return string
      */
-    public function jsonSerialize(int $options = 0, $depth = 512): string
+    public function jsonSerialize(int $options = 0, int $depth = 512): string
     {
         return json_encode($this, $options, $depth);
     }
