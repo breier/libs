@@ -491,8 +491,8 @@ class ExtendedArrayTest extends TestCase
         $this->plainArray['simple'] = $this->splFixedArray;
         $this->extendedArray->simple = $this->splFixedArray;
         $this->assertSame(
-            $this->plainArray['simple'],
-            $this->extendedArray->simple
+            $this->plainArray['simple']->toArray(),
+            $this->extendedArray->simple->getArrayCopy()
         );
         $this->assertSame(
             array_keys($this->plainArray),
@@ -531,8 +531,8 @@ class ExtendedArrayTest extends TestCase
         $this->plainArray['set'] = $this->splFixedArray;
         $this->extendedArray->offsetSet('set', $this->splFixedArray);
         $this->assertSame(
-            $this->plainArray['set'],
-            $this->extendedArray->offsetGet('set')
+            $this->plainArray['set']->toArray(),
+            $this->extendedArray->offsetGet('set')->getArrayCopy()
         );
         $this->assertSame(
             array_keys($this->plainArray),
