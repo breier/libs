@@ -97,9 +97,9 @@ abstract class ExtendedArrayBase extends ArrayIterator
      * Extending ASort Method to support sub-arrays
      * Sort ascending by elements
      *
-     * @return null
+     * @return ExtendedArrayBase
      */
-    public function asort(): void
+    public function asort(): ExtendedArrayBase
     {
         $this->uasort(
             function ($a, $b) {
@@ -112,6 +112,8 @@ abstract class ExtendedArrayBase extends ArrayIterator
                 return $a < $b ? -1 : 1;
             }
         );
+
+        return $this;
     }
 
     /**
@@ -199,13 +201,15 @@ abstract class ExtendedArrayBase extends ArrayIterator
      * Extending KSort Method to update position map
      * Sort ascending by element indexes
      *
-     * @return null
+     * @return ExtendedArrayBase
      */
-    public function ksort(): void
+    public function ksort(): ExtendedArrayBase
     {
         parent::ksort();
 
         $this->_updatePositionMap();
+
+        return $this;
     }
 
     /**
@@ -222,26 +226,30 @@ abstract class ExtendedArrayBase extends ArrayIterator
      * Extending NatCaseSort Method to update position map
      * Sort elements using case insensitive "natural order"
      *
-     * @return null
+     * @return ExtendedArrayBase
      */
-    public function natcasesort(): void
+    public function natcasesort(): ExtendedArrayBase
     {
         parent::natcasesort();
 
         $this->_updatePositionMap();
+
+        return $this;
     }
 
     /**
      * Extending NatSort Method to update position map
      * Sort elements using "natural order"
      *
-     * @return null
+     * @return ExtendedArrayBase
      */
-    public function natsort(): void
+    public function natsort(): ExtendedArrayBase
     {
         parent::natsort();
 
         $this->_updatePositionMap();
+
+        return $this;
     }
 
     /**
@@ -386,13 +394,15 @@ abstract class ExtendedArrayBase extends ArrayIterator
      *
      * @param callable $cmp_function to compare
      *
-     * @return null
+     * @return ExtendedArrayBase
      */
-    public function uasort($cmp_function): void
+    public function uasort($cmp_function): ExtendedArrayBase
     {
         parent::uasort($cmp_function);
 
         $this->_updatePositionMap();
+
+        return $this;
     }
 
     /**
@@ -401,13 +411,15 @@ abstract class ExtendedArrayBase extends ArrayIterator
      *
      * @param callable $cmp_function to compare
      *
-     * @return null
+     * @return ExtendedArrayBase
      */
-    public function uksort($cmp_function): void
+    public function uksort($cmp_function): ExtendedArrayBase
     {
         parent::uksort($cmp_function);
 
         $this->_updatePositionMap();
+
+        return $this;
     }
 
     /**
