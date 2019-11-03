@@ -158,7 +158,7 @@ abstract class ExtendedArrayBase extends ArrayIterator
         $plainArray = parent::getArrayCopy();
 
         foreach ($plainArray as &$item) {
-            if ($item instanceof ExtendedArrayBase) {
+            if (self::isArrayObject($item)) {
                 $item = $item->getArrayCopy();
             }
         }
