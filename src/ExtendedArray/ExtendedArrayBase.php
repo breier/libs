@@ -79,6 +79,8 @@ abstract class ExtendedArrayBase extends ArrayIterator
         parent::__construct($array, $flags);
 
         $this->_updatePositionMap();
+
+        $this->rewind();
     }
 
     /**
@@ -445,8 +447,6 @@ abstract class ExtendedArrayBase extends ArrayIterator
         for ($this->first(); $this->valid(); $this->next()) {
             array_push($this->_positionMap, $this->key());
         }
-
-        $this->rewind();
     }
 
     /**
