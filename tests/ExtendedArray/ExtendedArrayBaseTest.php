@@ -16,8 +16,6 @@ namespace Test\ExtendedArray;
 use Breier\ExtendedArray\ExtendedArrayBase;
 use PHPUnit\Framework\TestCase;
 
-use Breier\ExtendedArray\ExtendedArrayException;
-
 use ArrayIterator;
 use ArrayObject;
 use SplFixedArray;
@@ -36,11 +34,11 @@ class ExtendedArrayBaseClass extends ExtendedArrayBase
     /**
      * Get Keys
      *
-     * @return ExtendedArrayBaseClass
+     * @return array
      */
-    public function keys(): ExtendedArrayBaseClass
+    public function keys(): array
     {
-        return new ExtendedArrayBaseClass($this->getPositionMap());
+        return $this->getPositionMap();
     }
 }
 
@@ -82,409 +80,269 @@ class ExtendedArrayBaseTest extends TestCase
         $this->extendedArray = new ExtendedArrayBaseClass($this->plainArray);
         $this->arrayIterator = new ArrayIterator($this->plainArray);
         $this->arrayObject = new ArrayObject($this->plainArray);
-        $this->splFixedArray = new SplFixedArray(count($this->plainArray));
-
-        $index = 0;
-        foreach ($this->plainArray as $value) {
-            $this->splFixedArray->offsetSet($index++, $value);
-        }
+        $this->splFixedArray = SplFixedArray::fromArray(
+            array_values($this->plainArray)
+        );
     }
 
     /**
-     * Test array works with every array type
+     * Test Instantiate Array
      *
      * @return null
-     * @test   array works with every array type
      */
-    public function worksWithAllArrayTypes(): void
+    public function testInstantiateArray(): void
     {
-        /**
-         * Instantiated with Array
-         */
+        $this->extendedArray->next();
+        next($this->plainArray);
+
         $this->assertSame(
             $this->plainArray,
             $this->extendedArray->getArrayCopy()
         );
+        $this->assertSame(
+            array_keys($this->plainArray),
+            $this->extendedArray->keys()
+        );
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
+    }
 
-        /**
-         * Instantiated with ArrayIterator(array)
-         */
+    /**
+     * Test Instantiate ArrayIterator
+     *
+     * @return null
+     */
+    public function testInstantiateArrayIterator(): void
+    {
+        $newFromArrayIterator = new ExtendedArrayBaseClass($this->arrayIterator);
+        $newFromArrayIterator->next();
+        next($this->plainArray);
+
         $this->assertSame(
             $this->plainArray,
-            (new ExtendedArrayBaseClass($this->arrayIterator))->getArrayCopy()
+            $newFromArrayIterator->getArrayCopy()
         );
+        $this->assertSame(
+            array_keys($this->plainArray),
+            $newFromArrayIterator->keys()
+        );
+        $this->assertSame(
+            key($this->plainArray),
+            $newFromArrayIterator->key()
+        );
+    }
 
-        /**
-         * Instantiated with ArrayObject(array)
-         */
+    /**
+     * Test Instantiate ArrayObject
+     *
+     * @return null
+     */
+    public function testInstantiateArrayObject(): void
+    {
+        $newFromArrayObject = new ExtendedArrayBaseClass($this->arrayObject);
+        $newFromArrayObject->next();
+        next($this->plainArray);
+
         $this->assertSame(
             $this->plainArray,
-            (new ExtendedArrayBaseClass($this->arrayObject))->getArrayCopy()
+            $newFromArrayObject->getArrayCopy()
         );
+        $this->assertSame(
+            array_keys($this->plainArray),
+            $newFromArrayObject->keys()
+        );
+        $this->assertSame(
+            key($this->plainArray),
+            $newFromArrayObject->key()
+        );
+    }
 
-        /**
-         * Instantiated empty, then populated by unserialize
-         */
-        $fromSerialized = new ExtendedArrayBaseClass();
-        $fromSerialized->unserialize(
+    /**
+     * Test Instantiate Serialized
+     *
+     * @return null
+     */
+    public function testInstantiateSerialized(): void
+    {
+        $newFromSerialized = new ExtendedArrayBaseClass();
+        $newFromSerialized->unserialize(
             $this->extendedArray->serialize()
         );
+        $newFromSerialized->next();
+        next($this->plainArray);
+
         $this->assertSame(
             $this->plainArray,
-            $fromSerialized->getArrayCopy()
+            $newFromSerialized->getArrayCopy()
         );
+        $this->assertSame(
+            array_keys($this->plainArray),
+            $newFromSerialized->keys()
+        );
+        $this->assertSame(
+            key($this->plainArray),
+            $newFromSerialized->key()
+        );
+    }
 
-        /**
-         * Instantiated with SplFixedArray
-         */
+    /**
+     * Test Instantiate SplFixedArray
+     *
+     * @return null
+     */
+    public function testInstantiateSplFixedArray(): void
+    {
+        $newFromSplFixedArray = new ExtendedArrayBaseClass($this->splFixedArray);
+        $newFromSplFixedArray->next();
+        $this->splFixedArray->next();
+
         $this->assertSame(
             $this->splFixedArray->toArray(),
-            (new ExtendedArrayBaseClass($this->splFixedArray))->getArrayCopy()
+            $newFromSplFixedArray->getArrayCopy()
+        );
+        $this->assertSame(
+            array_keys($this->splFixedArray->toArray()),
+            $newFromSplFixedArray->keys()
+        );
+        $this->assertSame(
+            $this->splFixedArray->key(),
+            $newFromSplFixedArray->key()
         );
     }
 
     /**
-     * Test returned the correct a-sorted array
+     * Test toString
      *
      * @return null
-     * @test   returned the correct a-sorted array
      */
-    public function returnsCorrectASortedArray(): void
+    public function testToString(): void
     {
-        asort($this->plainArray);
-        $this->extendedArray->asort();
-        $this->assertSame($this->plainArray, $this->extendedArray->getArrayCopy());
-        $this->assertSame(
-            array_keys($this->plainArray),
-            $this->extendedArray->keys()->getArrayCopy()
-        );
-    }
-
-    /**
-     * Test returned the correct k-sorted array
-     *
-     * @return null
-     * @test   returned the correct k-sorted array
-     */
-    public function returnsCorrectKSortedArray(): void
-    {
-        ksort($this->plainArray);
-        $this->extendedArray->ksort();
-        $this->assertSame($this->plainArray, $this->extendedArray->getArrayCopy());
-        $this->assertSame(
-            array_keys($this->plainArray),
-            $this->extendedArray->keys()->getArrayCopy()
-        );
-    }
-
-    /**
-     * Test returned the correct u-a-sorted array
-     *
-     * @return null
-     * @test   returned the correct u-a-sorted array
-     */
-    public function returnsCorrectUASortedArray(): void
-    {
-        uasort(
-            $this->plainArray,
-            function ($a, $b) {
-                return md5(json_encode($a)) <=> md5(json_encode($b));
-            }
-        );
-        $this->extendedArray->uasort(
-            function ($a, $b) {
-                return md5(json_encode($a)) <=> md5(json_encode($b));
-            }
-        );
-        $this->assertSame($this->plainArray, $this->extendedArray->getArrayCopy());
-        $this->assertSame(
-            array_keys($this->plainArray),
-            $this->extendedArray->keys()->getArrayCopy()
-        );
-    }
-
-    /**
-     * Test returned the correct u-k-sorted array
-     *
-     * @return null
-     * @test   returned the correct u-k-sorted array
-     */
-    public function returnsCorrectUKSortedArray(): void
-    {
-        uksort(
-            $this->plainArray,
-            function ($a, $b) {
-                return md5(json_encode($a)) <=> md5(json_encode($b));
-            }
-        );
-        $this->extendedArray->uksort(
-            function ($a, $b) {
-                return md5(json_encode($a)) <=> md5(json_encode($b));
-            }
-        );
-        $this->assertSame($this->plainArray, $this->extendedArray->getArrayCopy());
-        $this->assertSame(
-            array_keys($this->plainArray),
-            $this->extendedArray->keys()->getArrayCopy()
-        );
-    }
-
-    /**
-     * Test returned the correct nat-case-sorted array
-     *
-     * @return null
-     * @test   returned the correct nat-case-sorted array
-     */
-    public function returnsCorrectNatCaseSortedArray(): void
-    {
-        $jsonStringifiedArray = $this->plainArray;
-        $jsonStringifiedArray[0] = json_encode($jsonStringifiedArray[0]);
-        $jsonStringifiedArray['six'] = json_encode($jsonStringifiedArray['six']);
-        natcasesort($jsonStringifiedArray);
-        $jsonStringifiedArray['six'] = json_decode(
-            $jsonStringifiedArray['six'],
-            true
-        );
-        $jsonStringifiedArray[0] = json_decode(
-            $jsonStringifiedArray[0],
-            true
-        );
-        $this->extendedArray->natcasesort();
-        $this->assertSame(
-            $jsonStringifiedArray,
-            $this->extendedArray->getArrayCopy()
-        );
-        $this->assertSame(
-            array_keys($jsonStringifiedArray),
-            $this->extendedArray->keys()->getArrayCopy()
-        );
-    }
-
-    /**
-     * Test returned the correct nat-sorted array
-     *
-     * @return null
-     * @test   returned the correct nat-sorted array
-     */
-    public function returnsCorrectNatSortedArray(): void
-    {
-        $jsonStringifiedArray = $this->plainArray;
-        $jsonStringifiedArray[0] = json_encode($jsonStringifiedArray[0]);
-        $jsonStringifiedArray['six'] = json_encode($jsonStringifiedArray['six']);
-        natsort($jsonStringifiedArray);
-        $jsonStringifiedArray['six'] = json_decode(
-            $jsonStringifiedArray['six'],
-            true
-        );
-        $jsonStringifiedArray[0] = json_decode(
-            $jsonStringifiedArray[0],
-            true
-        );
-        $this->extendedArray->natsort();
-        $this->assertSame(
-            $jsonStringifiedArray,
-            $this->extendedArray->getArrayCopy()
-        );
-        $this->assertSame(
-            array_keys($jsonStringifiedArray),
-            $this->extendedArray->keys()->getArrayCopy()
-        );
-    }
-
-    /**
-     * Test cursor moves around as expected
-     *
-     * @return null
-     * @test   cursor moves around as expected
-     */
-    public function cursorMovesAroundAsExpected(): void
-    {
-        $this->assertSame(key($this->plainArray), $this->extendedArray->key());
-
-        end($this->plainArray);
-        $this->extendedArray->last();
-        $this->assertSame(key($this->plainArray), $this->extendedArray->key());
-
-        reset($this->plainArray);
-        $this->extendedArray->first();
-        $this->assertSame(key($this->plainArray), $this->extendedArray->key());
-
-        next($this->plainArray);
         $this->extendedArray->next();
-        $this->assertSame(key($this->plainArray), $this->extendedArray->key());
+        next($this->plainArray);
 
-        $this->assertSame(1, $this->extendedArray->pos());
-
-        prev($this->plainArray);
-        $this->extendedArray->prev();
-        $this->assertSame(key($this->plainArray), $this->extendedArray->key());
-
-        prev($this->plainArray);
-        $this->extendedArray->prev();
-        $this->assertSame(key($this->plainArray), $this->extendedArray->key());
-
-        $this->extendedArray->seek(2);
+        $magicStringFromObject = sprintf("%s", $this->extendedArray);
         $this->assertSame(
-            $this->plainArray[$this->extendedArray->key()],
-            $this->extendedArray->element()
-        );
-
-        $this->seekKey($this->plainArray, 7);
-        $this->extendedArray->seekKey(7);
-        $this->assertSame(key($this->plainArray), $this->extendedArray->key());
-    }
-
-    /**
-     * Test throw ExtendedArrayException for non-existent key
-     *
-     * @return null
-     * @test   throw ExtendedArrayException for non-existent key
-     */
-    public function throwsForNonExistentKey(): void
-    {
-        $this->expectException(ExtendedArrayException::class);
-
-        $this->extendedArray->seekKey('non-existent');
-    }
-
-    /**
-     * Test simple set / unset
-     *
-     * @return null
-     * @test   simple set / unset
-     */
-    public function simpleSetUnset(): void
-    {
-        /**
-         * OffsetSet existent key (simple)
-         */
-        $this->plainArray[7] = 'seven';
-        $this->extendedArray->{7} = 'seven';
-        $this->assertSame($this->plainArray[7], $this->extendedArray->{7});
-
-        /**
-         * OffsetSet new key (simple)
-         */
-        $this->plainArray['simple'] = $this->splFixedArray;
-        $this->extendedArray->simple = $this->splFixedArray;
-        $this->assertSame(
-            $this->plainArray['simple']->toArray(),
-            $this->extendedArray->simple->getArrayCopy()
+            $magicStringFromObject,
+            $this->extendedArray->jsonSerialize()
         );
         $this->assertSame(
-            array_keys($this->plainArray),
-            $this->extendedArray->keys()->getArrayCopy()
-        );
-
-        /**
-         * OffsetUnset new key (simple)
-         */
-        unset($this->plainArray['simple']);
-        unset($this->extendedArray->simple);
-        $this->assertSame(
-            array_keys($this->plainArray),
-            $this->extendedArray->keys()->getArrayCopy()
+            key($this->plainArray),
+            $this->extendedArray->key()
         );
     }
 
     /**
-     * Test Offset Set / Unset
+     * Test Append [indirect]
      *
      * @return null
-     * @test   Offset Set / Unset
      */
-    public function offsetSetUnset(): void
+    public function testAppend(): void
     {
-        /**
-         * OffsetSet existent key (set)
-         */
-        $this->plainArray[8] = 'eight';
-        $this->extendedArray->offsetSet(8, 'eight');
-        $this->assertSame($this->plainArray[8], $this->extendedArray->offsetGet(8));
+        $this->extendedArray->next();
+        next($this->plainArray);
 
-        /**
-         * OffsetSet new key (set)
-         */
-        $this->plainArray['set'] = $this->splFixedArray;
-        $this->extendedArray->offsetSet('set', $this->splFixedArray);
-        $this->assertSame(
-            $this->plainArray['set']->toArray(),
-            $this->extendedArray->offsetGet('set')->getArrayCopy()
-        );
-        $this->assertSame(
-            array_keys($this->plainArray),
-            $this->extendedArray->keys()->getArrayCopy()
-        );
-
-        /**
-         * OffsetUnset new key (set)
-         */
-        unset($this->plainArray['set']);
-        $this->extendedArray->offsetUnset('set');
-        $this->assertSame(
-            array_keys($this->plainArray),
-            $this->extendedArray->keys()->getArrayCopy()
-        );
-    }
-
-    /**
-     * Test Append element
-     *
-     * @return null
-     * @test   append element
-     */
-    public function appendElement(): void
-    {
-        array_push($this->plainArray, 'appended element');
         $this->extendedArray->append('appended element');
+        array_push($this->plainArray, 'appended element');
+ 
         $this->assertSame(
             $this->plainArray,
             $this->extendedArray->getArrayCopy()
         );
         $this->assertSame(
             array_keys($this->plainArray),
-            $this->extendedArray->keys()->getArrayCopy()
+            $this->extendedArray->keys()
+        );
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
         );
     }
 
     /**
-     * Test returned the correct array as JSON
+     * Test Asort
      *
      * @return null
-     * @test   returned the correct array as JSON
      */
-    public function returnedArrayAsJSON(): void
+    public function testAsort(): void
     {
-        /**
-         * Default JSON
-         */
-        $plainArrayJSON = json_encode($this->plainArray);
-        $extendedArrayJSON = $this->extendedArray->jsonSerialize();
+        $this->extendedArray->next();
+        next($this->plainArray);
 
-        $this->assertSame($plainArrayJSON, $extendedArrayJSON);
+        asort($this->plainArray);
 
-        /**
-         * Pretty JSON
-         */
-        $plainArrayPrettyJSON = json_encode(
+        $this->assertSame(
             $this->plainArray,
-            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+            $this->extendedArray->asort()->getArrayCopy()
         );
-        $extendedArrayPrettyJSON = $this->extendedArray->jsonSerialize(
-            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+        $this->assertSame(
+            array_keys($this->plainArray),
+            $this->extendedArray->keys()
         );
-
-        $this->assertSame($plainArrayPrettyJSON, $extendedArrayPrettyJSON);
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
     }
 
     /**
-     * Test Is Array Object works with all array objects
+     * Test Element
      *
      * @return null
-     * @test   Is Array Object works with all array objects
      */
-    public function isArrayObjectWorksWithAllArrayObjects(): void
+    public function testElement(): void
     {
+        $this->extendedArray->next();
+        next($this->plainArray);
+
+        $this->assertSame(
+            current($this->plainArray),
+            $this->extendedArray->element()->getArrayCopy()
+        );
+    }
+
+    /**
+     * Test End
+     *
+     * @return null
+     */
+    public function testEnd(): void
+    {
+        end($this->plainArray);
+
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->end()->key()
+        );
+    }
+
+    /**
+     * Test First
+     *
+     * @return null
+     */
+    public function testFirst(): void
+    {
+        reset($this->plainArray);
+
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->first()->key()
+        );
+    }
+
+    /**
+     * Test Is Array Object
+     *
+     * @return null
+     */
+    public function testIsArrayObject(): void
+    {
+        $this->extendedArray->next();
+        next($this->plainArray);
+
+        $this->assertTrue(is_array($this->plainArray));
         $this->assertTrue(
             ExtendedArrayBaseClass::isArrayObject($this->extendedArray)
         );
@@ -509,6 +367,423 @@ class ExtendedArrayBaseTest extends TestCase
                 $this->extendedArray->jsonSerialize()
             )
         );
+
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
+    }
+
+    /**
+     * Test Json Serialize
+     *
+     * @return null
+     */
+    public function testJsonSerialize(): void
+    {
+        $this->extendedArray->next();
+        next($this->plainArray);
+
+        $plainArrayJSON = json_encode($this->plainArray);
+        $extendedArrayJSON = $this->extendedArray->jsonSerialize();
+        $this->assertSame(
+            $plainArrayJSON,
+            $extendedArrayJSON
+        );
+
+        $plainArrayPrettyJSON = json_encode(
+            $this->plainArray,
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+        );
+        $extendedArrayPrettyJSON = $this->extendedArray->jsonSerialize(
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+        );
+        $this->assertSame(
+            $plainArrayPrettyJSON,
+            $extendedArrayPrettyJSON
+        );
+
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
+    }
+
+    /**
+     * Test Ksort
+     *
+     * @return null
+     */
+    public function testKsort(): void
+    {
+        $this->extendedArray->next();
+        next($this->plainArray);
+
+        ksort($this->plainArray);
+
+        $this->assertSame(
+            $this->plainArray,
+            $this->extendedArray->ksort()->getArrayCopy()
+        );
+        $this->assertSame(
+            array_keys($this->plainArray),
+            $this->extendedArray->keys()
+        );
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
+    }
+
+    /**
+     * Test Last
+     *
+     * @return null
+     */
+    public function testLast(): void
+    {
+        end($this->plainArray);
+
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->last()->key()
+        );
+    }
+
+    /**
+     * Test NatCaseSort
+     *
+     * @return null
+     */
+    public function testNatCaseSort(): void
+    {
+        $this->extendedArray->next();
+        next($this->plainArray);
+
+        $this->plainArray[0] = json_encode($this->plainArray[0]);
+        $this->plainArray['six'] = json_encode($this->plainArray['six']);
+        natcasesort($this->plainArray);
+        $this->plainArray['six'] = json_decode($this->plainArray['six'], true);
+        $this->plainArray[0] = json_decode($this->plainArray[0], true);
+
+        $this->assertSame(
+            $this->plainArray,
+            $this->extendedArray->natcasesort()->getArrayCopy()
+        );
+        $this->assertSame(
+            array_keys($this->plainArray),
+            $this->extendedArray->keys()
+        );
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
+    }
+
+    /**
+     * Test NarSort
+     *
+     * @return null
+     */
+    public function testNatSort(): void
+    {
+        $this->extendedArray->next();
+        next($this->plainArray);
+
+        $this->plainArray[0] = json_encode($this->plainArray[0]);
+        $this->plainArray['six'] = json_encode($this->plainArray['six']);
+        natsort($this->plainArray);
+        $this->plainArray['six'] = json_decode($this->plainArray['six'], true);
+        $this->plainArray[0] = json_decode($this->plainArray[0], true);
+
+        $this->assertSame(
+            $this->plainArray,
+            $this->extendedArray->natsort()->getArrayCopy()
+        );
+        $this->assertSame(
+            array_keys($this->plainArray),
+            $this->extendedArray->keys()
+        );
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
+    }
+
+    /**
+     * Test Next
+     *
+     * @return null
+     */
+    public function testNext(): void
+    {
+        next($this->plainArray);
+
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->next()->key()
+        );
+
+        end($this->plainArray);
+        next($this->plainArray);
+
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->end()->next()->key()
+        );
+    }
+
+    /**
+     * Test OffsetSet
+     *
+     * @return null
+     */
+    public function testOffsetSet(): void
+    {
+        $this->extendedArray->next();
+        next($this->plainArray);
+
+        /**
+         * Overwriting as property
+         */
+        $this->extendedArray->{7} = 'seven';
+        $this->plainArray[7] = 'seven';
+        $this->assertSame(
+            $this->plainArray[7],
+            $this->extendedArray->{7}
+        );
+        $this->assertSame(
+            array_keys($this->plainArray),
+            $this->extendedArray->keys()
+        );
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
+
+        $this->extendedArray->next();
+        next($this->plainArray);
+
+        /**
+         * Adding as property
+         */
+        $this->extendedArray->simple = $this->splFixedArray;
+        $this->plainArray['simple'] = $this->splFixedArray;
+        $this->assertSame(
+            $this->plainArray['simple']->toArray(),
+            $this->extendedArray->simple->getArrayCopy()
+        );
+        $this->assertSame(
+            array_keys($this->plainArray),
+            $this->extendedArray->keys()
+        );
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
+
+        $this->extendedArray->next();
+        next($this->plainArray);
+
+        /**
+         * Overwriting with OffsetSet
+         */
+        $this->extendedArray->offsetSet(8, 'eight');
+        $this->plainArray[8] = 'eight';
+        $this->assertSame(
+            $this->plainArray[8],
+            $this->extendedArray->offsetGet(8)
+        );
+        $this->assertSame(
+            array_keys($this->plainArray),
+            $this->extendedArray->keys()
+        );
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
+
+        $this->extendedArray->next();
+        next($this->plainArray);
+
+        /**
+         * Adding with OffsetSet
+         */
+        $this->extendedArray->offsetSet('set', $this->splFixedArray);
+        $this->plainArray['set'] = $this->splFixedArray;
+        $this->assertSame(
+            $this->plainArray['set']->toArray(),
+            $this->extendedArray->offsetGet('set')->getArrayCopy()
+        );
+        $this->assertSame(
+            array_keys($this->plainArray),
+            $this->extendedArray->keys()
+        );
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
+    }
+
+    /**
+     * Test OffsetUnset
+     *
+     * @return null
+     */
+    public function testOffsetUnset(): void
+    {
+        $this->extendedArray->next();
+        next($this->plainArray);
+
+        /**
+         * Unset as property
+         */
+        unset($this->plainArray['six']);
+        unset($this->extendedArray->six);
+        $this->assertSame(
+            $this->plainArray,
+            $this->extendedArray->getArrayCopy()
+        );
+        $this->assertSame(
+            array_keys($this->plainArray),
+            $this->extendedArray->keys()
+        );
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
+
+        $this->extendedArray->next();
+        next($this->plainArray);
+
+        /**
+         * Unset with OffsetUnset
+         */
+        unset($this->plainArray[7]);
+        $this->extendedArray->offsetUnset(7);
+        $this->assertSame(
+            $this->plainArray,
+            $this->extendedArray->getArrayCopy()
+        );
+        $this->assertSame(
+            array_keys($this->plainArray),
+            $this->extendedArray->keys()
+        );
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
+    }
+
+    /**
+     * Test Prev
+     *
+     * @return null
+     */
+    public function testPrev(): void
+    {
+        end($this->plainArray);
+        prev($this->plainArray);
+
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->end()->prev()->key()
+        );
+
+        reset($this->plainArray);
+        prev($this->plainArray);
+
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->first()->prev()->key()
+        );
+    }
+
+    /**
+     * Test Rewind
+     *
+     * @return null
+     */
+    public function testRewind(): void
+    {
+        reset($this->plainArray);
+
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->rewind()->key()
+        );
+    }
+
+    /**
+     * Test Uasort
+     *
+     * @return null
+     */
+    public function testUasort(): void
+    {
+        $this->extendedArray->next();
+        next($this->plainArray);
+
+        $this->extendedArray->uasort(
+            function ($a, $b) {
+                return md5(json_encode($a)) <=> md5(json_encode($b));
+            }
+        );
+        uasort(
+            $this->plainArray,
+            function ($a, $b) {
+                return md5(json_encode($a)) <=> md5(json_encode($b));
+            }
+        );
+
+        $this->assertSame(
+            $this->plainArray,
+            $this->extendedArray->getArrayCopy()
+        );
+        $this->assertSame(
+            array_keys($this->plainArray),
+            $this->extendedArray->keys()
+        );
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
+    }
+
+    /**
+     * Test Uksort
+     *
+     * @return null
+     */
+    public function testUksort(): void
+    {
+        $this->extendedArray->next();
+        next($this->plainArray);
+
+        $this->extendedArray->uksort(
+            function ($a, $b) {
+                return md5(json_encode($a)) <=> md5(json_encode($b));
+            }
+        );
+        uksort(
+            $this->plainArray,
+            function ($a, $b) {
+                return md5(json_encode($a)) <=> md5(json_encode($b));
+            }
+        );
+
+        $this->assertSame(
+            $this->plainArray,
+            $this->extendedArray->getArrayCopy()
+        );
+        $this->assertSame(
+            array_keys($this->plainArray),
+            $this->extendedArray->keys()
+        );
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
     }
 
     /**
@@ -530,22 +805,5 @@ class ExtendedArrayBaseTest extends TestCase
         $timeTaken = microtime(true) - $startTime;
 
         $this->assertLessThan(0.05, $timeTaken);
-    }
-
-    /**
-     * Seek Key poly-fill for extended array
-     *
-     * @param array      $array to move cursor
-     * @param int|string $key   to seek
-     *
-     * @return null
-     */
-    protected function seekKey(array &$array, $key): void
-    {
-        for (reset($array); !is_null(key($array)); next($array)) {
-            if (key($array) === $key) {
-                break;
-            }
-        }
     }
 }
