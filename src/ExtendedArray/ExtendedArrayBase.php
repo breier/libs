@@ -113,7 +113,7 @@ abstract class ExtendedArrayBase extends ArrayIterator
             }
         );
 
-        return $this;
+        return $this->rewind();
     }
 
     /**
@@ -209,7 +209,7 @@ abstract class ExtendedArrayBase extends ArrayIterator
 
         $this->_updatePositionMap();
 
-        return $this;
+        return $this->rewind();
     }
 
     /**
@@ -234,7 +234,7 @@ abstract class ExtendedArrayBase extends ArrayIterator
 
         $this->_updatePositionMap();
 
-        return $this;
+        return $this->rewind();
     }
 
     /**
@@ -249,7 +249,7 @@ abstract class ExtendedArrayBase extends ArrayIterator
 
         $this->_updatePositionMap();
 
-        return $this;
+        return $this->rewind();
     }
 
     /**
@@ -402,7 +402,7 @@ abstract class ExtendedArrayBase extends ArrayIterator
 
         $this->_updatePositionMap();
 
-        return $this;
+        return $this->rewind();
     }
 
     /**
@@ -419,7 +419,7 @@ abstract class ExtendedArrayBase extends ArrayIterator
 
         $this->_updatePositionMap();
 
-        return $this;
+        return $this->rewind();
     }
 
     /**
