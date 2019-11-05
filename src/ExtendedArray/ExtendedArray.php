@@ -297,7 +297,8 @@ class ExtendedArray extends ExtendedArrayBase
     {
         $this->saveCursor();
 
-        $item = $this->seek($position)->element();
+        $this->seek($position);
+        $item = $this->element();
 
         $this->restoreCursor();
 
