@@ -163,6 +163,9 @@ abstract class ExtendedArrayBase extends ArrayIterator
             if (self::isArrayObject($item)) {
                 $item = $item->getArrayCopy();
             }
+            if ($item instanceof ExtendedArrayMergeMap) {
+                $item = $item->getElements();
+            }
         }
 
         return $plainArray;
