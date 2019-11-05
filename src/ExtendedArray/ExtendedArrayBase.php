@@ -198,6 +198,13 @@ abstract class ExtendedArrayBase extends ArrayIterator
     }
 
     /**
+     * Get Keys have to be implemented
+     *
+     * @return mixed
+     */
+    abstract public function keys();
+
+    /**
      * Extending KSort Method to update position map
      * Sort ascending by element indexes
      *
