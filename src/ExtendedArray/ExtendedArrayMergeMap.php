@@ -56,11 +56,13 @@ class ExtendedArrayMergeMap
      *
      * @param mixed $element To be merged
      *
-     * @return null
+     * @return ExtendedArrayMergeMap
      */
-    public function merge($element): void
+    public function merge($element): ExtendedArrayMergeMap
     {
         array_push($this->elements, $element);
+
+        return $this;
     }
 
     /**
