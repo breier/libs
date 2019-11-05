@@ -13,9 +13,9 @@
 
 namespace Breier\ExtendedArray;
 
-use ArrayIterator;
-use ArrayObject;
-use SplFixedArray;
+use \ArrayIterator;
+use \ArrayObject;
+use \SplFixedArray;
 
 /**
  * Extended Array Class
@@ -47,7 +47,7 @@ class ExtendedArray extends ExtendedArrayBase
             }
         );
 
-        return $this;
+        return $this->rewind();
     }
 
     /**
@@ -197,7 +197,7 @@ class ExtendedArray extends ExtendedArrayBase
             }
         );
 
-        return $this;
+        return $this->rewind();
     }
 
     /**
@@ -318,7 +318,7 @@ class ExtendedArray extends ExtendedArrayBase
             }
         );
 
-        return $this;
+        return $this->rewind();
     }
 
     /**

@@ -60,12 +60,9 @@ class ExtendedArrayTest extends TestCase
         $this->extendedArray = new ExtendedArray($this->plainArray);
         $this->arrayIterator = new ArrayIterator($this->plainArray);
         $this->arrayObject = new ArrayObject($this->plainArray);
-        $this->splFixedArray = new SplFixedArray(count($this->plainArray));
-
-        $index = 0;
-        foreach ($this->plainArray as $value) {
-            $this->splFixedArray->offsetSet($index++, $value);
-        }
+        $this->splFixedArray = SplFixedArray::fromArray(
+            array_values($this->plainArray)
+        );
     }
 
     /**
