@@ -312,21 +312,9 @@ abstract class ExtendedArrayBase extends ArrayIterator
     {
         parent::offsetUnset($index);
 
+        $this->saveCursor();
         $this->_updatePositionMap();
-    }
-
-    /**
-     * Current Position, poly-fill for `pos` of SplFixedArray
-     *
-     * @return int
-     */
-    public function pos(): int
-    {
-        return array_search(
-            $this->key(),
-            $this->_positionMap,
-            true
-        );
+        $this->restoreCursor();
     }
 
     /**
