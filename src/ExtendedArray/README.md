@@ -27,10 +27,12 @@ You can find all the methods and their documentation at
   | key          |                    | mixed  | Current position element index
   | offsetExists | mixed $index       | bool   | Validate element index
   | offsetGet    | mixed $index       | mixed  | Get element in given index
+  | seek         | int $position      | null   | Moves the cursor to given position
   | serialize    |                    | string | Applies PHP serialization to the object
   | setFlags     | string $flags      | null   | Set behaviour flags of the ArrayIterator
   | unserialize  | string $serialized | null   | Populates self using PHP unserialize
   | valid        |                    | bool   | Validate element in the current position
+
   _* "append" is indirectly modified as it uses "offsetSet" internally_
 </details>
 
@@ -63,11 +65,8 @@ to improve its use as a clean Object Oriented Class.
   | next          |                        | this   | Extending method to return $this
   | offsetSet     | <nobr>mixed $index, mixed $newval</nobr>  | null   | Extending method to update position map
   | offsetUnset   | mixed $index           | null   | Extending method to update position map
-  | pos           |                        | int    | `[added]` Current position as in \SplFixedArray
   | prev          |                        | this   | `[added]` Move the cursor to previous element
   | rewind        |                        | this   | Extending method to return $this
-  | seek          | int $position          | this   | Extending method to return $this
-  | seekKey       | mixed $key             | this   | `[added]` Moves the cursor to given key
   | uasort        | callable $cmp_function | this   | Extending method to update position map
   | uksort        | callable $cmp_function | this   | Extending method to update position map
 </details>
