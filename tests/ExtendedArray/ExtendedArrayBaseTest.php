@@ -333,6 +333,14 @@ class ExtendedArrayBaseTest extends TestCase
     }
 
     /**
+     * Test GetArrayCopy
+     *
+     * It's pretty much covered everywhere else
+     * 
+     * So I'm just skipping it ;)
+     */
+
+    /**
      * Test Is Array Object
      *
      * @return null
