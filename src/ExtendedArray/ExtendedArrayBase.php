@@ -324,13 +324,14 @@ abstract class ExtendedArrayBase extends ArrayIterator
      */
     public function prev(): ExtendedArrayBase
     {
-        $currentPosition = $this->pos();
+        $currentPosition = $this->_getCursorPosition();
 
         if (!$currentPosition) {
             return $this->end()->next();
         }
 
-        return $this->seek($currentPosition - 1);
+        $this->seek($currentPosition - 1);
+        return $this;
     }
 
     /**
@@ -344,43 +345,6 @@ abstract class ExtendedArrayBase extends ArrayIterator
         parent::rewind();
 
         return $this;
-    }
-
-    /**
-     * Extending Seek Method to return ExtendedArrayBase instead of void
-     *
-     * @param int $position To seek
-     *
-     * @return ExtendedArrayBase
-     */
-    public function seek($position): ExtendedArrayBase
-    {
-        parent::seek($position);
-
-        return $this;
-    }
-
-    /**
-     * Seek Key moves the pointer to given key
-     *
-     * @param int|string $key Property to seek
-     *
-     * @return ExtendedArrayBase
-     * @throws ExtendedArrayException
-     */
-    public function seekKey($key): ExtendedArrayBase
-    {
-        if (!$this->offsetExists($key)) {
-            throw new ExtendedArrayException("Key '{$key}' doesn't exist!");
-        }
-
-        $keyPosition = array_search(
-            $key,
-            $this->_positionMap,
-            true
-        );
-
-        return $this->seek($keyPosition);
     }
 
     /**
