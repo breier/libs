@@ -107,7 +107,7 @@ class ExtendedArrayMergeMap
      */
     public static function prepareMapParams(
         ExtendedArray $mainArray,
-        array $params = null
+        array $params = []
     ): ExtendedArray {
         $preparedParams = $mainArray->values();
 
