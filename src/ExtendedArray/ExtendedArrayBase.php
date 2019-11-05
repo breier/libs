@@ -47,8 +47,8 @@ use \ArrayObject;
  */
 abstract class ExtendedArrayBase extends ArrayIterator
 {
-    private $_positionMap;
-    private $_lastCursorKey;
+    private $_positionMap = [];
+    private $_lastCursorPosition = 0;
 
     /**
      * Instantiate an Extended Array
@@ -439,7 +439,7 @@ abstract class ExtendedArrayBase extends ArrayIterator
      */
     protected function saveCursor(): void
     {
-        $this->_lastCursorKey = $this->key();
+        $this->_lastCursorPosition = $this->_getCursorPosition();
     }
 
     /**
@@ -449,9 +449,26 @@ abstract class ExtendedArrayBase extends ArrayIterator
      */
     protected function restoreCursor(): void
     {
-        if (!is_null($this->_lastCursorKey)) {
-            $this->seekKey($this->_lastCursorKey);
+        if ($this->_lastCursorPosition >= $this->count()) {
+            $this->end();
+            return;
         }
+
+        $this->seek($this->_lastCursorPosition);
+    }
+
+    /**
+     * Get Cursor Position
+     *
+     * @return int
+     */
+    private function _getCursorPosition(): int
+    {
+        return array_search(
+            $this->key(),
+            $this->_positionMap,
+            true
+        );
     }
 
     /**
