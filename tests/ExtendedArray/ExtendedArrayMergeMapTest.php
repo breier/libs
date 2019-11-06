@@ -55,7 +55,6 @@ class ExtendedArrayMergeMapTest extends TestCase
         ];
     }
 
-
     /**
      * Test Instantiate
      *
@@ -63,25 +62,31 @@ class ExtendedArrayMergeMapTest extends TestCase
      */
     public function testInstantiate(): void
     {
+        $mapEmpty = new ExtendedArrayMergeMap();
+        $this->assertSame(
+            [],
+            $mapEmpty->getArrayCopy()
+        );
+
         $mapOne = new ExtendedArrayMergeMap('one');
         $this->assertSame(
             ['one'],
-            $mapOne->getElements()
+            $mapOne->getArrayCopy()
         );
 
         $mapTwo = new ExtendedArrayMergeMap(2, ['three', 4 => 'five']);
         $this->assertSame(
             [2, ['three', 4 => 'five']],
-            $mapTwo->getElements()
+            $mapTwo->getArrayCopy()
         );
     }
 
     /**
-     * Test GetElements
+     * Test GetArrayCopy
      *
      * @return null
      */
-    public function testGetElements(): void
+    public function testGetArrayCopy(): void
     {
         $mapWithObjects = new ExtendedArrayMergeMap(
             ['sub-array' => true],
@@ -93,8 +98,11 @@ class ExtendedArrayMergeMapTest extends TestCase
                 ['sub-array' => true],
                 $this->extendedArray
             ],
-            $mapWithObjects->getElements()
+            $mapWithObjects->getArrayCopy()
         );
+
+        $emptyMap = new ExtendedArrayMergeMap();
+        $this->assertSame([], $emptyMap->getArrayCopy());
     }
 
     /**
@@ -116,7 +124,7 @@ class ExtendedArrayMergeMapTest extends TestCase
                 $this->extendedArray,
                 $this->extendedArray->Japan
             ],
-            $mapWithObjects->getElements()
+            $mapWithObjects->getArrayCopy()
         );
     }
 
@@ -139,14 +147,14 @@ class ExtendedArrayMergeMapTest extends TestCase
             $this->extendedArray->getArrayCopy()
         );
 
-        ExtendedArrayMergeMap::mergePush($this->extendedArray, [5, 3.5, 2, 200]);
+        ExtendedArrayMergeMap::mergePush($this->extendedArray, [5, 3.5, 2]);
 
         $this->assertSame(
             [
                 'Ireland' => ['Dublin', 'Umbrella', 5],
                 'France' => ['Paris', 'Croisant', 3.5],
                 'Egypt' => ['Cairo', 'Pyramids', 2],
-                'Japan' => ['Tokyo', 'Sakura', 200]
+                'Japan' => ['Tokyo', 'Sakura', null]
             ],
             $this->extendedArray->getArrayCopy()
         );
@@ -164,14 +172,14 @@ class ExtendedArrayMergeMapTest extends TestCase
          */
         $mapParams = ExtendedArrayMergeMap::prepareMapParams(
             $this->extendedArray,
-            [$this->plainArray, [5, 3.5, 2, 200]]
+            [$this->plainArray, [5, 3.5, null, 200]]
         );
 
         $this->assertSame(
             [
                 ['Dublin', 'Umbrella', 5],
                 ['Paris', 'Croisant', 3.5],
-                ['Cairo', 'Pyramids', 2],
+                ['Cairo', 'Pyramids', null],
                 ['Tokyo', 'Sakura', 200]
             ],
             $mapParams->getArrayCopy()
@@ -209,6 +217,21 @@ class ExtendedArrayMergeMapTest extends TestCase
             ],
             $mapParams->getArrayCopy()
         );
+
+        /**
+         * Throws InvalidArgumentException
+         */
+        try {
+            $null = ExtendedArrayMergeMap::prepareMapParams(
+                $this->extendedArray,
+                [1, null]
+            );
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame(
+                'Second parameter has to be an array of arrays!',
+                $e->getMessage()
+            );
+        }
 
         /**
          * Original Array should be untouched

@@ -53,6 +53,7 @@ class ExtendedArrayBaseClass extends ExtendedArrayBase
  */
 class ExtendedArrayBaseTest extends TestCase
 {
+    protected $emptyArray;
     protected $plainArray;
     protected $extendedArray;
     protected $arrayIterator;
@@ -77,6 +78,7 @@ class ExtendedArrayBaseTest extends TestCase
             ],
         ];
 
+        $this->emptyArray = new ExtendedArrayBaseClass();
         $this->extendedArray = new ExtendedArrayBaseClass($this->plainArray);
         $this->arrayIterator = new ArrayIterator($this->plainArray);
         $this->arrayObject = new ArrayObject($this->plainArray);
@@ -213,6 +215,80 @@ class ExtendedArrayBaseTest extends TestCase
     }
 
     /**
+     * Test Throws for non-array types
+     *
+     * @return null
+     */
+    public function testInstantiateThrowsInvalidArgumentException(): void
+    {
+        /**
+         * String
+         */
+        try {
+            $null = new ExtendedArrayBaseClass('non-array');
+            $this->assertFalse($null);
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame(
+                'Only array types are accepted as parameter!',
+                $e->getMessage()
+            );
+        }
+
+        /**
+         * Integer
+         */
+        try {
+            $null = new ExtendedArrayBaseClass(123);
+            $this->assertFalse($null);
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame(
+                'Only array types are accepted as parameter!',
+                $e->getMessage()
+            );
+        }
+
+        /**
+         * Boolean
+         */
+        try {
+            $null = new ExtendedArrayBaseClass(true);
+            $this->assertFalse($null);
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame(
+                'Only array types are accepted as parameter!',
+                $e->getMessage()
+            );
+        }
+
+        /**
+         * Float
+         */
+        try {
+            $null = new ExtendedArrayBaseClass(123.456789);
+            $this->assertFalse($null);
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame(
+                'Only array types are accepted as parameter!',
+                $e->getMessage()
+            );
+        }
+
+        /**
+         * Object
+         */
+        try {
+            $object = (object) ['invalid'];
+            $null = new ExtendedArrayBaseClass($object);
+            $this->assertFalse($null);
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame(
+                'Only array types are accepted as parameter!',
+                $e->getMessage()
+            );
+        }
+    }
+
+    /**
      * Test toString
      *
      * @return null
@@ -231,6 +307,8 @@ class ExtendedArrayBaseTest extends TestCase
             key($this->plainArray),
             $this->extendedArray->key()
         );
+
+        $this->assertSame('{}', sprintf("%s", $this->emptyArray));
     }
 
     /**
@@ -284,6 +362,8 @@ class ExtendedArrayBaseTest extends TestCase
             key($this->plainArray),
             $this->extendedArray->key()
         );
+
+        $this->assertSame([], $this->emptyArray->asort()->getArrayCopy());
     }
 
     /**
@@ -300,6 +380,8 @@ class ExtendedArrayBaseTest extends TestCase
             current($this->plainArray),
             $this->extendedArray->element()->getArrayCopy()
         );
+
+        $this->assertSame(null, $this->emptyArray->element());
     }
 
     /**
@@ -315,6 +397,8 @@ class ExtendedArrayBaseTest extends TestCase
             key($this->plainArray),
             $this->extendedArray->end()->key()
         );
+
+        $this->assertSame(null, $this->emptyArray->end()->key());
     }
 
     /**
@@ -330,6 +414,8 @@ class ExtendedArrayBaseTest extends TestCase
             key($this->plainArray),
             $this->extendedArray->first()->key()
         );
+
+        $this->assertSame(null, $this->emptyArray->first()->key());
     }
 
     /**
@@ -415,6 +501,8 @@ class ExtendedArrayBaseTest extends TestCase
             key($this->plainArray),
             $this->extendedArray->key()
         );
+
+        $this->assertSame('{}', $this->emptyArray->jsonSerialize());
     }
 
     /**
@@ -441,6 +529,8 @@ class ExtendedArrayBaseTest extends TestCase
             key($this->plainArray),
             $this->extendedArray->key()
         );
+
+        $this->assertSame([], $this->emptyArray->ksort()->getArrayCopy());
     }
 
     /**
@@ -456,6 +546,8 @@ class ExtendedArrayBaseTest extends TestCase
             key($this->plainArray),
             $this->extendedArray->last()->key()
         );
+
+        $this->assertSame(null, $this->emptyArray->last()->key());
     }
 
     /**
@@ -486,10 +578,12 @@ class ExtendedArrayBaseTest extends TestCase
             key($this->plainArray),
             $this->extendedArray->key()
         );
+
+        $this->assertSame([], $this->emptyArray->natcasesort()->getArrayCopy());
     }
 
     /**
-     * Test NarSort
+     * Test NatSort
      *
      * @return null
      */
@@ -516,6 +610,8 @@ class ExtendedArrayBaseTest extends TestCase
             key($this->plainArray),
             $this->extendedArray->key()
         );
+
+        $this->assertSame([], $this->emptyArray->natsort()->getArrayCopy());
     }
 
     /**
@@ -539,6 +635,8 @@ class ExtendedArrayBaseTest extends TestCase
             key($this->plainArray),
             $this->extendedArray->end()->next()->key()
         );
+
+        $this->assertSame(null, $this->emptyArray->next()->key());
     }
 
     /**
@@ -705,6 +803,8 @@ class ExtendedArrayBaseTest extends TestCase
             key($this->plainArray),
             $this->extendedArray->first()->prev()->key()
         );
+
+        $this->assertSame(null, $this->emptyArray->prev()->key());
     }
 
     /**
@@ -720,6 +820,8 @@ class ExtendedArrayBaseTest extends TestCase
             key($this->plainArray),
             $this->extendedArray->rewind()->key()
         );
+
+        $this->assertSame(null, $this->emptyArray->rewind()->key());
     }
 
     /**
@@ -756,6 +858,15 @@ class ExtendedArrayBaseTest extends TestCase
             key($this->plainArray),
             $this->extendedArray->key()
         );
+
+        $this->assertSame(
+            [],
+            $this->emptyArray->uasort(
+                function ($a, $b) {
+                    return md5(json_encode($a)) <=> md5(json_encode($b));
+                }
+            )->getArrayCopy()
+        );
     }
 
     /**
@@ -791,6 +902,15 @@ class ExtendedArrayBaseTest extends TestCase
         $this->assertSame(
             key($this->plainArray),
             $this->extendedArray->key()
+        );
+
+        $this->assertSame(
+            [],
+            $this->emptyArray->uksort(
+                function ($a, $b) {
+                    return md5(json_encode($a)) <=> md5(json_encode($b));
+                }
+            )->getArrayCopy()
         );
     }
 
