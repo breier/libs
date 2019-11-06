@@ -55,6 +55,8 @@ abstract class ExtendedArrayBase extends ArrayIterator
      *
      * @param mixed $array To be parsed into properties
      * @param int   $flags (STD_PROP_LIST | ARRAY_AS_PROPS)
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct($array = null, int $flags = 2)
     {
@@ -68,6 +70,12 @@ abstract class ExtendedArrayBase extends ArrayIterator
 
         if (empty($array)) {
             $array = [];
+        }
+
+        if (!is_array($array)) {
+            throw new \InvalidArgumentException(
+                'Only array types are accepted as parameter!'
+            );
         }
 
         foreach ($array as &$item) {
