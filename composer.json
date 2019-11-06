@@ -2,7 +2,7 @@
     "name": "breier/libs",
     "description": "An Extended Array Library to use everywhere",
     "license": "GPL-3.0-or-later",
-    "version": "0.9.7",
+    "version": "0.9.8",
     "type": "library",
     "authors": [
         {
