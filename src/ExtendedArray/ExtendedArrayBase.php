@@ -13,6 +13,8 @@
 
 namespace Breier\ExtendedArray;
 
+use Breier\ExtendedArray\ExtendedArrayMergeMap as MergeMap;
+
 use \SplFixedArray;
 use \ArrayIterator;
 use \ArrayObject;
@@ -168,11 +170,8 @@ abstract class ExtendedArrayBase extends ArrayIterator
         $plainArray = parent::getArrayCopy();
 
         foreach ($plainArray as &$item) {
-            if (self::isArrayObject($item)) {
+            if (static::isArrayObject($item) || $item instanceof MergeMap) {
                 $item = $item->getArrayCopy();
-            }
-            if ($item instanceof ExtendedArrayMergeMap) {
-                $item = $item->getElements();
             }
         }
 
