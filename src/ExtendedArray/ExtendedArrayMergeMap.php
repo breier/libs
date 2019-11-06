@@ -109,6 +109,11 @@ class ExtendedArrayMergeMap
         $preparedParams = $mainArray->values();
 
         foreach ($params as $array) {
+            if (!ExtendedArray::isArray($array)) {
+                throw new \InvalidArgumentException(
+                    'Second parameter has to be an array of arrays!'
+                );
+            }
             static::mergePush($preparedParams, $array);
         }
 
