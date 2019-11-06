@@ -39,11 +39,11 @@ class ExtendedArrayMergeMap
     }
 
     /**
-     * Get Elements
+     * Get Array Copy
      *
      * @return array
      */
-    public function getElements(): array
+    public function getArrayCopy(): array
     {
         return $this->elements;
     }
