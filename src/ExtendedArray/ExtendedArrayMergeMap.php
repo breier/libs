@@ -29,15 +29,12 @@ class ExtendedArrayMergeMap
     /**
      * Instantiate an Extended Array Merge Map
      *
-     * @param mixed $element To be stored
-     * @param mixed $extra   To be merged
+     * @param mixed ...$elements To be stored
      */
-    public function __construct($element, $extra = null)
+    public function __construct(...$elements)
     {
-        $this->merge($element);
-        
-        if (null !== $extra) {
-            $this->merge($extra);
+        foreach ($elements as $item) {
+            $this->merge($item);
         }
     }
 
