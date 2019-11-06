@@ -60,7 +60,7 @@ abstract class ExtendedArrayBase extends ArrayIterator
      */
     public function __construct($array = null, int $flags = 2)
     {
-        if ($array instanceof ArrayIterator || $array instanceof ArrayObject) {
+        if (static::isArrayObject($array)) {
             $array = $array->getArrayCopy();
         }
 
