@@ -103,6 +103,7 @@ Contains is similar to "in_array" with object support.
   $cities = new ExtendedArray(['Dublin', 'Paris', 'Cairo', 'Tokyo']);
   var_dump($cities->contains('Cairo')); // true
   var_dump($cities->contains('Kyoto')); // false
+  var_dump($cities->contains($cities->{1})); // true
   ```
 </details>
 
@@ -205,7 +206,7 @@ Extending filter to support objects.
 </details>
 
 ### `keys(): ExtendedArray`
-Get this array keys (properties).
+Get this array keys (properties' names).
 <details>
   <summary>Code Example</summary>
 
