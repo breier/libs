@@ -297,7 +297,7 @@ abstract class ExtendedArrayBase extends ArrayIterator
             : true;
 
         if (is_array($newval)
-            || self::isArrayObject($newval)
+            || static::isArrayObject($newval)
             || $newval instanceof SplFixedArray
         ) {
             $newval = new static($newval);
