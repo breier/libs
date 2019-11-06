@@ -76,7 +76,7 @@ class ExtendedArrayMergeMap
 
         for (
             $mainArray->first(), $tempArray->first();
-            $mainArray->valid(), $tempArray->valid();
+            $mainArray->valid();
             $mainArray->next(), $tempArray->next()
         ) {
             if (! $mainArray->element() instanceof static) {
