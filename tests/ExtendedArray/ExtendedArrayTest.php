@@ -33,6 +33,7 @@ use SplFixedArray;
  */
 class ExtendedArrayTest extends TestCase
 {
+    protected $emptyArray;
     protected $plainArray;
     protected $extendedArray;
     protected $arrayIterator;
@@ -57,6 +58,7 @@ class ExtendedArrayTest extends TestCase
             ],
         ];
 
+        $this->emptyArray = new ExtendedArray();
         $this->extendedArray = new ExtendedArray($this->plainArray);
         $this->arrayIterator = new ArrayIterator($this->plainArray);
         $this->arrayObject = new ArrayObject($this->plainArray);
@@ -66,7 +68,381 @@ class ExtendedArrayTest extends TestCase
     }
 
     /**
+     * Test Arsort
+     *
+     * @return null
+     */
+    public function testArsort(): void
+    {
+        $this->extendedArray->next();
+        next($this->plainArray);
+
+        arsort($this->plainArray);
+
+        $this->assertSame(
+            $this->plainArray,
+            $this->extendedArray->arsort()->getArrayCopy()
+        );
+        $this->assertSame(
+            array_keys($this->plainArray),
+            $this->extendedArray->keys()->getArrayCopy()
+        );
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
+
+        $this->assertSame([], $this->emptyArray->arsort()->getArrayCopy());
+    }
+
+    /**
+     * Test Contains String
+     *
+     * @return null
+     */
+    public function testContainsString(): void
+    {
+        $this->extendedArray->next();
+        next($this->plainArray);
+
+        $this->assertSame(
+            in_array('four', $this->plainArray),
+            $this->extendedArray->contains('four')
+        );
+        $this->assertSame(
+            array_keys($this->plainArray),
+            $this->extendedArray->keys()->getArrayCopy()
+        );
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
+    }
+
+    /**
+     * Test Contains Object
+     *
+     * @return null
+     */
+    public function testContainsObject(): void
+    {
+        $byPass78756 = true; // https://bugs.php.net/bug.php?id=78756
+        $this->assertSame(
+            in_array($this->arrayObject, $this->plainArray, $byPass78756),
+            $this->extendedArray->contains($this->arrayObject)
+        );
+    }
+
+    /**
+     * Test Contains Own
+     *
+     * @return null
+     */
+    public function testContainsOwn(): void
+    {
+        $plainElementZero = $this->plainArray[0];
+        $extendedElementZero = $this->extendedArray->{0};
+        $this->assertSame(
+            in_array($plainElementZero, $this->plainArray, true),
+            $this->extendedArray->contains($extendedElementZero, true)
+        );
+    }
+
+    /**
+     * Test Contains Integer
+     *
+     * @return null
+     */
+    public function testContainsInteger(): void
+    {
+        $this->assertSame(
+            in_array(2019, $this->plainArray),
+            $this->extendedArray->contains(2019)
+        );
+    }
+
+    /**
+     * Test Contains Other
+     *
+     * @return null
+     */
+    public function testContainsOther(): void
+    {
+        $this->assertSame(
+            in_array(0, $this->plainArray),
+            $this->extendedArray->contains(0)
+        );
+        $this->assertSame(
+            in_array(0, $this->plainArray, true),
+            $this->extendedArray->contains(0, true)
+        );
+
+        $this->assertSame(false, $this->emptyArray->contains('anything'));
+    }
+
+    /**
+     * Test Filter isArray
+     *
+     * @return null
+     */
+    public function testFilterIsArray(): void
+    {
+        $this->extendedArray->next();
+        next($this->plainArray);
+
+        $isArrayFilter = function ($item) {
+            return ExtendedArray::isArray($item);
+        };
+        $this->assertSame(
+            array_filter($this->plainArray, $isArrayFilter),
+            $this->extendedArray->filter($isArrayFilter)->getArrayCopy()
+        );
+        $this->assertSame(
+            array_keys($this->plainArray),
+            $this->extendedArray->keys()->getArrayCopy()
+        );
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
+    }
+
+    /**
+     * Test Filter isString Key
+     *
+     * @return null
+     */
+    public function testFilterIsStringKey(): void
+    {
+        $isStringFilter = function ($item) {
+            return is_string($item);
+        };
+        $this->assertSame(
+            array_filter(
+                $this->plainArray,
+                $isStringFilter,
+                ARRAY_FILTER_USE_KEY
+            ),
+            $this->extendedArray->filter(
+                $isStringFilter,
+                ARRAY_FILTER_USE_KEY
+            )->getArrayCopy()
+        );
+    }
+
+    /**
+     * Test Filter False
+     *
+     * @return null
+     */
+    public function testFilterFalse(): void
+    {
+        $allFalseFilter = function ($item) {
+            return false;
+        };
+        $this->assertSame(
+            array_filter($this->plainArray, $allFalseFilter),
+            $this->extendedArray->filter($allFalseFilter)->getArrayCopy()
+        );
+    }
+
+    /**
+     * Test Key and Value Filter
+     *
+     * @return null
+     */
+    public function testFilterKeyValue(): void
+    {
+        $keyValueFilter = function ($value, $key) {
+            return (is_numeric($key) && ExtendedArray::isArray($value));
+        };
+        $this->assertSame(
+            array_filter(
+                $this->plainArray,
+                $keyValueFilter,
+                ARRAY_FILTER_USE_BOTH
+            ),
+            $this->extendedArray->filter(
+                $keyValueFilter,
+                ARRAY_FILTER_USE_BOTH
+            )->getArrayCopy()
+        );
+    }
+
+    /**
+     * Test Empty Array Filter
+     *
+     * @return null
+     */
+    public function testFilterEmpty(): void
+    {
+        $allTrueFilter = function ($item) {
+            return true;
+        };
+        $this->assertSame(
+            array_filter([], $allTrueFilter),
+            $this->emptyArray->filter($allTrueFilter)->getArrayCopy()
+        );
+    }
+
+    /**
+     * Test Empty Filter on sub-array
+     *
+     * @return null
+     */
+    public function testFilterSubEmpty(): void
+    {
+        $this->assertSame(
+            array_filter($this->plainArray['six']),
+            $this->extendedArray->six->filter()->getArrayCopy()
+        );
+    }
+
+    /**
+     * Test FilterWithObjects isArray
+     *
+     * @return null
+     */
+    public function testFilterWithObjectsIsArray(): void
+    {
+        $this->extendedArray->next();
+        next($this->plainArray);
+
+        $isArrayFilter = function ($item) {
+            return ExtendedArray::isArray($item);
+        };
+        $this->assertSame(
+            array_filter($this->plainArray, $isArrayFilter),
+            $this->extendedArray->filterWithObjects($isArrayFilter)->getArrayCopy()
+        );
+        $this->assertSame(
+            array_keys($this->plainArray),
+            $this->extendedArray->keys()->getArrayCopy()
+        );
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
+    }
+
+    /**
+     * Test FilterWithObjects isString Key
+     *
+     * @return null
+     */
+    public function testFilterWithObjectsIsStringKey(): void
+    {
+        $isStringFilter = function ($item) {
+            return is_string($item);
+        };
+        $this->assertSame(
+            array_filter(
+                $this->plainArray,
+                $isStringFilter,
+                ARRAY_FILTER_USE_KEY
+            ),
+            $this->extendedArray->filterWithObjects(
+                $isStringFilter,
+                ARRAY_FILTER_USE_KEY
+            )->getArrayCopy()
+        );
+    }
+
+    /**
+     * Test FilterWithObjects False
+     *
+     * @return null
+     */
+    public function testFilterWithObjectsFalse(): void
+    {
+        $allFalseFilter = function ($item) {
+            return false;
+        };
+        $this->assertSame(
+            array_filter($this->plainArray, $allFalseFilter),
+            $this->extendedArray->filterWithObjects($allFalseFilter)->getArrayCopy()
+        );
+    }
+
+    /**
+     * Test Key and Value FilterWithObjects
+     *
+     * @return null
+     */
+    public function testFilterWithObjectsKeyValue(): void
+    {
+        $keyValueFilter = function ($value, $key) {
+            return (is_numeric($key) && ExtendedArray::isArray($value));
+        };
+        $this->assertSame(
+            array_filter(
+                $this->plainArray,
+                $keyValueFilter,
+                ARRAY_FILTER_USE_BOTH
+            ),
+            $this->extendedArray->filterWithObjects(
+                $keyValueFilter,
+                ARRAY_FILTER_USE_BOTH
+            )->getArrayCopy()
+        );
+    }
+
+    /**
+     * Test Methods FilterWithObjects
+     *
+     * @return null
+     */
+    public function testFilterWithObjectsMethod(): void
+    {
+        $methodFilter = function ($value) {
+            if (!ExtendedArray::isArrayObject($value)) {
+                return false;
+            }
+            return $value->contains('two');
+        };
+        $this->assertSame(
+            array_filter($this->plainArray, $methodFilter),
+            []
+        );
+        $this->assertSame(
+            [0 => [2 => 'two', 'three']],
+            $this->extendedArray->filterWithObjects($methodFilter)->getArrayCopy()
+        );
+    }
+
+    /**
+     * Test Empty Array FilterWithObjects
+     *
+     * @return null
+     */
+    public function testFilterWithObjectsEmpty(): void
+    {
+        $allTrueFilter = function ($item) {
+            return true;
+        };
+        $this->assertSame(
+            array_filter([], $allTrueFilter),
+            $this->emptyArray->filterWithObjects($allTrueFilter)->getArrayCopy()
+        );
+    }
+
+    /**
+     * Test Empty FilterWithObjects on sub-array
+     *
+     * @return null
+     */
+    public function testFilterWithObjectsSubEmpty(): void
+    {
+        $this->assertSame(
+            array_filter($this->plainArray['six']),
+            $this->extendedArray->six->filterWithObjects()->getArrayCopy()
+        );
+    }
+
+    /**
      * Test extended array instantiates from JSON
+     *
+     * Pending review from here on
      *
      * @return null
      * @test   extended array instantiates from JSON
@@ -105,23 +481,6 @@ class ExtendedArrayTest extends TestCase
 
         ExtendedArray::fromJSON(
             substr($this->extendedArray->jsonSerialize(), 0, 50)
-        );
-    }
-
-    /**
-     * Test returned the correct a-r-sorted array
-     *
-     * @return null
-     * @test   returned the correct a-r-sorted array
-     */
-    public function returnsCorrectARSortedArray(): void
-    {
-        arsort($this->plainArray);
-        $this->extendedArray->arsort();
-        $this->assertSame($this->plainArray, $this->extendedArray->getArrayCopy());
-        $this->assertSame(
-            array_keys($this->plainArray),
-            $this->extendedArray->keys()->getArrayCopy()
         );
     }
 
@@ -212,125 +571,6 @@ class ExtendedArrayTest extends TestCase
         $this->assertSame(
             current($this->plainArray),
             $this->getItem($this->extendedArray->OffsetGetPosition(2))
-        );
-    }
-
-    /**
-     * Test Array Contains element
-     *
-     * @return null
-     * @test   Array Contains element
-     */
-    public function arrayContainsElement(): void
-    {
-        /**
-         * Simple comparison, expects TRUE
-         */
-        $this->assertSame(
-            in_array('four', $this->plainArray),
-            $this->extendedArray->contains('four')
-        );
-
-        /**
-         * Object comparison, expects FALSE
-         */
-        $byPass78756 = true; // https://bugs.php.net/bug.php?id=78756
-        $this->assertSame(
-            in_array($this->arrayObject, $this->plainArray, $byPass78756),
-            $this->extendedArray->contains($this->arrayObject)
-        );
-
-        /**
-         * Advanced comparison, expects TRUE
-         */
-        $plainElementZero = $this->plainArray[0];
-        $extendedElementZero = $this->extendedArray->{0};
-        $this->assertSame(
-            in_array($plainElementZero, $this->plainArray, true),
-            $this->extendedArray->contains($extendedElementZero, true)
-        );
-
-        /**
-         * Integer comparison, expects FALSE
-         */
-        $this->assertSame(
-            in_array(2019, $this->plainArray),
-            $this->extendedArray->contains(2019)
-        );
-    }
-
-    /**
-     * Test returned correct filtered array
-     *
-     * @return null
-     * @test   returned correct filtered array
-     */
-    public function returnedCorrectFilteredArray(): void
-    {
-        /**
-         * Is Array Filter
-        */
-        $isArrayFilter = function ($item) {
-            return ExtendedArray::isArray($item);
-        };
-        $this->assertSame(
-            array_filter($this->plainArray, $isArrayFilter),
-            $this->extendedArray->filter($isArrayFilter)->getArrayCopy()
-        );
-
-        /**
-         * Is String Key Filter
-        */
-        $isStringFilter = function ($item) {
-            return is_string($item);
-        };
-        $this->assertSame(
-            array_filter(
-                $this->plainArray,
-                $isStringFilter,
-                ARRAY_FILTER_USE_KEY
-            ),
-            $this->extendedArray->filter(
-                $isStringFilter,
-                ARRAY_FILTER_USE_KEY
-            )->getArrayCopy()
-        );
-
-        /**
-         * All False Filter
-        */
-        $allFalseFilter = function ($item) {
-            return false;
-        };
-        $this->assertSame(
-            array_filter($this->plainArray, $allFalseFilter),
-            $this->extendedArray->filter($allFalseFilter)->getArrayCopy()
-        );
-
-        /**
-         * Empty Filter on sub-array
-        */
-        $this->assertSame(
-            array_filter($this->plainArray['six']),
-            $this->extendedArray->six->filter()->getArrayCopy()
-        );
-
-        /**
-         * Key and Value Filter
-         */
-        $keyValueFilter = function ($value, $key) {
-            return (is_numeric($key) && ExtendedArray::isArray($value));
-        };
-        $this->assertSame(
-            array_filter(
-                $this->plainArray,
-                $isStringFilter,
-                ARRAY_FILTER_USE_BOTH
-            ),
-            $this->extendedArray->filter(
-                $isStringFilter,
-                ARRAY_FILTER_USE_BOTH
-            )->getArrayCopy()
         );
     }
 
