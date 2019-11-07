@@ -35,7 +35,7 @@ class ExtendedArray extends ExtendedArrayBase
      */
     public function arsort(): ExtendedArray
     {
-        $this->uasort(
+        return $this->uasort(
             function ($a, $b) {
                 if (static::isArrayObject($a)) {
                     $a = $a->getArrayCopy();
@@ -46,8 +46,6 @@ class ExtendedArray extends ExtendedArrayBase
                 return $a < $b ? 1 : -1;
             }
         );
-
-        return $this->rewind();
     }
 
     /**
@@ -191,13 +189,11 @@ class ExtendedArray extends ExtendedArrayBase
      */
     public function krsort(): ExtendedArray
     {
-        $this->uksort(
+        return $this->uksort(
             function ($a, $b) {
                 return $a < $b ? 1 : -1;
             }
         );
-
-        return $this->rewind();
     }
 
     /**
@@ -312,13 +308,11 @@ class ExtendedArray extends ExtendedArrayBase
      */
     public function shuffle(): ExtendedArray
     {
-        $this->uasort(
+        return $this->uasort(
             function ($a, $b) {
                 return rand(-1, 1);
             }
         );
-
-        return $this->rewind();
     }
 
     /**

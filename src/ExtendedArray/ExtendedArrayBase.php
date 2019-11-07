@@ -111,7 +111,7 @@ abstract class ExtendedArrayBase extends ArrayIterator
      */
     public function asort(): ExtendedArrayBase
     {
-        $this->uasort(
+        return $this->uasort(
             function ($a, $b) {
                 if (static::isArrayObject($a)) {
                     $a = $a->getArrayCopy();
@@ -122,8 +122,6 @@ abstract class ExtendedArrayBase extends ArrayIterator
                 return $a < $b ? -1 : 1;
             }
         );
-
-        return $this->rewind();
     }
 
     /**
@@ -341,6 +339,7 @@ abstract class ExtendedArrayBase extends ArrayIterator
         }
 
         $this->seek($currentPosition - 1);
+
         return $this;
     }
 
