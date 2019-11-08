@@ -110,10 +110,6 @@ class ExtendedArrayTest extends TestCase
             $this->extendedArray->contains('four')
         );
         $this->assertSame(
-            array_keys($this->plainArray),
-            $this->extendedArray->keys()->getArrayCopy()
-        );
-        $this->assertSame(
             key($this->plainArray),
             $this->extendedArray->key()
         );
@@ -177,7 +173,7 @@ class ExtendedArrayTest extends TestCase
             $this->extendedArray->contains(0, true)
         );
 
-        $this->assertSame(false, $this->emptyArray->contains('anything'));
+        $this->assertSame(false, $this->emptyArray->contains(0));
     }
 
     /**
@@ -196,10 +192,6 @@ class ExtendedArrayTest extends TestCase
         $this->assertSame(
             array_filter($this->plainArray, $isArrayFilter),
             $this->extendedArray->filter($isArrayFilter)->getArrayCopy()
-        );
-        $this->assertSame(
-            array_keys($this->plainArray),
-            $this->extendedArray->keys()->getArrayCopy()
         );
         $this->assertSame(
             key($this->plainArray),
@@ -314,10 +306,6 @@ class ExtendedArrayTest extends TestCase
         $this->assertSame(
             array_filter($this->plainArray, $isArrayFilter),
             $this->extendedArray->filterWithObjects($isArrayFilter)->getArrayCopy()
-        );
-        $this->assertSame(
-            array_keys($this->plainArray),
-            $this->extendedArray->keys()->getArrayCopy()
         );
         $this->assertSame(
             key($this->plainArray),
@@ -440,148 +428,74 @@ class ExtendedArrayTest extends TestCase
     }
 
     /**
-     * Test extended array instantiates from JSON
-     *
-     * Pending review from here on
+     * Test PlainArray From JSON
      *
      * @return null
-     * @test   extended array instantiates from JSON
      */
-    public function instantiateFromJSON(): void
+    public function testPlainArrayFromJSON(): void
     {
         $fromJSON = json_encode($this->plainArray);
         $this->assertSame(
             $this->plainArray,
-            ExtendedArray::fromJSON($fromJSON)->getArrayCopy()
+            ExtendedArray::fromJSON($fromJSON, 3)->getArrayCopy()
         );
     }
 
     /**
-     * Test throws for invalid JSON
+     * Test Throws JSON Exception
      *
      * @return null
-     * @test   throws for invalid JSON
      */
-    public function throwsForInvalidJSON(): void
+    public function testInstantiateThrowsJsonException(): void
     {
-        $this->expectException(JsonException::class);
-
-        ExtendedArray::fromJSON('invalid');
-    }
-
-    /**
-     * Test throws for broken JSON
-     *
-     * @return null
-     * @test   throws for broken JSON
-     */
-    public function throwsForBrokenJSON(): void
-    {
-        $this->expectException(JsonException::class);
-
-        ExtendedArray::fromJSON(
-            substr($this->extendedArray->jsonSerialize(), 0, 50)
-        );
-    }
-
-    /**
-     * Test returned the correct k-r-sorted array
-     *
-     * @return null
-     * @test   returned the correct k-r-sorted array
-     */
-    public function returnsCorrectKRSortedArray(): void
-    {
-        krsort($this->plainArray);
-        $this->extendedArray->krsort();
-        $this->assertSame($this->plainArray, $this->extendedArray->getArrayCopy());
-        $this->assertSame(
-            array_keys($this->plainArray),
-            $this->extendedArray->keys()->getArrayCopy()
-        );
-    }
-
-    /**
-     * Test returned the correct shuffled array
-     *
-     * @return null
-     * @test   returned the correct shuffled array
-     */
-    public function returnsCorrectShuffledArray(): void
-    {
-        $this->extendedArray->shuffle();
-        $this->assertSame(
-            array_keys($this->extendedArray->getArrayCopy()),
-            $this->extendedArray->keys()->getArrayCopy()
-        );
-    }
-
-    /**
-     * Test Offset Get / First / Last / Position
-     *
-     * @return null
-     * @test   Offset Get / First / Last / Position
-     */
-    public function offsetGetFirstLastPosition(): void
-    {
+        $fromJSON = json_encode($this->plainArray);
         /**
-         * OffsetGet string key
+         * Maximum stack depth exceeded
          */
-        $this->assertSame(
-            $this->plainArray['one'],
-            $this->getItem($this->extendedArray->one)
-        );
-        $this->assertSame(
-            $this->plainArray['one'],
-            $this->getItem($this->extendedArray->offsetGet('one'))
-        );
+        try {
+            ExtendedArray::fromJSON($fromJSON, 2);
+        } catch (\JsonException $e) {
+            $this->assertSame(
+                'Maximum stack depth exceeded',
+                $e->getMessage()
+            );
+        }
 
         /**
-         * OffsetGet int key with ExtendedArray element
+         * Control character error, possibly incorrectly encoded
          */
-        $this->assertSame(
-            $this->plainArray[0],
-            $this->getItem($this->extendedArray->{0})
-        );
-        $this->assertSame(
-            $this->plainArray[0],
-            $this->getItem($this->extendedArray->offsetGet(0))
-        );
+        try {
+            ExtendedArray::fromJSON(substr($fromJSON, 0, 50));
+        } catch (\JsonException $e) {
+            $this->assertSame(
+                'Control character error, possibly incorrectly encoded',
+                $e->getMessage()
+            );
+        }
 
         /**
-         * OffsetGetFirst
+         * Syntax error
          */
-        $this->assertSame(
-            reset($this->plainArray),
-            $this->getItem($this->extendedArray->offsetGetFirst())
-        );
-
-        /**
-         * OffsetGetLast
-         */
-        $this->assertSame(
-            end($this->plainArray),
-            $this->getItem($this->extendedArray->offsetGetLast())
-        );
-
-        /**
-         * OffsetGetPosition
-         */
-        $this->seekKey($this->plainArray, 7); // pos 2
-        $this->assertSame(
-            current($this->plainArray),
-            $this->getItem($this->extendedArray->OffsetGetPosition(2))
-        );
+        try {
+            ExtendedArray::fromJSON('invalid');
+        } catch (\JsonException $e) {
+            $this->assertSame(
+                'Syntax error',
+                $e->getMessage()
+            );
+        }
     }
 
     /**
-     * Test Is Array works with all array types
+     * Test Is Array
      *
      * @return null
-     * @test   Is Array works with all array types
      */
-    public function isArrayWorksWithAllArrayTypes(): void
+    public function testIsArray(): void
     {
+        $this->extendedArray->next();
+        next($this->plainArray);
+
         $this->assertTrue(ExtendedArray::isArray($this->plainArray));
         $this->assertTrue(ExtendedArray::isArray($this->extendedArray));
         $this->assertTrue(ExtendedArray::isArray($this->arrayIterator));
@@ -598,53 +512,101 @@ class ExtendedArrayTest extends TestCase
         $this->assertFalse(
             ExtendedArray::isArray($this->extendedArray->jsonSerialize())
         );
+
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
     }
 
     /**
-     * Test returned correct mapped array
+     * Test Keys
+     *
+     * It's pretty much covered everywhere else
+     * 
+     * So I'm just skipping it ;)
+     */
+
+    /**
+     * Test Krsort
      *
      * @return null
-     * @test   returned correct mapped array
      */
-    public function returnedCorrectMappedArray(): void
+    public function testKrsort(): void
     {
-        /**
-         * String Length Mapping
-        */
+        $this->extendedArray->next();
+        next($this->plainArray);
+
+        krsort($this->plainArray);
+
+        $this->assertSame(
+            $this->plainArray,
+            $this->extendedArray->krsort()->getArrayCopy()
+        );
+        $this->assertSame(
+            array_keys($this->plainArray),
+            $this->extendedArray->keys()->getArrayCopy()
+        );
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
+
+        $this->assertSame([], $this->emptyArray->krsort()->getArrayCopy());
+    }
+
+    /**
+     * Test Map String Length
+     *
+     * @return null
+     */
+    public function testMapStringLength(): void
+    {
+        $this->extendedArray->next();
+        next($this->plainArray);
+
         $strlenMap = function ($item) {
             if (is_array($item)) {
                 $item = json_encode($item);
             }
             return strlen($item);
         };
-        next($this->plainArray);
-        $this->extendedArray->next();
         $this->assertSame(
             array_map($strlenMap, $this->plainArray),
             $this->extendedArray->map($strlenMap)->getArrayCopy()
         );
-        $this->assertSame(key($this->plainArray), $this->extendedArray->key());
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
+    }
 
-        /**
-         * String Conversion Mapping
-        */
+    /**
+     * Test Map String Conversion
+     *
+     * @return null
+     */
+    public function testMapStringConversion(): void
+    {
         $toStringMap = function ($item) {
             if (is_array($item)) {
                 $item = json_encode($item);
             }
             return (string) $item;
         };
-        next($this->plainArray);
-        $this->extendedArray->next();
         $this->assertSame(
             array_map($toStringMap, $this->plainArray),
             $this->extendedArray->map($toStringMap)->getArrayCopy()
         );
-        $this->assertSame(key($this->plainArray), $this->extendedArray->key());
+    }
 
-        /**
-         * Cube Mapping
-        */
+    /**
+     * Test Map Cube
+     *
+     * @return null
+     */
+    public function testMapCube(): void
+    {
         $cubeMap = function ($item) {
             if (ExtendedArray::isArray($item)) {
                 $item = (new ExtendedArray($item))->count();
@@ -654,31 +616,35 @@ class ExtendedArrayTest extends TestCase
             }
             return $item * $item * $item;
         };
-        next($this->plainArray);
-        $this->extendedArray->next();
         $this->assertSame(
             array_map($cubeMap, $this->plainArray),
             $this->extendedArray->map($cubeMap)->getArrayCopy()
         );
-        $this->assertSame(key($this->plainArray), $this->extendedArray->key());
+    }
 
-        /**
-         * Is Array Map
-        */
+    /**
+     * Test Map isArray
+     *
+     * @return null
+     */
+    public function testMapIsArray(): void
+    {
         $isArrayMap = function ($item) {
             return ExtendedArray::isArray($item);
         };
-        next($this->plainArray);
-        $this->extendedArray->next();
         $this->assertSame(
             array_map($isArrayMap, $this->plainArray),
             $this->extendedArray->map($isArrayMap)->getArrayCopy()
         );
-        $this->assertSame(key($this->plainArray), $this->extendedArray->key());
+    }
 
-        /**
-         * Extra Params Map
-         */
+    /**
+     * Test Map Extra Params
+     *
+     * @return null
+     */
+    public function testMapExtraParams(): void
+    {
         $extraParamsMap = function ($item, $name, $city) {
             return [$item => [$name => $city]];
         };
@@ -702,17 +668,303 @@ class ExtendedArrayTest extends TestCase
     }
 
     /**
-     * Test array values return as expected
+     * Test Empty Array Map
      *
      * @return null
-     * @test   array values return as expected
      */
-    public function returnedValuesAsExpected(): void
+    public function testMapEmpty(): void
     {
+        $allTrueMap = function ($item) {
+            return $item;
+        };
+        $this->assertSame(
+            array_map($allTrueMap, []),
+            $this->emptyArray->map($allTrueMap)->getArrayCopy()
+        );
+    }
+
+    /**
+     * Test MapWithObjects String Length
+     *
+     * @return null
+     */
+    public function testMapWithObjectsStringLength(): void
+    {
+        $this->extendedArray->next();
+        next($this->plainArray);
+
+        $strlenMap = function ($item) {
+            if (is_array($item)) {
+                $item = json_encode($item);
+            }
+            return strlen($item);
+        };
+        $this->assertSame(
+            array_map($strlenMap, $this->plainArray),
+            $this->extendedArray->mapWithObjects($strlenMap)->getArrayCopy()
+        );
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
+    }
+
+    /**
+     * Test MapWithObjects String Conversion
+     *
+     * @return null
+     */
+    public function testMapWithObjectsStringConversion(): void
+    {
+        $toStringMap = function ($item) {
+            if (is_array($item)) {
+                $item = json_encode($item);
+            }
+            return (string) $item;
+        };
+        $this->assertSame(
+            array_map($toStringMap, $this->plainArray),
+            $this->extendedArray->mapWithObjects($toStringMap)->getArrayCopy()
+        );
+    }
+
+    /**
+     * Test MapWithObjects Cube
+     *
+     * @return null
+     */
+    public function testMapWithObjectsCube(): void
+    {
+        $cubeMap = function ($item) {
+            if (ExtendedArray::isArray($item)) {
+                $item = (new ExtendedArray($item))->count();
+            }
+            if (!is_int($item)) {
+                $item = intval($item);
+            }
+            return $item * $item * $item;
+        };
+        $this->assertSame(
+            array_map($cubeMap, $this->plainArray),
+            $this->extendedArray->mapWithObjects($cubeMap)->getArrayCopy()
+        );
+    }
+
+    /**
+     * Test MapWithObjects isArray
+     *
+     * @return null
+     */
+    public function testMapWithObjectsIsArray(): void
+    {
+        $isArrayMap = function ($item) {
+            return ExtendedArray::isArray($item);
+        };
+        $this->assertSame(
+            array_map($isArrayMap, $this->plainArray),
+            $this->extendedArray->mapWithObjects($isArrayMap)->getArrayCopy()
+        );
+    }
+
+    /**
+     * Test MapWithObjects Extra Params
+     *
+     * @return null
+     */
+    public function testMapWithObjectsExtraParams(): void
+    {
+        $extraParamsMap = function ($item, $name, $city) {
+            return [$item => [$name => $city]];
+        };
+        $itemArray = [99, 27, 43, 56];
+        $nameArray = ['Umbrela', 'Lolypop', 'Tire', 'Cap'];
+        $cityArray = ['Dublin', 'Paris', 'Alabama', 'Chicago'];
+        $extendedItems = new ExtendedArray($itemArray);
+        $this->assertSame(
+            array_map(
+                $extraParamsMap,
+                $itemArray,
+                $nameArray,
+                $cityArray
+            ),
+            $extendedItems->mapWithObjects(
+                $extraParamsMap,
+                $nameArray,
+                $cityArray
+            )->getArrayCopy()
+        );
+    }
+
+    /**
+     * Test MapWithObjects Method
+     *
+     * @return null
+     */
+    public function testMapWithObjectsMethod(): void
+    {
+        $methodMap = function ($item) {
+            if (!ExtendedArray::isArrayObject($item)) {
+                return json_encode([$item, -1]);
+            }
+            $item->asort()->append($item->count());
+            return $item->jsonSerialize();
+        };
+        $expectedPlainArrayMap = [
+            'one' => '[1,-1]',
+            0 => '[{"2":"two","3":"three"},-1]',
+            7 => '["four",-1]',
+            8 => '["five",-1]',
+            'six' => '[{"temp":"long string that\'s not so long","empty":null},-1]'
+        ];
+        $expectedExtendedArrayMap = [
+            'one' => '[1,-1]',
+            0 => '{"3":"three","2":"two","4":2}',
+            7 => '["four",-1]',
+            8 => '["five",-1]',
+            'six' => '{"empty":null,"temp":"long string that\'s not so long","0":2}'
+        ];
+        $this->assertSame(
+            array_map($methodMap, $this->plainArray),
+            $expectedPlainArrayMap
+        );
+        $this->assertSame(
+            $expectedExtendedArrayMap,
+            $this->extendedArray->mapWithObjects($methodMap)->getArrayCopy()
+        );
+    }
+
+    /**
+     * Test Empty Array MapWithObjects
+     *
+     * @return null
+     */
+    public function testMapWithObjectsEmpty(): void
+    {
+        $allTrueMap = function ($item) {
+            return $item;
+        };
+        $this->assertSame(
+            array_map($allTrueMap, []),
+            $this->emptyArray->mapWithObjects($allTrueMap)->getArrayCopy()
+        );
+    }
+
+    /**
+     * Test Offset Get First
+     *
+     * @return null
+     */
+    public function testOffsetGetFirst(): void
+    {
+        $this->extendedArray->next();
+        next($this->plainArray);
+
+        $this->assertSame(
+            $this->plainArray[array_key_first($this->plainArray)],
+            $this->extendedArray->offsetGetFirst()
+        );
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
+
+        $this->assertSame(null, $this->emptyArray->offsetGetFirst());
+    }
+
+    /**
+     * Test Offset Get Last
+     *
+     * @return null
+     */
+    public function testOffsetGetLast(): void
+    {
+        $this->extendedArray->next();
+        next($this->plainArray);
+
+        $this->assertSame(
+            $this->plainArray[array_key_last($this->plainArray)],
+            $this->extendedArray->offsetGetLast()->getArrayCopy()
+        );
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
+
+        $this->assertSame(null, $this->emptyArray->offsetGetLast());
+    }
+
+    /**
+     * Test Offset Get Position
+     *
+     * @return null
+     */
+    public function testOffsetGetPosition(): void
+    {
+        $this->extendedArray->next();
+        next($this->plainArray);
+
+        $keyFromPosition = array_keys($this->plainArray)[2];
+        $this->assertSame(
+            $this->plainArray[$keyFromPosition],
+            $this->extendedArray->OffsetGetPosition(2)
+        );
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
+
+        try {
+            $this->emptyArray->offsetGetPosition(0);
+        } catch (\OutOfBoundsException $e) {
+            $this->assertSame(
+                'Seek position 0 is out of range',
+                $e->getMessage()
+            );
+        }
+    }
+
+    /**
+     * Test Shuffle
+     *
+     * @return null
+     */
+    public function testShuffle(): void
+    {
+        $this->extendedArray->next();
+
+        $this->extendedArray->shuffle()->keys();
+        $this->assertSame(
+            array_keys($this->extendedArray->getArrayCopy()),
+            $this->extendedArray->keys()->getArrayCopy()
+        );
+        $this->assertSame(
+            $this->extendedArray->keys()->offsetGetFirst(),
+            $this->extendedArray->key()
+        );
+
+        $this->assertSame([], $this->emptyArray->shuffle()->getArrayCopy());
+    }
+
+    /**
+     * Test Values
+     *
+     * @return null
+     */
+    public function testValues(): void
+    {
+        $this->extendedArray->next();
+        next($this->plainArray);
+
         $this->assertSame(
             array_values($this->plainArray),
             $this->extendedArray->values()->getArrayCopy()
         );
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
+
+        $this->assertSame([], $this->emptyArray->values()->getArrayCopy());
     }
 
     /**
@@ -736,36 +988,5 @@ class ExtendedArrayTest extends TestCase
         $timeTaken = microtime(true) - $startTime;
 
         $this->assertLessThan(0.05, $timeTaken);
-    }
-
-    /**
-     * Seek Key poly-fill for extended array
-     *
-     * @param array      $array to move cursor
-     * @param int|string $key   to seek
-     *
-     * @return null
-     */
-    protected function seekKey(array &$array, $key): void
-    {
-        for (reset($array); !is_null(key($array)); next($array)) {
-            if (key($array) === $key) {
-                break;
-            }
-        }
-    }
-
-    /**
-     * Get item from extended array
-     *
-     * @param mixed $item to be returned
-     *
-     * @return mixed
-     */
-    public function getItem($item)
-    {
-        return ExtendedArray::isArrayObject($item)
-            ? $item->getArrayCopy()
-            : $item;
     }
 }
