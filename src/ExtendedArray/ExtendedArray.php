@@ -13,6 +13,8 @@
 
 namespace Breier\ExtendedArray;
 
+use Breier\ExtendedArray\ExtendedArrayMergeMap as MergeMap;
+
 use \ArrayIterator;
 use \ArrayObject;
 use \SplFixedArray;
@@ -228,7 +230,7 @@ class ExtendedArray extends ExtendedArrayBase
     ): ExtendedArray {
 
         $this->saveCursor();
-        $preparedParams = ExtendedArrayMergeMap::prepareMapParams($this, $params);
+        $preparedParams = MergeMap::prepareMapParams($this, $params);
         $mappedArray = new static();
 
         for (
@@ -240,7 +242,7 @@ class ExtendedArray extends ExtendedArrayBase
                 $this->key(),
                 call_user_func_array(
                     $callback,
-                    $preparedParams->element()->getElements()
+                    $preparedParams->element()->getArrayCopy()
                 )
             );
         }
