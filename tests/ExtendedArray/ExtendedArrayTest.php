@@ -520,10 +520,103 @@ class ExtendedArrayTest extends TestCase
     }
 
     /**
+     * Test Join with Comma
+     *
+     * @return null
+     */
+    public function testJoinComma(): void
+    {
+        $toStringMap = function ($item) {
+            if (is_array($item)) {
+                $item = json_encode($item);
+            }
+            return (string) $item;
+        };
+        $stringArray = array_map($toStringMap, $this->plainArray);
+
+        $this->extendedArray->next();
+        next($stringArray);
+
+        $this->assertSame(
+            join(',', $stringArray),
+            $this->extendedArray->join(',')
+        );
+        $this->assertSame(
+            key($stringArray),
+            $this->extendedArray->key()
+        );
+
+        $this->assertSame('', $this->emptyArray->join());
+    }
+
+    /**
+     * Test Join with String
+     *
+     * @return null
+     */
+    public function testJoinString(): void
+    {
+        $toStringMap = function ($item) {
+            if (is_array($item)) {
+                $item = json_encode($item);
+            }
+            return (string) $item;
+        };
+        $stringArray = array_map($toStringMap, $this->plainArray);
+
+        $this->assertSame(
+            join('=/=', $stringArray),
+            $this->extendedArray->join('=/=')
+        );
+    }
+
+    /**
+     * Test Join with Integer
+     *
+     * @return null
+     */
+    public function testJoinInteger(): void
+    {
+        $toStringMap = function ($item) {
+            if (is_array($item)) {
+                $item = json_encode($item);
+            }
+            return (string) $item;
+        };
+        $stringArray = array_map($toStringMap, $this->plainArray);
+
+        $this->assertSame(
+            join(77, $stringArray),
+            $this->extendedArray->join(77)
+        );
+    }
+
+    /**
+     * Test Join with Empty String
+     *
+     * @return null
+     */
+    public function testJoinEmptyString(): void
+    {
+        $toStringMap = function ($item) {
+            if (is_array($item)) {
+                $item = json_encode($item);
+            }
+            return (string) $item;
+        };
+        $stringArray = array_map($toStringMap, $this->plainArray);
+
+        $this->assertSame(
+            join('', $stringArray),
+            $this->extendedArray->join()
+        );
+    }
+
+    /**
      * Test Keys
      *
      * It's pretty much covered everywhere else
-     * 
+     *
      * So I'm just skipping it ;)
      */
 

@@ -205,6 +205,18 @@ Extending filter to support objects.
   ```
 </details>
 
+### `join(string $glue = ''): string`
+Concatenate array values in a string separated by $glue
+<details>
+  <summary>Code Example</summary>
+
+  ```php
+  <?php
+  $cities = new ExtendedArray(['Dublin', 'Paris', 'Cairo', 'Tokyo']);
+  print($cities->join(',')); // Dublin,Paris,Cairo,Tokyo
+  ```
+</details>
+
 ### `keys(): ExtendedArray`
 Get this array keys (properties' names).
 <details>

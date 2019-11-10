@@ -175,6 +175,30 @@ class ExtendedArray extends ExtendedArrayBase
     }
 
     /**
+     * Concatenate array values in a string separated by glue
+     *
+     * @param string $glue To join items with
+     *
+     * @return string
+     */
+    public function join(string $glue = ''): string
+    {
+        $this->saveCursor();
+        $outputString = '';
+
+        for ($this->first(); $this->valid(); $this->next()) {
+            if (strlen($outputString)) {
+                $outputString .= $glue;
+            }
+            $outputString .= $this->element();
+        }
+
+        $this->restoreCursor();
+
+        return $outputString;
+    }
+
+    /**
      * Extended Array Keys, poly-fill for `array_keys`
      *
      * @return ExtendedArray
@@ -228,7 +252,6 @@ class ExtendedArray extends ExtendedArrayBase
         callable $callback,
         array ...$params
     ): ExtendedArray {
-
         $this->saveCursor();
         $preparedParams = MergeMap::prepareMapParams($this, $params);
         $mappedArray = new static();
