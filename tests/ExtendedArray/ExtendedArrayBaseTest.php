@@ -162,34 +162,6 @@ class ExtendedArrayBaseTest extends TestCase
     }
 
     /**
-     * Test Instantiate Serialized
-     *
-     * @return null
-     */
-    public function testInstantiateSerialized(): void
-    {
-        $newFromSerialized = new ExtendedArrayBaseClass();
-        $newFromSerialized->unserialize(
-            $this->extendedArray->serialize()
-        );
-        $newFromSerialized->next();
-        next($this->plainArray);
-
-        $this->assertSame(
-            $this->plainArray,
-            $newFromSerialized->getArrayCopy()
-        );
-        $this->assertSame(
-            array_keys($this->plainArray),
-            $newFromSerialized->keys()
-        );
-        $this->assertSame(
-            key($this->plainArray),
-            $newFromSerialized->key()
-        );
-    }
-
-    /**
      * Test Instantiate SplFixedArray
      *
      * @return null
@@ -637,6 +609,39 @@ class ExtendedArrayBaseTest extends TestCase
         );
 
         $this->assertSame(null, $this->emptyArray->next()->key());
+    }
+
+    /**
+     * Test OffsetExists
+     *
+     * @return null
+     */
+    public function testOffsetExists(): void
+    {
+        $this->extendedArray->next();
+        next($this->plainArray);
+
+        $this->assertSame(
+            array_key_exists('one', $this->plainArray),
+            $this->extendedArray->offsetExists('one')
+        );
+        $this->assertSame(
+            key($this->plainArray),
+            $this->extendedArray->key()
+        );
+
+        $this->assertSame(
+            array_key_exists(5, $this->plainArray),
+            $this->extendedArray->offsetExists(5)
+        );
+        $this->assertSame(
+            array_key_exists(null, $this->plainArray),
+            $this->extendedArray->offsetExists(null)
+        );
+        $this->assertSame(
+            array_key_exists('one', []),
+            $this->emptyArray->offsetExists('one')
+        );
     }
 
     /**

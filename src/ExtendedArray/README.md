@@ -25,7 +25,6 @@ You can find all the methods and their documentation at
   | current      |                    | mixed  | Get the element under the cursor
   | getFlags     |                    | int    | Get behaviour flags of the ArrayIterator
   | key          |                    | mixed  | Current position element index
-  | offsetExists | mixed $index       | bool   | Validate element index
   | offsetGet    | mixed $index       | mixed  | Get element in given index
   | seek         | int $position      | null   | Moves the cursor to given position
   | serialize    |                    | string | Applies PHP serialization to the object
@@ -63,6 +62,7 @@ to improve its use as a clean Object Oriented Class.
   | natcasesort   |                        | this   | Extending method to update position map
   | natsort       |                        | this   | Extending method to update position map
   | next          |                        | this   | Extending method to return $this
+  | offsetExists  | mixed $index           | bool   | Extending method to behave like "array_key_exists"
   | offsetSet     | <nobr>mixed $index, mixed $newval</nobr>  | null   | Extending method to update position map
   | offsetUnset   | mixed $index           | null   | Extending method to update position map
   | prev          |                        | this   | `[added]` Move the cursor to previous element

@@ -32,7 +32,6 @@ use \ArrayObject;
  * @method mixed current(); Get the element under the cursor
  * @method int getFlags(); Get behaviour flags of the ArrayIterator
  * @method mixed key(); Current position element index
- * @method bool offsetExists(mixed $index); Validate element index
  * @method mixed offsetGet(mixed $index); Get element in given index
  * @method string serialize(); Applies PHP serialization to the object
  * @method null setFlags(string $flags); Set behaviour flags of the ArrayIterator
@@ -277,6 +276,21 @@ abstract class ExtendedArrayBase extends ArrayIterator
         parent::next();
 
         return $this;
+    }
+
+    /**
+     * Extending Offset Exists Method to behave like "array_key_exists"
+     * Validate element index
+     *
+     * @param mixed $index To check
+     *
+     * @return bool
+     */
+    public function offsetExists($index): bool
+    {
+        $index = $index ?: '';
+
+        return parent::offsetExists($index);
     }
 
     /**
