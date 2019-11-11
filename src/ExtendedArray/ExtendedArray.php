@@ -15,10 +15,6 @@ namespace Breier\ExtendedArray;
 
 use Breier\ExtendedArray\ExtendedArrayMergeMap as MergeMap;
 
-use \ArrayIterator;
-use \ArrayObject;
-use \SplFixedArray;
-
 /**
  * Extended Array Class
  *
@@ -170,7 +166,7 @@ class ExtendedArray extends ExtendedArrayBase
         return (
             is_array($element)
             || static::isArrayObject($element)
-            || $element instanceof SplFixedArray
+            || $element instanceof \SplFixedArray
         );
     }
 
