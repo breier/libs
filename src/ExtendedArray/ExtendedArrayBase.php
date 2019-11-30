@@ -178,8 +178,10 @@ abstract class ExtendedArrayBase extends ArrayIterator
      * @param int $options (JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | ...)
      * @param int $depth   Recursion level
      */
-    public function jsonSerialize(int $options = 0, int $depth = 512): string
-    {
+    public function jsonSerialize(
+        int $options = JSON_THROW_ON_ERROR,
+        int $depth = 512
+    ): string {
         return json_encode($this, $options, $depth);
     }
 
