@@ -63,6 +63,17 @@ class ExtendedArray extends ExtendedArrayBase
     }
 
     /**
+     * Explode a string by delimiter
+     */
+    public static function explode(
+        string $delimiter,
+        string $string,
+        int $limit = PHP_INT_MAX
+    ): ExtendedArray {
+        return new static(explode($delimiter, $string, $limit));
+    }
+
+    /**
      * Filter, poly-fill for `array_filter`
      * When using flag "both", $value goes first, then $key.
      *

@@ -107,6 +107,26 @@ Contains is similar to "in_array" with object support.
   ```
 </details>
 
+
+### `explode(string $delimiter, string $string[, int $limit = PHP_INT_MAX]): ExtendedArray`
+Explode a string by delimiter
+<details>
+  <summary>Code Example</summary>
+
+  ```php
+  <?php
+  print(ExtendedArray::explode(',', 'Dublin,Paris,Cairo,Tokyo'));
+  /**
+   * {
+   *   "0": "Dublin",
+   *   "1": "Paris",
+   *   "2": "Cairo",
+   *   "3": "Tokyo"
+   * }
+   */
+  ```
+</details>
+
 ### `filter([callable $callback[, int $flag]]): ExtendedArray`
 A poly-fill for "array_filter".
 <details>

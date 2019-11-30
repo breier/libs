@@ -158,6 +158,52 @@ class ExtendedArrayTest extends TestCase
     }
 
     /**
+     * Test Explode
+     *
+     * @return void
+     */
+    public function testExplode(): void
+    {
+        $this->assertSame(
+            explode(' ', $this->plainArray['six']['temp']),
+            ExtendedArray::explode(
+                ' ',
+                $this->extendedArray->six->temp
+            )->getArrayCopy()
+        );
+
+        $this->assertSame(
+            explode(' ', $this->plainArray['six']['temp'], 3),
+            ExtendedArray::explode(
+                ' ',
+                $this->extendedArray->six->temp,
+                3
+            )->getArrayCopy()
+        );
+
+        $this->assertSame(
+            explode('that', $this->plainArray['six']['temp']),
+            ExtendedArray::explode(
+                'that',
+                $this->extendedArray->six->temp
+            )->getArrayCopy()
+        );
+
+        $this->assertSame(
+            explode(77, $this->plainArray['six']['temp']),
+            ExtendedArray::explode(
+                77,
+                $this->extendedArray->six->temp
+            )->getArrayCopy()
+        );
+
+        $this->assertSame(
+            explode('"', ''),
+            ExtendedArray::explode('"', '')->getArrayCopy()
+        );
+    }
+
+    /**
      * Test Filter isArray
      */
     public function testFilterIsArray(): void
