@@ -205,7 +205,7 @@ Extending filter to support objects.
   ```
 </details>
 
-### `join(string $glue = ''): string`
+### `implode(string $glue = ''): string`
 Concatenate array values in a string separated by $glue
 <details>
   <summary>Code Example</summary>
@@ -213,7 +213,7 @@ Concatenate array values in a string separated by $glue
   ```php
   <?php
   $cities = new ExtendedArray(['Dublin', 'Paris', 'Cairo', 'Tokyo']);
-  print($cities->join(',')); // Dublin,Paris,Cairo,Tokyo
+  print($cities->implode(',')); // Dublin,Paris,Cairo,Tokyo
   ```
 </details>
 

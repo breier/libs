@@ -159,8 +159,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Filter isArray
-     *
-     * @return null
      */
     public function testFilterIsArray(): void
     {
@@ -448,9 +446,92 @@ class ExtendedArrayTest extends TestCase
     }
 
     /**
+     * Test Implode with Comma
+     */
+    public function testImplodeComma(): void
+    {
+        $toStringMap = function ($item) {
+            if (is_array($item)) {
+                $item = json_encode($item);
+            }
+            return (string) $item;
+        };
+        $stringArray = array_map($toStringMap, $this->plainArray);
+
+        $this->extendedArray->next();
+        next($stringArray);
+
+        $this->assertSame(
+            implode(',', $stringArray),
+            $this->extendedArray->implode(',')
+        );
+        $this->assertSame(
+            key($stringArray),
+            $this->extendedArray->key()
+        );
+
+        $this->assertSame('', $this->emptyArray->implode());
+    }
+
+    /**
+     * Test Implode with String
+     */
+    public function testImplodeString(): void
+    {
+        $toStringMap = function ($item) {
+            if (is_array($item)) {
+                $item = json_encode($item);
+            }
+            return (string) $item;
+        };
+        $stringArray = array_map($toStringMap, $this->plainArray);
+
+        $this->assertSame(
+            implode('=/=', $stringArray),
+            $this->extendedArray->implode('=/=')
+        );
+    }
+
+    /**
+     * Test Implode with Integer
+     */
+    public function testImplodeInteger(): void
+    {
+        $toStringMap = function ($item) {
+            if (is_array($item)) {
+                $item = json_encode($item);
+            }
+            return (string) $item;
+        };
+        $stringArray = array_map($toStringMap, $this->plainArray);
+
+        $this->assertSame(
+            implode(77, $stringArray),
+            $this->extendedArray->implode(77)
+        );
+    }
+
+    /**
+     * Test Implode with Empty String
+     */
+    public function testImplodeEmptyString(): void
+    {
+        $toStringMap = function ($item) {
+            if (is_array($item)) {
+                $item = json_encode($item);
+            }
+            return (string) $item;
+        };
+        $stringArray = array_map($toStringMap, $this->plainArray);
+
+        $this->assertSame(
+            implode('', $stringArray),
+            $this->extendedArray->implode()
+        );
+    }
+
+    /**
      * Test Is Array
-     *
-     * @return null
      */
     public function testIsArray(): void
     {
@@ -477,99 +558,6 @@ class ExtendedArrayTest extends TestCase
         $this->assertSame(
             key($this->plainArray),
             $this->extendedArray->key()
-        );
-    }
-
-    /**
-     * Test Join with Comma
-     *
-     * @return null
-     */
-    public function testJoinComma(): void
-    {
-        $toStringMap = function ($item) {
-            if (is_array($item)) {
-                $item = json_encode($item);
-            }
-            return (string) $item;
-        };
-        $stringArray = array_map($toStringMap, $this->plainArray);
-
-        $this->extendedArray->next();
-        next($stringArray);
-
-        $this->assertSame(
-            join(',', $stringArray),
-            $this->extendedArray->join(',')
-        );
-        $this->assertSame(
-            key($stringArray),
-            $this->extendedArray->key()
-        );
-
-        $this->assertSame('', $this->emptyArray->join());
-    }
-
-    /**
-     * Test Join with String
-     *
-     * @return null
-     */
-    public function testJoinString(): void
-    {
-        $toStringMap = function ($item) {
-            if (is_array($item)) {
-                $item = json_encode($item);
-            }
-            return (string) $item;
-        };
-        $stringArray = array_map($toStringMap, $this->plainArray);
-
-        $this->assertSame(
-            join('=/=', $stringArray),
-            $this->extendedArray->join('=/=')
-        );
-    }
-
-    /**
-     * Test Join with Integer
-     *
-     * @return null
-     */
-    public function testJoinInteger(): void
-    {
-        $toStringMap = function ($item) {
-            if (is_array($item)) {
-                $item = json_encode($item);
-            }
-            return (string) $item;
-        };
-        $stringArray = array_map($toStringMap, $this->plainArray);
-
-        $this->assertSame(
-            join(77, $stringArray),
-            $this->extendedArray->join(77)
-        );
-    }
-
-    /**
-     * Test Join with Empty String
-     *
-     * @return null
-     */
-    public function testJoinEmptyString(): void
-    {
-        $toStringMap = function ($item) {
-            if (is_array($item)) {
-                $item = json_encode($item);
-            }
-            return (string) $item;
-        };
-        $stringArray = array_map($toStringMap, $this->plainArray);
-
-        $this->assertSame(
-            join('', $stringArray),
-            $this->extendedArray->join()
         );
     }
 

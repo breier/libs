@@ -154,7 +154,7 @@ class ExtendedArray extends ExtendedArrayBase
     /**
      * Concatenate array values in a string separated by glue
      */
-    public function join(string $glue = ''): string
+    public function implode(string $glue = ''): string
     {
         $this->saveCursor();
         $outputString = '';
