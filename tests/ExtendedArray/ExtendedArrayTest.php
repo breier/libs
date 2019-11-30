@@ -1,6 +1,7 @@
 <?php
+
 /**
- * Class ExtendedArrayTest
+ * Extended Array Test File
  *
  * PHP version 7
  *
@@ -13,37 +14,29 @@
 
 namespace Test\ExtendedArray;
 
-use Breier\ExtendedArray\ExtendedArray;
 use PHPUnit\Framework\TestCase;
 
-use JsonException;
+use Breier\ExtendedArray\ExtendedArray;
 
 use ArrayIterator;
 use ArrayObject;
 use SplFixedArray;
+use JsonException;
 
 /**
- * Class ExtendedArrayTest
- *
- * @category Tests
- * @package  Breier/Libs
- * @author   Andre Breier <andre@breier.net.br>
- * @license  GPLv3 https://www.gnu.org/licenses/gpl-3.0.en.html
- * @link     php vendor/phpunit/phpunit/phpunit tests/ExtendedArrayTest.php
+ * Extended Array Test Class
  */
 class ExtendedArrayTest extends TestCase
 {
-    protected $emptyArray;
-    protected $plainArray;
-    protected $extendedArray;
-    protected $arrayIterator;
-    protected $arrayObject;
-    protected $splFixedArray;
+    private $emptyArray;
+    private $plainArray;
+    private $extendedArray;
+    private $arrayIterator;
+    private $arrayObject;
+    private $splFixedArray;
 
     /**
      * Set up an example array for every test
-     *
-     * @return null
      */
     public function setUp(): void
     {
@@ -69,8 +62,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Arsort
-     *
-     * @return null
      */
     public function testArsort(): void
     {
@@ -97,8 +88,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Contains String
-     *
-     * @return null
      */
     public function testContainsString(): void
     {
@@ -117,8 +106,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Contains Object
-     *
-     * @return null
      */
     public function testContainsObject(): void
     {
@@ -131,8 +118,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Contains Own
-     *
-     * @return null
      */
     public function testContainsOwn(): void
     {
@@ -146,8 +131,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Contains Integer
-     *
-     * @return null
      */
     public function testContainsInteger(): void
     {
@@ -159,8 +142,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Contains Other
-     *
-     * @return null
      */
     public function testContainsOther(): void
     {
@@ -201,8 +182,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Filter isString Key
-     *
-     * @return null
      */
     public function testFilterIsStringKey(): void
     {
@@ -224,8 +203,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Filter False
-     *
-     * @return null
      */
     public function testFilterFalse(): void
     {
@@ -240,8 +217,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Key and Value Filter
-     *
-     * @return null
      */
     public function testFilterKeyValue(): void
     {
@@ -263,8 +238,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Empty Array Filter
-     *
-     * @return null
      */
     public function testFilterEmpty(): void
     {
@@ -279,8 +252,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Empty Filter on sub-array
-     *
-     * @return null
      */
     public function testFilterSubEmpty(): void
     {
@@ -292,8 +263,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test FilterWithObjects isArray
-     *
-     * @return null
      */
     public function testFilterWithObjectsIsArray(): void
     {
@@ -305,7 +274,9 @@ class ExtendedArrayTest extends TestCase
         };
         $this->assertSame(
             array_filter($this->plainArray, $isArrayFilter),
-            $this->extendedArray->filterWithObjects($isArrayFilter)->getArrayCopy()
+            $this->extendedArray->filterWithObjects(
+                $isArrayFilter
+            )->getArrayCopy()
         );
         $this->assertSame(
             key($this->plainArray),
@@ -315,8 +286,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test FilterWithObjects isString Key
-     *
-     * @return null
      */
     public function testFilterWithObjectsIsStringKey(): void
     {
@@ -338,8 +307,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test FilterWithObjects False
-     *
-     * @return null
      */
     public function testFilterWithObjectsFalse(): void
     {
@@ -348,14 +315,14 @@ class ExtendedArrayTest extends TestCase
         };
         $this->assertSame(
             array_filter($this->plainArray, $allFalseFilter),
-            $this->extendedArray->filterWithObjects($allFalseFilter)->getArrayCopy()
+            $this->extendedArray->filterWithObjects(
+                $allFalseFilter
+            )->getArrayCopy()
         );
     }
 
     /**
      * Test Key and Value FilterWithObjects
-     *
-     * @return null
      */
     public function testFilterWithObjectsKeyValue(): void
     {
@@ -377,8 +344,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Methods FilterWithObjects
-     *
-     * @return null
      */
     public function testFilterWithObjectsMethod(): void
     {
@@ -394,14 +359,14 @@ class ExtendedArrayTest extends TestCase
         );
         $this->assertSame(
             [0 => [2 => 'two', 'three']],
-            $this->extendedArray->filterWithObjects($methodFilter)->getArrayCopy()
+            $this->extendedArray->filterWithObjects(
+                $methodFilter
+            )->getArrayCopy()
         );
     }
 
     /**
      * Test Empty Array FilterWithObjects
-     *
-     * @return null
      */
     public function testFilterWithObjectsEmpty(): void
     {
@@ -410,14 +375,14 @@ class ExtendedArrayTest extends TestCase
         };
         $this->assertSame(
             array_filter([], $allTrueFilter),
-            $this->emptyArray->filterWithObjects($allTrueFilter)->getArrayCopy()
+            $this->emptyArray->filterWithObjects(
+                $allTrueFilter
+            )->getArrayCopy()
         );
     }
 
     /**
      * Test Empty FilterWithObjects on sub-array
-     *
-     * @return null
      */
     public function testFilterWithObjectsSubEmpty(): void
     {
@@ -429,8 +394,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test PlainArray From JSON
-     *
-     * @return null
      */
     public function testPlainArrayFromJSON(): void
     {
@@ -443,8 +406,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Throws JSON Exception
-     *
-     * @return null
      */
     public function testInstantiateThrowsJsonException(): void
     {
@@ -454,7 +415,7 @@ class ExtendedArrayTest extends TestCase
          */
         try {
             ExtendedArray::fromJSON($fromJSON, 2);
-        } catch (\JsonException $e) {
+        } catch (JsonException $e) {
             $this->assertSame(
                 'Maximum stack depth exceeded',
                 $e->getMessage()
@@ -466,7 +427,7 @@ class ExtendedArrayTest extends TestCase
          */
         try {
             ExtendedArray::fromJSON(substr($fromJSON, 0, 50));
-        } catch (\JsonException $e) {
+        } catch (JsonException $e) {
             $this->assertSame(
                 'Control character error, possibly incorrectly encoded',
                 $e->getMessage()
@@ -478,7 +439,7 @@ class ExtendedArrayTest extends TestCase
          */
         try {
             ExtendedArray::fromJSON('invalid');
-        } catch (\JsonException $e) {
+        } catch (JsonException $e) {
             $this->assertSame(
                 'Syntax error',
                 $e->getMessage()
@@ -622,8 +583,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Krsort
-     *
-     * @return null
      */
     public function testKrsort(): void
     {
@@ -650,8 +609,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Map String Length
-     *
-     * @return null
      */
     public function testMapStringLength(): void
     {
@@ -676,8 +633,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Map String Conversion
-     *
-     * @return null
      */
     public function testMapStringConversion(): void
     {
@@ -695,8 +650,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Map Cube
-     *
-     * @return null
      */
     public function testMapCube(): void
     {
@@ -717,8 +670,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Map isArray
-     *
-     * @return null
      */
     public function testMapIsArray(): void
     {
@@ -733,8 +684,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Map Extra Params
-     *
-     * @return null
      */
     public function testMapExtraParams(): void
     {
@@ -762,8 +711,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Empty Array Map
-     *
-     * @return null
      */
     public function testMapEmpty(): void
     {
@@ -778,8 +725,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test MapWithObjects String Length
-     *
-     * @return null
      */
     public function testMapWithObjectsStringLength(): void
     {
@@ -804,8 +749,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test MapWithObjects String Conversion
-     *
-     * @return null
      */
     public function testMapWithObjectsStringConversion(): void
     {
@@ -823,8 +766,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test MapWithObjects Cube
-     *
-     * @return null
      */
     public function testMapWithObjectsCube(): void
     {
@@ -845,8 +786,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test MapWithObjects isArray
-     *
-     * @return null
      */
     public function testMapWithObjectsIsArray(): void
     {
@@ -861,8 +800,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test MapWithObjects Extra Params
-     *
-     * @return null
      */
     public function testMapWithObjectsExtraParams(): void
     {
@@ -890,8 +827,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test MapWithObjects Method
-     *
-     * @return null
      */
     public function testMapWithObjectsMethod(): void
     {
@@ -907,14 +842,16 @@ class ExtendedArrayTest extends TestCase
             0 => '[{"2":"two","3":"three"},-1]',
             7 => '["four",-1]',
             8 => '["five",-1]',
-            'six' => '[{"temp":"long string that\'s not so long","empty":null},-1]'
+            'six' => '[{"temp":"long string that\'s not'
+                . ' so long","empty":null},-1]'
         ];
         $expectedExtendedArrayMap = [
             'one' => '[1,-1]',
             0 => '{"3":"three","2":"two","4":2}',
             7 => '["four",-1]',
             8 => '["five",-1]',
-            'six' => '{"empty":null,"temp":"long string that\'s not so long","0":2}'
+            'six' => '{"empty":null,"temp":"long string'
+                . ' that\'s not so long","0":2}'
         ];
         $this->assertSame(
             array_map($methodMap, $this->plainArray),
@@ -928,8 +865,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Empty Array MapWithObjects
-     *
-     * @return null
      */
     public function testMapWithObjectsEmpty(): void
     {
@@ -944,8 +879,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Offset Get First
-     *
-     * @return null
      */
     public function testOffsetGetFirst(): void
     {
@@ -966,8 +899,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Offset Get Last
-     *
-     * @return null
      */
     public function testOffsetGetLast(): void
     {
@@ -988,8 +919,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Offset Get Position
-     *
-     * @return null
      */
     public function testOffsetGetPosition(): void
     {
@@ -1018,8 +947,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Shuffle
-     *
-     * @return null
      */
     public function testShuffle(): void
     {
@@ -1040,8 +967,6 @@ class ExtendedArrayTest extends TestCase
 
     /**
      * Test Values
-     *
-     * @return null
      */
     public function testValues(): void
     {
@@ -1061,10 +986,7 @@ class ExtendedArrayTest extends TestCase
     }
 
     /**
-     * Test 1000 ElementArray takes less than 50ms
-     *
-     * @return null
-     * @test   1000 ElementArray takes less than 50ms
+     * @test 1000 ElementArray takes less than 50ms
      */
     public function executionTimeIsAcceptable(): void
     {

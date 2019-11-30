@@ -1,6 +1,7 @@
 <?php
+
 /**
- * Class ExtendedArrayMergeMapTest
+ * Extended Array Merge Map Test File
  *
  * PHP version 7
  *
@@ -13,28 +14,21 @@
 
 namespace Test\ExtendedArray;
 
-use Breier\ExtendedArray\ExtendedArrayMergeMap;
-use Breier\ExtendedArray\ExtendedArray;
 use PHPUnit\Framework\TestCase;
 
+use Breier\ExtendedArray\ExtendedArray;
+use Breier\ExtendedArray\ExtendedArrayMergeMap;
+
 /**
- * Class ExtendedArrayMergeMapTest
- *
- * @category Tests
- * @package  Breier/Libs
- * @author   Andre Breier <andre@breier.net.br>
- * @license  GPLv3 https://www.gnu.org/licenses/gpl-3.0.en.html
- * @link     php vendor/phpunit/phpunit/phpunit tests/ExtendedArrayMergeMapTest.php
+ * Extended Array Merge Map Test Class
  */
 class ExtendedArrayMergeMapTest extends TestCase
 {
-    protected $plainArray;
-    protected $extendedArray;
+    private $plainArray;
+    private $extendedArray;
 
     /**
      * Set up an example array for every test
-     *
-     * @return null
      */
     public function setUp(): void
     {
@@ -57,8 +51,6 @@ class ExtendedArrayMergeMapTest extends TestCase
 
     /**
      * Test Instantiate
-     *
-     * @return null
      */
     public function testInstantiate(): void
     {
@@ -83,8 +75,6 @@ class ExtendedArrayMergeMapTest extends TestCase
 
     /**
      * Test GetArrayCopy
-     *
-     * @return null
      */
     public function testGetArrayCopy(): void
     {
@@ -107,8 +97,6 @@ class ExtendedArrayMergeMapTest extends TestCase
 
     /**
      * Test Merge
-     *
-     * @return null
      */
     public function testMerge(): void
     {
@@ -130,8 +118,6 @@ class ExtendedArrayMergeMapTest extends TestCase
 
     /**
      * Test MergePush [static]
-     *
-     * @return null
      */
     public function testMergePush(): void
     {
@@ -162,8 +148,6 @@ class ExtendedArrayMergeMapTest extends TestCase
 
     /**
      * Test PrepareMapParams [static]
-     *
-     * @return null
      */
     public function testPrepareMapParams(): void
     {
@@ -222,7 +206,7 @@ class ExtendedArrayMergeMapTest extends TestCase
          * Throws InvalidArgumentException
          */
         try {
-            $null = ExtendedArrayMergeMap::prepareMapParams(
+            ExtendedArrayMergeMap::prepareMapParams(
                 $this->extendedArray,
                 [1, null]
             );

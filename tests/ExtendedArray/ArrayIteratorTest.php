@@ -1,6 +1,7 @@
 <?php
+
 /**
- * Class ArrayIteratorTest
+ * Array Iterator Test File
  *
  * PHP version 7
  *
@@ -13,30 +14,22 @@
 
 namespace Test\ExtendedArray;
 
-use Breier\ExtendedArray\ExtendedArray;
 use PHPUnit\Framework\TestCase;
 
-use \ArrayIterator;
+use Breier\ExtendedArray\ExtendedArray;
+use ArrayIterator;
 
 /**
- * Class ArrayIteratorTest
- *
- * @category Tests
- * @package  Breier/Libs
- * @author   Andre Breier <andre@breier.net.br>
- * @license  GPLv3 https://www.gnu.org/licenses/gpl-3.0.en.html
- * @link     php vendor/phpunit/phpunit/phpunit tests/ArrayIteratorTest.php
+ * Array Iterator Test Class
  */
 class ArrayIteratorTest extends TestCase
 {
-    protected $emptyArray;
-    protected $plainArray;
-    protected $extendedArray;
+    private $emptyArray;
+    private $plainArray;
+    private $extendedArray;
 
     /**
      * Set up an example array for every test
-     *
-     * @return null
      */
     public function setUp(): void
     {
@@ -57,8 +50,6 @@ class ArrayIteratorTest extends TestCase
 
     /**
      * Test Count
-     *
-     * @return null
      */
     public function testCount(): void
     {
@@ -83,8 +74,6 @@ class ArrayIteratorTest extends TestCase
 
     /**
      * Test Current
-     *
-     * @return null
      */
     public function testCurrent(): void
     {
@@ -105,8 +94,6 @@ class ArrayIteratorTest extends TestCase
 
     /**
      * Test Get Flags ExtendedArray
-     *
-     * @return null
      */
     public function testGetFlagsExtendedArray(): void
     {
@@ -130,8 +117,6 @@ class ArrayIteratorTest extends TestCase
 
     /**
      * Test Get Flags ArrayIterator
-     *
-     * @return null
      */
     public function testGetFlagsArrayIterator(): void
     {
@@ -144,8 +129,6 @@ class ArrayIteratorTest extends TestCase
 
     /**
      * Test Key
-     *
-     * @return null
      */
     public function testKey(): void
     {
@@ -174,8 +157,6 @@ class ArrayIteratorTest extends TestCase
 
     /**
      * Test Offset Get
-     *
-     * @return null
      */
     public function testOffsetGet(): void
     {
@@ -199,8 +180,6 @@ class ArrayIteratorTest extends TestCase
 
     /**
      * Test Seek
-     *
-     * @return null
      */
     public function testSeek(): void
     {
@@ -239,8 +218,6 @@ class ArrayIteratorTest extends TestCase
 
     /**
      * Test Serialize
-     *
-     * @return null
      */
     public function testSerialize(): void
     {
@@ -261,8 +238,6 @@ class ArrayIteratorTest extends TestCase
 
     /**
      * Test Set Flags
-     *
-     * @return null
      */
     public function testSetFlags(): void
     {
@@ -308,8 +283,6 @@ class ArrayIteratorTest extends TestCase
 
     /**
      * Test Unserialize
-     *
-     * @return null
      */
     public function testUnserialize(): void
     {

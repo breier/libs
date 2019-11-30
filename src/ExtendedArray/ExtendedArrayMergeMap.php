@@ -1,26 +1,20 @@
 <?php
+
 /**
  * PHP Version 7
  *
- * Extended Array Merge Map Class
+ * Extended Array Merge Map File
  *
  * @category Extended_Class
  * @package  Breier\Libs
  * @author   Andre Breier <breier.de@gmail.com>
  * @license  GPLv3 https://www.gnu.org/licenses/gpl-3.0.en.html
- * @link     none.io
  */
 
 namespace Breier\ExtendedArray;
 
 /**
  * Extended Array Merge Map Class
- *
- * @category Extended_Class
- * @package  Breier\Libs
- * @author   Andre Breier <breier.de@gmail.com>
- * @license  GPLv3 https://www.gnu.org/licenses/gpl-3.0.en.html
- * @link     none.io
  */
 class ExtendedArrayMergeMap
 {
@@ -40,8 +34,6 @@ class ExtendedArrayMergeMap
 
     /**
      * Get Array Copy
-     *
-     * @return array
      */
     public function getArrayCopy(): array
     {
@@ -52,8 +44,6 @@ class ExtendedArrayMergeMap
      * Merge element to this
      *
      * @param mixed $element To be merged
-     *
-     * @return ExtendedArrayMergeMap
      */
     public function merge($element): ExtendedArrayMergeMap
     {
@@ -64,43 +54,33 @@ class ExtendedArrayMergeMap
 
     /**
      * Merge Push adds values from another array into main.
-     *
-     * @param ExtendedArray $mainArray To merge to
-     * @param array         $array     To merge from
-     *
-     * @return null
      */
-    public static function mergePush(ExtendedArray $mainArray, array $array): void
+    public static function mergePush(ExtendedArray $target, array $source): void
     {
-        $tempArray = new ExtendedArray($array);
+        $extendedSource = new ExtendedArray($source);
 
         for (
-            $mainArray->first(), $tempArray->first();
-            $mainArray->valid();
-            $mainArray->next(), $tempArray->next()
+            $target->first(), $extendedSource->first();
+            $target->valid();
+            $target->next(), $extendedSource->next()
         ) {
-            if (! $mainArray->element() instanceof static) {
-                $mainArray->offsetSet(
-                    $mainArray->key(),
-                    new static($mainArray->element(), $tempArray->element())
+            if (! $target->element() instanceof static) {
+                $target->offsetSet(
+                    $target->key(),
+                    new static($target->element(), $extendedSource->element())
                 );
                 continue;
             }
 
-            $mainArray->offsetSet(
-                $mainArray->key(),
-                $mainArray->element()->merge($tempArray->element())
+            $target->offsetSet(
+                $target->key(),
+                $target->element()->merge($extendedSource->element())
             );
         }
     }
 
     /**
      * Prepare Map Params
-     *
-     * @param ExtendedArray $mainArray To map to
-     * @param array         $params    To be mapped
-     *
-     * @return ExtendedArray
      */
     public static function prepareMapParams(
         ExtendedArray $mainArray,
@@ -108,13 +88,13 @@ class ExtendedArrayMergeMap
     ): ExtendedArray {
         $preparedParams = $mainArray->values();
 
-        foreach ($params as $array) {
-            if (!ExtendedArray::isArray($array)) {
+        foreach ($params as $subParams) {
+            if (!ExtendedArray::isArray($subParams)) {
                 throw new \InvalidArgumentException(
                     'Second parameter has to be an array of arrays!'
                 );
             }
-            static::mergePush($preparedParams, $array);
+            static::mergePush($preparedParams, $subParams);
         }
 
         foreach ($preparedParams as &$element) {

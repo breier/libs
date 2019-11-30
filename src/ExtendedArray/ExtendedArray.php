@@ -1,14 +1,14 @@
 <?php
+
 /**
  * PHP Version 7
  *
- * Extended Array Class
+ * Extended Array File
  *
  * @category Extended_Class
  * @package  Breier\Libs
  * @author   Andre Breier <breier.de@gmail.com>
  * @license  GPLv3 https://www.gnu.org/licenses/gpl-3.0.en.html
- * @link     none.io
  */
 
 namespace Breier\ExtendedArray;
@@ -17,19 +17,11 @@ use Breier\ExtendedArray\ExtendedArrayMergeMap as MergeMap;
 
 /**
  * Extended Array Class
- *
- * @category Extended_Class
- * @package  Breier\Libs
- * @author   Andre Breier <breier.de@gmail.com>
- * @license  GPLv3 https://www.gnu.org/licenses/gpl-3.0.en.html
- * @link     none.io
  */
 class ExtendedArray extends ExtendedArrayBase
 {
     /**
      * Reverse Sort by element, poly-fill for `arsort`
-     *
-     * @return ExtendedArray
      */
     public function arsort(): ExtendedArray
     {
@@ -49,16 +41,11 @@ class ExtendedArray extends ExtendedArrayBase
     /**
      * Contains, poly-fill for `in_array`
      *
-     * @param mixed $needle To search for
-     * @param bool  $strict Hard or soft comparison
-     *
-     * @return bool
-     *
      * @TO-DO review once array_search is implemented
      */
     public function contains($needle, bool $strict = false): bool
     {
-        $compare = $this->_getCompareFunction($strict);
+        $compare = $this->getCompareFunction($strict);
         $isContained = false;
 
         $this->saveCursor();
@@ -81,11 +68,11 @@ class ExtendedArray extends ExtendedArrayBase
      *
      * @param callable $callback Function to use
      * @param int      $flag     (ARRAY_FILTER_USE_KEY, ARRAY_FILTER_USE_BOTH)
-     *
-     * @return ExtendedArray
      */
-    public function filter(callable $callback = null, int $flag = 0): ExtendedArray
-    {
+    public function filter(
+        callable $callback = null,
+        int $flag = 0
+    ): ExtendedArray {
         if (is_null($callback)) {
             $flag = 0;
             $callback = function ($value) {
@@ -105,8 +92,6 @@ class ExtendedArray extends ExtendedArrayBase
      *
      * @param callable $callback Function to use
      * @param int      $flag     (ARRAY_FILTER_USE_KEY, ARRAY_FILTER_USE_BOTH)
-     *
-     * @return ExtendedArray
      */
     public function filterWithObjects(
         callable $callback = null,
@@ -141,14 +126,12 @@ class ExtendedArray extends ExtendedArrayBase
     /**
      * ExtendedArray from JSON
      *
-     * @param string $json  To parse
-     * @param int    $depth Recursion level
-     *
-     * @return ExtendedArray
      * @throws JsonException
      */
-    public static function fromJSON(string $json, int $depth = 512): ExtendedArray
-    {
+    public static function fromJSON(
+        string $json,
+        int $depth = 512
+    ): ExtendedArray {
         return new static(
             json_decode($json, true, $depth, JSON_THROW_ON_ERROR)
         );
@@ -157,9 +140,7 @@ class ExtendedArray extends ExtendedArrayBase
     /**
      * Is Array static function, extends `is_array`
      *
-     * @param array|ExtendedArray $element To be validated
-     *
-     * @return bool
+     * @param mixed $element To be validated
      */
     public static function isArray($element): bool
     {
@@ -172,10 +153,6 @@ class ExtendedArray extends ExtendedArrayBase
 
     /**
      * Concatenate array values in a string separated by glue
-     *
-     * @param string $glue To join items with
-     *
-     * @return string
      */
     public function join(string $glue = ''): string
     {
@@ -196,8 +173,6 @@ class ExtendedArray extends ExtendedArrayBase
 
     /**
      * Extended Array Keys, poly-fill for `array_keys`
-     *
-     * @return ExtendedArray
      */
     public function keys(): ExtendedArray
     {
@@ -206,8 +181,6 @@ class ExtendedArray extends ExtendedArrayBase
 
     /**
      * Reverse Sort by index, poly-fill for `krsort`
-     *
-     * @return ExtendedArray
      */
     public function krsort(): ExtendedArray
     {
@@ -223,8 +196,6 @@ class ExtendedArray extends ExtendedArrayBase
      *
      * @param callable $callback  Function to use
      * @param array    ...$params Extra parameters for the callback
-     *
-     * @return ExtendedArray
      */
     public function map(callable $callback, array ...$params): ExtendedArray
     {
@@ -241,8 +212,6 @@ class ExtendedArray extends ExtendedArrayBase
      *
      * @param callable $callback  Function to use
      * @param array    ...$params Extra params to callback
-     *
-     * @return ExtendedArray
      */
     public function mapWithObjects(
         callable $callback,
@@ -306,8 +275,6 @@ class ExtendedArray extends ExtendedArrayBase
     /**
      * Offset Get by given Position
      *
-     * @param int $position To seek
-     *
      * @return mixed
      */
     public function offsetGetPosition(int $position)
@@ -324,8 +291,6 @@ class ExtendedArray extends ExtendedArrayBase
 
     /**
      * Shuffle Elements Randomly, poly-fill for `shuffle`
-     *
-     * @return ExtendedArray
      */
     public function shuffle(): ExtendedArray
     {
@@ -338,8 +303,6 @@ class ExtendedArray extends ExtendedArrayBase
 
     /**
      * Get Values in a numbered key array, poly-fill for `array_values`
-     *
-     * @return ExtendedArray
      */
     public function values(): ExtendedArray
     {
@@ -358,12 +321,8 @@ class ExtendedArray extends ExtendedArrayBase
 
     /**
      * Get Compare Function
-     *
-     * @param bool $strict or not
-     *
-     * @return callable
      */
-    private function _getCompareFunction(bool $strict = false): callable
+    private function getCompareFunction(bool $strict = false): callable
     {
         if ($strict) {
             return function ($a, $b) {

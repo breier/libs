@@ -1,29 +1,28 @@
 <?php
+
 /**
  * PHP Version 7
  *
- * Extended Array Base Abstract Class to improve array handling
+ * Extended Array Base File
  *
  * @category Extended_Class
  * @package  Breier\Libs
  * @author   Andre Breier <breier.de@gmail.com>
  * @license  GPLv3 https://www.gnu.org/licenses/gpl-3.0.en.html
- * @link     none.io
  */
 
 namespace Breier\ExtendedArray;
 
 use Breier\ExtendedArray\ExtendedArrayMergeMap as MergeMap;
-
-use \SplFixedArray;
-use \ArrayIterator;
-use \ArrayObject;
+use SplFixedArray;
+use ArrayIterator;
+use ArrayObject;
 
 /**
  * ArrayIterator Class Entities
  *
  * @property int STD_PROP_LIST  = 1;
- * Properties of the object have their normal functionality when accessed as list
+ * Properties have their normal functionality when accessed as list
  * @property int ARRAY_AS_PROPS = 2;
  * Entries can be accessed as properties (read and write)
  *
@@ -34,22 +33,16 @@ use \ArrayObject;
  * @method mixed key(); Current position element index
  * @method mixed offsetGet(mixed $index); Get element in given index
  * @method string serialize(); Applies PHP serialization to the object
- * @method null setFlags(string $flags); Set behaviour flags of the ArrayIterator
- * @method null unserialize(string $serialized); Populates self using PHP unserialize
+ * @method null setFlags(string $flags); Set behaviour flags of ArrayIterator
+ * @method null unserialize(string $serialized); Populates self properties
  * @method bool valid(); Validate element in the current position
  *
  * Extended Array Base Abstract Class to improve array handling
- *
- * @category Extended_Class
- * @package  Breier\Libs
- * @author   Andre Breier <breier.de@gmail.com>
- * @license  GPLv3 https://www.gnu.org/licenses/gpl-3.0.en.html
- * @link     none.io
  */
 abstract class ExtendedArrayBase extends ArrayIterator
 {
-    private $_positionMap = [];
-    private $_lastCursorPosition = 0;
+    private $positionMap = [];
+    private $lastCursorPosition = 0;
 
     /**
      * Instantiate an Extended Array
@@ -87,15 +80,13 @@ abstract class ExtendedArrayBase extends ArrayIterator
 
         parent::__construct($array, $flags);
 
-        $this->_updatePositionMap();
+        $this->updatePositionMap();
 
         $this->rewind();
     }
 
     /**
      * Converts the Extended Array to JSON String
-     *
-     * @return string
      */
     public function __toString(): string
     {
@@ -105,8 +96,6 @@ abstract class ExtendedArrayBase extends ArrayIterator
     /**
      * Extending ASort Method to support sub-arrays
      * Sort ascending by elements
-     *
-     * @return ExtendedArrayBase
      */
     public function asort(): ExtendedArrayBase
     {
@@ -135,13 +124,11 @@ abstract class ExtendedArrayBase extends ArrayIterator
 
     /**
      * Move the Cursor to the End, poly-fill for `end`
-     *
-     * @return ExtendedArrayBase
      */
     public function end(): ExtendedArrayBase
     {
         if ($this->count()) {
-            $this->seek($this->count() -1);
+            $this->seek($this->count() - 1);
         }
 
         return $this;
@@ -149,8 +136,6 @@ abstract class ExtendedArrayBase extends ArrayIterator
 
     /**
      * First is an alias for Rewind
-     *
-     * @return ExtendedArrayBase
      */
     public function first(): ExtendedArrayBase
     {
@@ -159,8 +144,6 @@ abstract class ExtendedArrayBase extends ArrayIterator
 
     /**
      * Extending Get Array Copy to convert sub-items to array
-     *
-     * @return array
      */
     public function getArrayCopy(): array
     {
@@ -179,8 +162,6 @@ abstract class ExtendedArrayBase extends ArrayIterator
      * Is Array Object identifies usable classes
      *
      * @param mixed $array The object to be validated
-     *
-     * @return bool
      */
     public static function isArrayObject($array): bool
     {
@@ -196,8 +177,6 @@ abstract class ExtendedArrayBase extends ArrayIterator
      *
      * @param int $options (JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | ...)
      * @param int $depth   Recursion level
-     *
-     * @return string
      */
     public function jsonSerialize(int $options = 0, int $depth = 512): string
     {
@@ -206,30 +185,24 @@ abstract class ExtendedArrayBase extends ArrayIterator
 
     /**
      * Get Keys have to be implemented
-     *
-     * @return mixed
      */
     abstract public function keys();
 
     /**
      * Extending KSort Method to update position map
      * Sort ascending by element indexes
-     *
-     * @return ExtendedArrayBase
      */
     public function ksort(): ExtendedArrayBase
     {
         parent::ksort();
 
-        $this->_updatePositionMap();
+        $this->updatePositionMap();
 
         return $this->rewind();
     }
 
     /**
      * Last is an alias to End
-     *
-     * @return ExtendedArrayBase
      */
     public function last(): ExtendedArrayBase
     {
@@ -239,14 +212,12 @@ abstract class ExtendedArrayBase extends ArrayIterator
     /**
      * Extending NatCaseSort Method to update position map
      * Sort elements using case insensitive "natural order"
-     *
-     * @return ExtendedArrayBase
      */
     public function natcasesort(): ExtendedArrayBase
     {
         parent::natcasesort();
 
-        $this->_updatePositionMap();
+        $this->updatePositionMap();
 
         return $this->rewind();
     }
@@ -254,22 +225,18 @@ abstract class ExtendedArrayBase extends ArrayIterator
     /**
      * Extending NatSort Method to update position map
      * Sort elements using "natural order"
-     *
-     * @return ExtendedArrayBase
      */
     public function natsort(): ExtendedArrayBase
     {
         parent::natsort();
 
-        $this->_updatePositionMap();
+        $this->updatePositionMap();
 
         return $this->rewind();
     }
 
     /**
      * Extending next Method to return ExtendedArrayBase instead of void
-     *
-     * @return ExtendedArrayBase
      */
     public function next(): ExtendedArrayBase
     {
@@ -283,8 +250,6 @@ abstract class ExtendedArrayBase extends ArrayIterator
      * Validate element index
      *
      * @param mixed $index To check
-     *
-     * @return bool
      */
     public function offsetExists($index): bool
     {
@@ -299,8 +264,6 @@ abstract class ExtendedArrayBase extends ArrayIterator
      *
      * @param int|string $index  Key of the item
      * @param mixed      $newval To be set
-     *
-     * @return null
      */
     public function offsetSet($index, $newval): void
     {
@@ -308,7 +271,8 @@ abstract class ExtendedArrayBase extends ArrayIterator
             ? !$this->offsetExists($index)
             : true;
 
-        if (is_array($newval)
+        if (
+            is_array($newval)
             || static::isArrayObject($newval)
             || $newval instanceof SplFixedArray
         ) {
@@ -318,7 +282,7 @@ abstract class ExtendedArrayBase extends ArrayIterator
         parent::offsetSet($index, $newval);
 
         if ($isAppend) {
-            $this->_appendPositionMap($index);
+            $this->appendPositionMap($index);
         }
     }
 
@@ -327,26 +291,22 @@ abstract class ExtendedArrayBase extends ArrayIterator
      * Remove an element
      *
      * @param int|string $index Key of the item
-     *
-     * @return null
      */
     public function offsetUnset($index): void
     {
         parent::offsetUnset($index);
 
         $this->saveCursor();
-        $this->_updatePositionMap();
+        $this->updatePositionMap();
         $this->restoreCursor();
     }
 
     /**
      * Move the Cursor to Previous element
-     *
-     * @return ExtendedArrayBase
      */
     public function prev(): ExtendedArrayBase
     {
-        $currentPosition = $this->_getCursorPosition();
+        $currentPosition = $this->getCursorPosition();
 
         if (!$currentPosition) {
             return $this->end()->next();
@@ -360,8 +320,6 @@ abstract class ExtendedArrayBase extends ArrayIterator
     /**
      * Extending Rewind Method to return ExtendedArrayBase instead of void
      * Move the cursor to initial position
-     *
-     * @return ExtendedArrayBase
      */
     public function rewind(): ExtendedArrayBase
     {
@@ -375,14 +333,12 @@ abstract class ExtendedArrayBase extends ArrayIterator
      * Sort by elements using given function
      *
      * @param callable $cmp_function to compare
-     *
-     * @return ExtendedArrayBase
      */
     public function uasort($cmp_function): ExtendedArrayBase
     {
         parent::uasort($cmp_function);
 
-        $this->_updatePositionMap();
+        $this->updatePositionMap();
 
         return $this->rewind();
     }
@@ -392,78 +348,66 @@ abstract class ExtendedArrayBase extends ArrayIterator
      * Sort by indexes using given function
      *
      * @param callable $cmp_function to compare
-     *
-     * @return ExtendedArrayBase
      */
     public function uksort($cmp_function): ExtendedArrayBase
     {
         parent::uksort($cmp_function);
 
-        $this->_updatePositionMap();
+        $this->updatePositionMap();
 
         return $this->rewind();
     }
 
     /**
      * Get Position Map
-     *
-     * @return array
      */
     protected function getPositionMap(): array
     {
-        return $this->_positionMap;
+        return $this->positionMap;
     }
 
     /**
      * Save Current Cursor Position so it can be restored
-     *
-     * @return void
      */
     protected function saveCursor(): void
     {
-        $this->_lastCursorPosition = $this->_getCursorPosition();
+        $this->lastCursorPosition = $this->getCursorPosition();
     }
 
     /**
      * Restore Cursor Position
-     *
-     * @return void
      */
     protected function restoreCursor(): void
     {
-        if ($this->_lastCursorPosition >= $this->count()) {
+        if ($this->lastCursorPosition >= $this->count()) {
             $this->end();
             return;
         }
 
-        $this->seek($this->_lastCursorPosition);
+        $this->seek($this->lastCursorPosition);
     }
 
     /**
      * Get Cursor Position
-     *
-     * @return int
      */
-    private function _getCursorPosition(): int
+    private function getCursorPosition(): int
     {
         return array_search(
             $this->key(),
-            $this->_positionMap,
+            $this->positionMap,
             true
         );
     }
 
     /**
      * Update Position Map
-     *
-     * @return null
      */
-    private function _updatePositionMap(): void
+    private function updatePositionMap(): void
     {
-        $this->_positionMap = [];
+        $this->positionMap = [];
 
         for ($this->first(); $this->valid(); $this->next()) {
-            array_push($this->_positionMap, $this->key());
+            array_push($this->positionMap, $this->key());
         }
     }
 
@@ -471,10 +415,8 @@ abstract class ExtendedArrayBase extends ArrayIterator
      * Append Position Map
      *
      * @param int|string $keyName being appended
-     *
-     * @return null
      */
-    private function _appendPositionMap($keyName = null): void
+    private function appendPositionMap($keyName = null): void
     {
         if (empty($keyName)) {
             $this->saveCursor();
@@ -482,6 +424,6 @@ abstract class ExtendedArrayBase extends ArrayIterator
             $this->restoreCursor();
         }
 
-        array_push($this->_positionMap, $keyName);
+        array_push($this->positionMap, $keyName);
     }
 }
