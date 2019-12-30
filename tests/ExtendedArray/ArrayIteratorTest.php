@@ -15,7 +15,6 @@
 namespace Test\ExtendedArray;
 
 use PHPUnit\Framework\TestCase;
-
 use Breier\ExtendedArray\ExtendedArray;
 use ArrayIterator;
 

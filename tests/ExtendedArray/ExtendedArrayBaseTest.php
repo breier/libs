@@ -16,7 +16,6 @@ namespace Test\ExtendedArray;
 
 use Breier\ExtendedArray\ExtendedArray;
 use PHPUnit\Framework\TestCase;
-
 use ArrayIterator;
 use ArrayObject;
 use SplFixedArray;

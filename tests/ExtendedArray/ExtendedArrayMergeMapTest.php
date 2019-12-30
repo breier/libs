@@ -15,9 +15,7 @@
 namespace Test\ExtendedArray;
 
 use PHPUnit\Framework\TestCase;
-
-use Breier\ExtendedArray\ExtendedArray;
-use Breier\ExtendedArray\ExtendedArrayMergeMap;
+use Breier\ExtendedArray\{ExtendedArray, ExtendedArrayMergeMap};
 
 /**
  * Extended Array Merge Map Test Class
