@@ -255,7 +255,9 @@ abstract class ExtendedArrayBase extends ArrayIterator
      */
     public function offsetExists($index): bool
     {
-        $index = $index ?: '';
+        if ($index !== 0) {
+            $index = $index ?: '';
+        }
 
         return parent::offsetExists($index);
     }
