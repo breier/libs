@@ -156,6 +156,102 @@ class ExtendedArrayTest extends TestCase
     }
 
     /**
+     * Test Array Diff with missing element
+     */
+    public function testArrayDIffSmaller(): void
+    {
+        $flaten = function ($item) {
+            return is_array($item) ? json_encode($item) : $item;
+        };
+
+        $array1 = array_map($flaten, $this->plainArray);
+        $array2 = array_map($flaten, $this->plainArray);
+        unset($array2[0]);
+
+        $extendedArray2 = new ExtendedArray($this->extendedArray);
+        $extendedArray2->offsetUnset(0);
+
+        $this->assertSame(
+            array_diff($array1, $array2),
+            $this->extendedArray->diff($extendedArray2)->map($flaten)->getArrayCopy()
+        );
+
+        $this->assertSame(
+            array_diff($array2, $array1),
+            $extendedArray2->diff($this->extendedArray)->map($flaten)->getArrayCopy()
+        );
+    }
+
+    /**
+     * Test Array Diff with extra element
+     */
+    public function testArrayDIffBigger(): void
+    {
+        $flaten = function ($item) {
+            return is_array($item) ? json_encode($item) : $item;
+        };
+
+        $array1 = array_map($flaten, $this->plainArray);
+        $array2 = array_map($flaten, $this->plainArray);
+        $array2['new_el'] = 'My Extra Element';
+
+        $extendedArray2 = new ExtendedArray($this->extendedArray);
+        $extendedArray2->offsetSet('new_el', 'My Extra Element');
+
+        $this->assertSame(
+            array_diff($array1, $array2),
+            $this->extendedArray->diff($extendedArray2)->map($flaten)->getArrayCopy()
+        );
+
+        $this->assertSame(
+            array_diff($array2, $array1),
+            $extendedArray2->diff($this->extendedArray)->map($flaten)->getArrayCopy()
+        );
+    }
+
+    /**
+     * Test Array Diff with third array
+     */
+    public function testArrayDIffThirdParam(): void
+    {
+        $flaten = function ($item) {
+            return is_array($item) ? json_encode($item) : $item;
+        };
+
+        $array1 = array_map($flaten, $this->plainArray);
+        $array2 = array_map($flaten, $this->plainArray);
+        unset($array2[0], $array2[7]);
+        $array3 = array_map($flaten, $this->plainArray);
+        unset($array3[7]);
+
+        $extendedArray2 = new ExtendedArray($this->extendedArray);
+        $extendedArray2->offsetUnset(0);
+        $extendedArray2->offsetUnset(7);
+        $extendedArray3 = new ExtendedArray($this->extendedArray);
+        $extendedArray3->offsetUnset(7);
+
+        $this->assertSame(
+            array_diff($array1, $array2, $array3),
+            $this->extendedArray->diff(
+                $extendedArray2,
+                $extendedArray3
+            )->map($flaten)->getArrayCopy()
+        );
+
+        $this->assertSame(
+            array_diff($array3, $array2, $array1),
+            $extendedArray3->diff(
+                $extendedArray2,
+                $this->extendedArray
+            )->map($flaten)->getArrayCopy()
+        );
+
+        $array1 = new ExtendedArray(["a" => "green", "red", "blue", 7 => ["red", "yellow"]]);
+        $array2 = new ExtendedArray(["b" => "green", "yellow", "red"]);
+        print($array1->diff($array2));
+    }
+
+    /**
      * Test Explode
      *
      * @return void

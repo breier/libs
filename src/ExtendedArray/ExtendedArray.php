@@ -63,6 +63,37 @@ class ExtendedArray extends ExtendedArrayBase
     }
 
     /**
+     * Diff, poly-fill for `array_diff`
+     */
+    public function diff($array2, ...$arrays)
+    {
+        if (!static::isArray($array2)) {
+            throw new \InvalidArgumentException(
+                'Only array types are accepted as parameter!'
+            );
+        }
+
+        $diffArrays = new static([$array2]);
+        if (!empty($arrays)) {
+            foreach ($arrays as $element) {
+                $diffArrays->append($element);
+            }
+        }
+
+        $resultingArray = new static($this);
+
+        foreach ($diffArrays as $diff) {
+            $resultingArray = $resultingArray->filterWithObjects(
+                function ($value) use ($diff) {
+                    return !$diff->contains($value);
+                }
+            );
+        }
+
+        return $resultingArray;
+    }
+
+    /**
      * Explode a string by delimiter
      */
     public static function explode(

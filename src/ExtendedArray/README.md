@@ -107,9 +107,27 @@ Contains is similar to "in_array" with object support.
   ```
 </details>
 
+### `diff($array2, ...$arrays): ExtendedArray`
+Diff is similar to "array_diff" with object support.
+<details>
+  <summary>Code Example</summary>
+
+  ```php
+  <?php
+  $array1 = new ExtendedArray(["a" => "green", "red", "blue", 7 => ["red", "yellow"]]);
+  $array2 = new ExtendedArray(["b" => "green", "yellow", "red"]);
+  print($array1->diff($array2));
+  /**
+   * {
+   *   "1": "blue",
+   *   "7": {"0":"red","1":"yellow"}
+   * }
+   */
+  ```
+</details>
 
 ### `explode(string $delimiter, string $string[, int $limit = PHP_INT_MAX]): ExtendedArray`
-Explode a string by delimiter
+`[static]` Instantiate from exploding a string by delimiter
 <details>
   <summary>Code Example</summary>
 
