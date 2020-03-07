@@ -3,7 +3,7 @@
     "description": "An Extended Array Library to use everywhere",
     "license": "GPL-3.0-or-later",
     "keywords": ["php", "extend", "array", "list", "collection"],
-    "version": "1.2.7",
+    "version": "1.3.4",
     "type": "library",
     "authors": [
         {
@@ -16,7 +16,7 @@
         "ext-json": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "^7.3"
+        "phpunit/phpunit": "^8.5"
     },
     "autoload": {
         "psr-4": {

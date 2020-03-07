@@ -2,3 +2,4 @@
 /tests/coverage
 /tests/temp
 /cov.xml
+.phpunit.result.cache
