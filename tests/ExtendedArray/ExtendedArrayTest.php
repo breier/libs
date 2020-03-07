@@ -298,6 +298,27 @@ class ExtendedArrayTest extends TestCase
     }
 
     /**
+     * Test Array Fill
+     */
+    public function testArrayFill(): void
+    {
+        $this->assertSame(
+            array_fill(0, 5, 123),
+            ExtendedArray::fill(0, 5, 123)->getArrayCopy()
+        );
+
+        $this->assertSame(
+            array_fill(5, 5, 'string'),
+            ExtendedArray::fill(5, 5, 'string')->getArrayCopy()
+        );
+
+        $this->assertSame(
+            array_fill(-10, 2, 321),
+            ExtendedArray::fill(-10, 2, 321)->getArrayCopy()
+        );
+    }
+
+    /**
      * Test Filter isArray
      */
     public function testFilterIsArray(): void

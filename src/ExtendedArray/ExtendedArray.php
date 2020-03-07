@@ -105,6 +105,16 @@ class ExtendedArray extends ExtendedArrayBase
     }
 
     /**
+     * Fill, poly-fill for `array_fill`
+     *
+     * @param mixed $value To fill new array
+     */
+    public static function fill(int $start, int $num, $value): ExtendedArray
+    {
+        return new static(array_fill($start, $num, $value));
+    }
+
+    /**
      * Filter, poly-fill for `array_filter`
      * When using flag "both", $value goes first, then $key.
      *

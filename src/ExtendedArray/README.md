@@ -145,6 +145,24 @@ Diff is similar to "array_diff" with object support.
   ```
 </details>
 
+### `fill(int $start, int $num, $value): ExtendedArray`
+`[static]` Instantiate an array filled with value by num of times
+<details>
+  <summary>Code Example</summary>
+
+  ```php
+  <?php
+  print(ExtendedArray::fill(0, 3, "test"));
+  /**
+   * {
+   *   "0": "test",
+   *   "1": "test",
+   *   "2": "test"
+   * }
+   */
+  ```
+</details>
+
 ### `filter([callable $callback[, int $flag]]): ExtendedArray`
 A poly-fill for "array_filter".
 <details>
