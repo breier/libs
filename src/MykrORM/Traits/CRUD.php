@@ -35,38 +35,17 @@ trait CRUD
 
         $this->createTableIfNotExists();
 
-        $fields = $this->dbProperties->filter(
-            function ($type) {
-                return stristr($type, 'SERIAL') === false
-                    && stristr($type, 'INCREMENT') === false;
-            }
-        )->keys();
-
-        $parameters = $this->dbProperties->keys()->map(
-            function ($field) {
-                $getter = 'get' . static::snakeToCamel($field);
-                return call_user_func([static::class, $getter]);
-            }
-        );
-
-        $fields = $fields->filter(
-            function ($index) use ($parameters) {
-                return $parameters->offsetGet($index) !== null;
-            },
-            ARRAY_FILTER_USE_KEY
-        );
-
-        $placeholders = ExtendedArray::fill(0, $fields->count(), '?');
-        $parameters = $parameters->filter();
+        $parameters = $this->getProperties();
+        $placeholders = ExtendedArray::fill(0, $parameters->count(), '?');
 
         $query = "INSERT INTO {$this->dbTableName}"
-            . " ({$fields->implode(', ')}) VALUES"
+            . " ({$parameters->keys()->implode(', ')}) VALUES"
             . " ({$placeholders->implode(', ')})";
 
         $this->getConnection()->beginTransaction();
         try {
             $preparedStatement = $this->getConnection()->prepare($query);
-            $preparedStatement->execute($parameters->getArrayCopy());
+            $preparedStatement->execute($parameters->values()->getArrayCopy());
             $this->getConnection()->commit();
         } catch (PDOException $e) {
             $this->getConnection()->rollBack();
@@ -79,13 +58,12 @@ trait CRUD
      *
      * @param array|ExtendedArray $criteria
      *
-     * @return static
+     * @return static|false
+     * @throws DBException
      */
     public static function find($criteria)
     {
         static::validateCriteria($criteria);
-        
-        $model = new static();
 
         $placeholders = $criteria->keys()->map(
             function ($field) {
@@ -93,8 +71,10 @@ trait CRUD
                 return "{$property} = :{$field}";
             }
         )->implode(' AND ');
-
+        
         try {
+            $model = new static();
+
             $preparedStatement = $model->getConnection()->prepare(
                 "SELECT * FROM {$model->dbTableName} WHERE {$placeholders}"
             );
@@ -104,6 +84,95 @@ trait CRUD
         } catch (PDOException $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
+    }
+
+    /**
+     * [Update] Change One Entry
+     *
+     * @param array|ExtendedArray $criteria
+     *
+     * @throws DBException
+     */
+    public function update($criteria): void
+    {
+        $original = static::find($criteria);
+        if ($original === false) {
+            throw new DBException(static::class . ' Not Found!');
+        }
+
+        $parameters = $this->getProperties();
+        $placeholders = $parameters->keys()->map(
+            function ($field) {
+                return "{$field} = ?";
+            }
+        );
+
+        $model = new static();
+        $firstField = $model->dbProperties->keys()->first()->element();
+        $firstGetter = 'get' . static::snakeToCamel($firstField);
+        $parameters->append($original->{$firstGetter}());
+
+        $query = "UPDATE {$model->dbTableName}"
+            . " SET {$placeholders->implode(', ')}"
+            . " WHERE {$firstField} = ?";
+
+        $this->getConnection()->beginTransaction();
+        try {
+            $preparedStatement = $this->getConnection()->prepare($query);
+            $preparedStatement->execute($parameters->values()->getArrayCopy());
+            $this->getConnection()->commit();
+        } catch (PDOException $e) {
+            $this->getConnection()->rollBack();
+            throw new DBException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+
+    /**
+     * [Delete] Erase Current Entry
+     *
+     * @throws DBException
+     */
+    public function delete(): void
+    {
+        $model = new static();
+        $firstField = $model->dbProperties->keys()->first()->element();
+        $firstGetter = 'get' . static::snakeToCamel($firstField);
+        $parameter = [$this->{$firstGetter}()];
+
+        $query = "DELETE FROM {$model->dbTableName} WHERE {$firstField} = ?";
+
+        $this->getConnection()->beginTransaction();
+        try {
+            $preparedStatement = $this->getConnection()->prepare($query);
+            $preparedStatement->execute($parameter);
+            if ($preparedStatement->rowCount() !== 1) {
+                throw new PDOException(static::class . ' Not Found!');
+            }
+            $this->getConnection()->commit();
+        } catch (PDOException $e) {
+            $this->getConnection()->rollBack();
+            throw new DBException($e->getMessage(), $e->getCode(), $e);
+        }
+    }
+
+    /**
+     * Prepare Fields for insertion
+     */
+    public function getProperties(): ExtendedArray
+    {
+        $allowedFields = $this->dbProperties->filter(
+            function ($type) {
+                return stristr($type, 'SERIAL') === false
+                    && stristr($type, 'INCREMENT') === false;
+            }
+        );
+
+        foreach ($allowedFields as $field => &$value) {
+            $getter = 'get' . static::snakeToCamel($field);
+            $value = $this->{$getter}();
+        }
+
+        return $allowedFields->filter();
     }
 
     /**
