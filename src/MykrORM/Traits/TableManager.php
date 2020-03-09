@@ -34,16 +34,19 @@ trait TableManager
             $result = $this->getConnection()->query(
                 "SELECT * FROM {$this->dbTableName} LIMIT 1"
             );
-
-            $diffProperties = $this->dbProperties->keys()->diff(
-                array_keys($result->fetch())
-            );
-            if ($diffProperties->count()) {
-                $this->alterTable($diffProperties);
-            }
         } catch (PDOException $e) {
             $this->createTable();
+            return;
         }
+
+        $fields = $result->fetch();
+        if ($fields === false) {
+            return;
+        }
+
+        $this->alterTable(
+            $this->dbProperties->keys()->diff(array_keys($fields))
+        );
     }
 
     /**
@@ -76,6 +79,19 @@ trait TableManager
      */
     private function alterTable(ExtendedArray $diff): void
     {
-        // @TODO: check and update table fields in DB
+        if ($diff->count() === 0) {
+            return;
+        }
+
+        foreach ($diff as $field) {
+            try {
+                $this->getConnection()->exec(
+                    "ALTER TABLE {$this->dbTableName} ADD {$field} "
+                    . $this->dbProperties->offsetGet($field)
+                );
+            } catch (PDOException $e) {
+                throw new DBException($e->getMessage(), $e->getCode(), $e);
+            }
+        }
     }
 }

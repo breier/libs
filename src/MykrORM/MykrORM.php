@@ -118,7 +118,9 @@ abstract class MykrORM
     public function __set(string $name, $value): void
     {
         $setter = 'set' . static::snakeToCamel($name);
-        $this->{$setter}($value);
+        if (method_exists($this, $setter)) {
+            $this->{$setter}($value);
+        }
     }
 
     /**
