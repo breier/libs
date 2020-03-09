@@ -89,7 +89,7 @@ abstract class MykrORM
     }
 
     /**
-     * Automatic Getters
+     * Automatic Getters [nothing is really private]
      *
      * @return mixed
      * @throws DBException
@@ -110,5 +110,40 @@ abstract class MykrORM
         }
 
         return $this->{$propertyName};
+    }
+
+    /**
+     * Setter Mapper for PDO
+     */
+    public function __set(string $name, $value): void
+    {
+        $setter = 'set' . static::snakeToCamel($name);
+        $this->{$setter}($value);
+    }
+
+    /**
+     * Snake To Camel case
+     */
+    protected static function snakeToCamel(string $string): string
+    {
+        return str_replace('_', '', ucwords($string, '_'));
+    }
+
+    /**
+     * Camel To Snake case
+     */
+    protected static function camelToSnake(string $string): string
+    {
+        return strtolower(
+            preg_replace(
+                '/([a-z])([A-Z0-9])/',
+                '$1_$2',
+                preg_replace(
+                    '/([A-Z0-9]+)([A-Z][a-z])/',
+                    '$1_$2',
+                    $string
+                )
+            )
+        );
     }
 }

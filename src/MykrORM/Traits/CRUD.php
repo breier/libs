@@ -37,22 +37,31 @@ trait CRUD
 
         $fields = $this->dbProperties->filter(
             function ($type) {
-                return stristr($type, 'SERIAL') === false;
-            },
-            ARRAY_FILTER_USE_KEY
+                return stristr($type, 'SERIAL') === false
+                    && stristr($type, 'INCREMENT') === false;
+            }
         )->keys();
 
+        $parameters = $this->dbProperties->keys()->map(
+            function ($field) {
+                $getter = 'get' . static::snakeToCamel($field);
+                return call_user_func([static::class, $getter]);
+            }
+        );
+
+        $fields = $fields->filter(
+            function ($index) use ($parameters) {
+                return $parameters->offsetGet($index) !== null;
+            },
+            ARRAY_FILTER_USE_KEY
+        );
+
         $placeholders = ExtendedArray::fill(0, $fields->count(), '?');
+        $parameters = $parameters->filter();
 
         $query = "INSERT INTO {$this->dbTableName}"
             . " ({$fields->implode(', ')}) VALUES"
             . " ({$placeholders->implode(', ')})";
-
-        $parameters = $this->dbProperties->keys()->map(
-            function ($field) {
-                return $this->{$field} ?? null;
-            }
-        );
 
         $this->getConnection()->beginTransaction();
         try {
@@ -80,7 +89,8 @@ trait CRUD
 
         $placeholders = $criteria->keys()->map(
             function ($field) {
-                return "{$field} = :{$field}";
+                $property = static::camelToSnake($field);
+                return "{$property} = :{$field}";
             }
         )->implode(' AND ');
 
@@ -117,7 +127,8 @@ trait CRUD
         $model = new static();
 
         foreach ($criteria->keys() as $field) {
-            if (!$model->dbProperties->offsetExists($field)) {
+            $property = static::camelToSnake($field);
+            if (!$model->dbProperties->offsetExists($property)) {
                 throw new DBException("Invalid criteria \"{$field}\"!");
             }
         }
