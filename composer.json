@@ -1,9 +1,9 @@
 {
     "name": "breier/libs",
-    "description": "An Extended Array Library to use everywhere",
+    "description": "A Collection of Minimalist Libraries",
     "license": "GPL-3.0-or-later",
-    "keywords": ["php", "extend", "array", "list", "collection"],
-    "version": "1.3.4",
+    "keywords": ["php", "extend", "array", "list", "collection", "orm", "database"],
+    "version": "2.0.1",
     "type": "library",
     "authors": [
         {
@@ -13,6 +13,7 @@
     ],
     "require": {
         "php": "^7.3",
+        "ext-pdo": "*",
         "ext-json": "*"
     },
     "require-dev": {
