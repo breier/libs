@@ -93,6 +93,9 @@ created in the database.
 If you update the model adding more columns they will be added on creation as well.
 
 While Create, Update and Delete are instance methods, "Read" (`find`) is static.
+
+It's recommended to have your properties visibility set to private, but MykrORM
+will create automatic getters for the ones listed in $this->dbProperties.
 ```php
 $session = Session::find(['token' => $AuthrizationBearerToken]);
 ```
@@ -143,7 +146,7 @@ Gets the stored PDO object with a valid connection.
 </details>
 
 ### `public function __call(string $name, array $arguments)`
-Provides automatic getters (no property is really private).
+Provides automatic getters for DB properties.
 <details>
   <summary>Code Example</summary>
 
@@ -151,6 +154,7 @@ Provides automatic getters (no property is really private).
   class Test extends MykrORM
   {
     private $test = 1234;
+    private $other = "private";
     public __construct()
     {
       $this->dbProperties = new ExtendedArray([
@@ -159,6 +163,7 @@ Provides automatic getters (no property is really private).
     }
   }
   (new Test())->getTest(); // 1234
+  (new Test())->getOther(); // throws DBException property does not exist!
   ```
 </details>
 

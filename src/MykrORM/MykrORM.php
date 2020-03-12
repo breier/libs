@@ -89,7 +89,7 @@ abstract class MykrORM
     }
 
     /**
-     * Automatic Getters [nothing is really private]
+     * Automatic Getters [DB fields are "never private"]
      *
      * @return mixed
      * @throws DBException
@@ -106,6 +106,11 @@ abstract class MykrORM
 
         $propertyName = strtolower($name[3]) . substr($name, 4);
         if (!property_exists($this, $propertyName)) {
+            throw new DBException('Property does not exist!');
+        }
+
+        $dbFields = $this->dbProperties->keys();
+        if (!$dbFields->contains(static::camelToSnake($propertyName))) {
             throw new DBException('Property does not exist!');
         }
 
