@@ -63,7 +63,7 @@ trait CRUD
      */
     public static function find($criteria)
     {
-        static::validateCriteria($criteria);
+        self::validateCriteria($criteria);
 
         $placeholders = $criteria->keys()->map(
             function ($field) {
