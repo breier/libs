@@ -3,8 +3,8 @@ This library started with the idea of providing less than minimal DB
 functionality with still some intuitive automated stuff.
 
 In order to handle data models and its properties in a clean code manner
-(readable and maintainable) I developed this library. Please enjoy
-(use at your own risk XD).
+(readable and maintainable) I developed this library on top of PDO.
+Please enjoy (use at your own risk XD).
 
 _\* You can find all the methods from PDO and their documentation at
 [php.net/manual/class.pdo](https://www.php.net/manual/en/class.pdo.php)._
@@ -25,6 +25,7 @@ namespace App\Model;
 use DateTime;
 use Breier\ExtendedArray\ExtendedArray;
 use Breier\MykrORM\Exception\DBException;
+use Breier\MykrORM\MykrORM;
 
 class Session extends MykrORM
 {
@@ -92,7 +93,8 @@ created in the database.
 
 If you update the model adding more columns they will be added on creation as well.
 
-While Create, Update and Delete are instance methods, "Read" (`find`) is static.
+While Create, Update and Delete are instance methods, "Read" (`find`) is static
+and returns an ExtendedArray of instances of the Model.
 
 It's recommended to have your properties visibility set to private, but MykrORM
 will create automatic getters for the ones listed in $this->dbProperties.
@@ -109,25 +111,10 @@ and it's also the base for every model you wish to create.
   * `PDO::ATTR_ERRMODE` -> `PDO::ERRMODE_EXCEPTION`
   * `PDO::ATTR_DEFAULT_FETCH_MODE` -> `PDO::FETCH_NAMED`
   * `PDO::ATTR_EMULATE_PREPARES` -> `false`
-* It sets the DB table name based on the model class name that extended from it;
-* It provides automatic getters via `__call`;
+* It sets the DB table name based on the model class name that extended from it.
+<br>But you can override it by setting `$this->dbTableName` before `parent::__construct()`;
+* It provides automatic getters via `__call` for related DB properties;
 * It maps setters via `__set` for `fetchObject()` PDO mode;
-
-### `abstract protected function getDSN(): string`
-Returns the DSN for PDO connection (has to be implemented by the extending class).
-<details>
-  <summary>Code Example</summary>
-
-  ```php
-  class Test extends MykrORM
-  {
-    protected function getDSN(): string
-    {
-      return 'pgsql:host=localhost;port=5432;dbname=test;user=test;password=1234';
-    }
-  }
-  ```
-</details>
 
 ### `protected function getConnection(): PDO`
 Gets the stored PDO object with a valid connection.
@@ -140,6 +127,22 @@ Gets the stored PDO object with a valid connection.
     public function test(): void
     {
       $this->getConnection()->query('SELECT * FROM test');
+    }
+  }
+  ```
+</details>
+
+### `abstract protected function getDSN(): string`
+Returns the DSN for PDO connection (has to be implemented by the extending class).
+<details>
+  <summary>Code Example</summary>
+
+  ```php
+  class Test extends MykrORM
+  {
+    protected function getDSN(): string
+    {
+      return 'pgsql:host=localhost;port=5432;dbname=test;user=test;password=1234';
     }
   }
   ```
@@ -192,22 +195,10 @@ Maps setters automatically for `fetchObject()` PDO mode.
       $preparedStatement->execute();
 
       $likeThis = $preparedStatement->fetchObject(static::class);
-    }
-  }
-  ```
-</details>
 
-### `protected static function snakeToCamel(string $string): string`
-`[static]` Converts Snake-Case to Camel-Case (from DB to Property).
-<details>
-  <summary>Code Example</summary>
-
-  ```php
-  class Test extends MykrORM
-  {
-    public function test(): void
-    {
-      static::snakeToCamel('test_name'); // TestName
+      if (!empty($likeThis)) {
+        $likeThis->getTestName(); // first row value found in DB
+      }
     }
   }
   ```
@@ -229,6 +220,22 @@ Maps setters automatically for `fetchObject()` PDO mode.
   ```
 </details>
 
+### `protected static function snakeToCamel(string $string): string`
+`[static]` Converts Snake-Case to Camel-Case (from DB to Property).
+<details>
+  <summary>Code Example</summary>
+
+  ```php
+  class Test extends MykrORM
+  {
+    public function test(): void
+    {
+      static::snakeToCamel('test_name'); // TestName
+    }
+  }
+  ```
+</details>
+
 ## CRUD Methods
 This methods are embedded in MykrORM but I rather list them here for better oganization.
 
@@ -244,16 +251,20 @@ Insert new row to the model table with current properties.
   ```
 </details>
 
-### `public static function find($criteria)`
-`[static]` Get a row of the model table that matches $criteria (returns a model instance).
+### `public static function find($criteria): ExtendedArray`
+`[static]` Get all rows of the model table that matches $criteria
+(returns an ExtendedArray with model instances).
 
 _\* There's a criteria validator in place here that can be further implemented by the model._
-<br>_\* It returns false if no object was found (PDO default behaviour)._
 <details>
   <summary>Code Example</summary>
 
   ```php
-  $test = Test::find(['test_name' => 'what']);
+  $test = Test::find(['test_name' => 'what']); // ExtendedArray
+  $test->first()->element(); // Test Model instance (or null)
+
+  $otherTest = Test::find(['test_name' => ['what', 'is', 'up']]); // ExtendedArray
+  $otherTest->next()->element(); // Test Model instance of second row (or null)
   ```
 </details>
 
@@ -266,9 +277,10 @@ _\* It internally uses `find` to get the original object._
 
   ```php
   $test = Test::find(['test_name' => 'what']);
-  if ($test !== false) {
-    $test->setTestName('soap');
-    $test->update(['test_name' => 'what']);
+  if ($test->count()) {
+    $testModel = $test->first()->element();
+    $testModel->setTestName('soap');
+    $testModel->update(['test_name' => 'what']);
   }
   ```
 </details>
@@ -280,8 +292,9 @@ Delete a row of the model table with current properties.
 
   ```php
   $test = Test::find(['test_name' => 'soap']);
-  if ($test !== false) {
-    $test->delete();
+  if ($test->count()) {
+    $testModel = $test->first()->element();
+    $testModel->delete();
   }
   ```
 </details>
@@ -293,8 +306,8 @@ Get database available properties in an associative array manner.
 
   ```php
   $test = Test::find(['test_name' => 'soap']);
-  if ($test !== false) {
-    print($test->getProperties()); // {"test_name":"soap"}
+  if ($test->count()) {
+    print($test->current()->getProperties()); // {"test_name":"soap"}
   }
   ```
 </details>

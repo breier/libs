@@ -58,18 +58,20 @@ trait CRUD
      *
      * @param array|ExtendedArray $criteria
      *
-     * @return static|false
      * @throws DBException
      */
-    public static function find($criteria)
+    public static function find($criteria): ExtendedArray
     {
         self::validateCriteria($criteria);
+        $criteria = new ExtendedArray($criteria);
 
-        $placeholders = $criteria->keys()->map(
-            function ($field) {
+        $placeholders = $criteria->map(
+            function ($value, $field) {
                 $property = static::camelToSnake($field);
-                return "{$property} = :{$field}";
-            }
+                $operator = is_array($value) ? 'IN' : '=';
+                return "{$property} {$operator} :{$field}";
+            },
+            $criteria->keys()->getArrayCopy()
         )->implode(' AND ');
         
         try {
@@ -80,7 +82,12 @@ trait CRUD
             );
             $preparedStatement->execute($criteria->getArrayCopy());
 
-            return $preparedStatement->fetchObject(static::class);
+            $result = new ExtendedArray();
+            while ($row = $preparedStatement->fetchObject(static::class)) {
+                $result->append($row);
+            }
+
+            return $result;
         } catch (PDOException $e) {
             throw new DBException($e->getMessage(), $e->getCode(), $e);
         }
@@ -96,9 +103,10 @@ trait CRUD
     public function update($criteria): void
     {
         $original = static::find($criteria);
-        if ($original === false) {
+        if ($original->count() !== 1) {
             throw new DBException(static::class . ' Not Found!');
         }
+        $original = $original->first()->element();
 
         $parameters = $this->getProperties();
         $placeholders = $parameters->keys()->map(
