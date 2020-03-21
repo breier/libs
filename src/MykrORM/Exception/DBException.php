@@ -14,11 +14,35 @@
 namespace Breier\MykrORM\Exception;
 
 use Exception;
+use Throwable;
 
 /**
  * DB Exception class
  */
 class DBException extends Exception
 {
-    // nothing to modify
+    /**
+     * Convert PDO Exception Codes to integer
+     */
+    public function __construct(
+        string $message,
+        $code = 0,
+        ?Throwable $e = null
+    ) {
+        if (!is_int($code)) {
+            $code = intval(substr($code, 2));
+        }
+
+        if (empty($code) && empty($e)) {
+            parent::__construct($message);
+            return;
+        }
+
+        if (empty($e)) {
+            parent::__construct($message, $code);
+            return;
+        }
+
+        parent::__construct($message, $code, $e);
+    }
 }
