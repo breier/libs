@@ -95,19 +95,19 @@ If you update the model adding more columns they will be added on creation as we
 
 While Create, Update and Delete are instance methods, "Read" (`find`) is static
 and returns an ExtendedArray of instances of the Model.
-
-It's recommended to have your properties visibility set to private, but MykrORM
-will create automatic getters for the ones listed in $this->dbProperties.
 ```php
 $session = Session::find(['token' => $AuthrizationBearerToken]);
 ```
+
+Properties listed in $this->dbProperties should be declared with protected visibility.
+MykrORM will provide automatic getters for them.
 
 ## Methods in MykrORM
 This is the abstract class that implements the ORM
 and it's also the base for every model you wish to create.
 * The model class that extends from it has to implement `getDSN()`
   that returns a DSN string to PDO connection;
-* It sets the default PDO options:
+* It sets these default PDO options:
   * `PDO::ATTR_ERRMODE` -> `PDO::ERRMODE_EXCEPTION`
   * `PDO::ATTR_DEFAULT_FETCH_MODE` -> `PDO::FETCH_NAMED`
   * `PDO::ATTR_EMULATE_PREPARES` -> `false`
@@ -143,6 +143,7 @@ Returns the DSN for PDO connection (has to be implemented by the extending class
     protected function getDSN(): string
     {
       return 'pgsql:host=localhost;port=5432;dbname=test;user=test;password=1234';
+      // return 'sqlite:messaging.sqlite3'; // local option ;)
     }
   }
   ```
@@ -156,8 +157,8 @@ Provides automatic getters for DB properties.
   ```php
   class Test extends MykrORM
   {
-    private $test = 1234;
-    private $other = "private";
+    protected $test = 1234;
+    protected $other = "private";
     public __construct()
     {
       $this->dbProperties = new ExtendedArray([
@@ -166,7 +167,7 @@ Provides automatic getters for DB properties.
     }
   }
   (new Test())->getTest(); // 1234
-  (new Test())->getOther(); // throws DBException property does not exist!
+  (new Test())->getOther(); // throws DBException property is not DB property!
   ```
 </details>
 
@@ -178,7 +179,7 @@ Maps setters automatically for `fetchObject()` PDO mode.
   ```php
   class Test extends MykrORM
   {
-    private $testName = 'test';
+    protected $testName = 'test';
     public __construct()
     {
       $this->dbProperties = new ExtendedArray([
@@ -197,7 +198,7 @@ Maps setters automatically for `fetchObject()` PDO mode.
       $likeThis = $preparedStatement->fetchObject(static::class);
 
       if (!empty($likeThis)) {
-        $likeThis->getTestName(); // first row value found in DB
+        $likeThis->getTestName(); // works because __set mapped 'test_name' to 'setTestName'
       }
     }
   }
@@ -237,7 +238,7 @@ Maps setters automatically for `fetchObject()` PDO mode.
 </details>
 
 ## CRUD Methods
-This methods are embedded in MykrORM but I rather list them here for better oganization.
+This methods are embedded in MykrORM but I rather list them here for better organization.
 
 ### `public function create(): void`
 Insert new row to the model table with current properties.
@@ -313,7 +314,7 @@ Get database available properties in an associative array manner.
 </details>
 
 ### `public static function validateCriteria($criteria): bool`
-Make sure that any key in criteria matches "dbProperties" and that they're not empty.
+Make sure that criteria is not empty and that any key in it matches "dbProperties".
 <details>
   <summary>Code Example</summary>
 
