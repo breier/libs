@@ -9,7 +9,7 @@
  * @package  Breier/Libs
  * @author   Andre Breier <andre@breier.net.br>
  * @license  GPLv3 https://www.gnu.org/licenses/gpl-3.0.en.html
- * @link     php vendor/phpunit/phpunit/phpunit tests/ExtendedArrayTest.php
+ * @link     php vendor/bin/phpunit tests/ExtendedArray/ExtendedArrayTest.php
  */
 
 namespace Test\ExtendedArray;
@@ -245,10 +245,6 @@ class ExtendedArrayTest extends TestCase
                 $this->extendedArray
             )->map($flaten)->getArrayCopy()
         );
-
-        $array1 = new ExtendedArray(["a" => "green", "red", "blue", 7 => ["red", "yellow"]]);
-        $array2 = new ExtendedArray(["b" => "green", "yellow", "red"]);
-        print($array1->diff($array2));
     }
 
     /**

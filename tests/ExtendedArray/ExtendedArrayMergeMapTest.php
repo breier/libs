@@ -9,7 +9,7 @@
  * @package  Breier/Libs
  * @author   Andre Breier <andre@breier.net.br>
  * @license  GPLv3 https://www.gnu.org/licenses/gpl-3.0.en.html
- * @link     php vendor/phpunit/phpunit/phpunit tests/ExtendedArrayMergeMapTest.php
+ * @link     php vendor/bin/phpunit tests/ExtendedArray/ExtendedArrayMergeMapTest.php
  */
 
 namespace Test\ExtendedArray;
