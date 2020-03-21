@@ -73,7 +73,7 @@ trait CRUD
             },
             $criteria->keys()->getArrayCopy()
         )->implode(' AND ');
-        
+
         try {
             $model = new static();
 
@@ -145,14 +145,17 @@ trait CRUD
         $model = new static();
         $firstField = $model->dbProperties->keys()->first()->element();
         $firstGetter = 'get' . static::snakeToCamel($firstField);
-        $parameter = [$this->{$firstGetter}()];
+        $firstValue = $this->{$firstGetter}();
+        if (empty($firstValue)) {
+            throw new DBException("'{$firstField}' is empty!");
+        }
 
         $query = "DELETE FROM {$model->dbTableName} WHERE {$firstField} = ?";
 
         $this->getConnection()->beginTransaction();
         try {
             $preparedStatement = $this->getConnection()->prepare($query);
-            $preparedStatement->execute($parameter);
+            $preparedStatement->execute([$firstValue]);
             if ($preparedStatement->rowCount() !== 1) {
                 throw new PDOException(static::class . ' Not Found!');
             }
