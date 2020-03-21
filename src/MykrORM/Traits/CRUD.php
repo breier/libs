@@ -29,7 +29,7 @@ trait CRUD
      */
     public function create(): void
     {
-        if (empty($this->dbProperties) || !ExtendedArray::isArray($this->dbProperties)) {
+        if (empty($this->getDBProperties())) {
             throw new DBException("Invalid DB properties!");
         }
 
@@ -116,7 +116,7 @@ trait CRUD
         );
 
         $model = new static();
-        $firstField = $model->dbProperties->keys()->first()->element();
+        $firstField = $model->getDBProperties()->keys()->first()->element();
         $firstGetter = 'get' . static::snakeToCamel($firstField);
         $parameters->append($original->{$firstGetter}());
 
@@ -143,7 +143,7 @@ trait CRUD
     public function delete(): void
     {
         $model = new static();
-        $firstField = $model->dbProperties->keys()->first()->element();
+        $firstField = $model->getDBProperties()->keys()->first()->element();
         $firstGetter = 'get' . static::snakeToCamel($firstField);
         $firstValue = $this->{$firstGetter}();
         if (empty($firstValue)) {
@@ -171,7 +171,7 @@ trait CRUD
      */
     public function getProperties(): ExtendedArray
     {
-        $allowedFields = $this->dbProperties->filter(
+        $allowedFields = $this->getDBProperties()->filter(
             function ($type) {
                 return stristr($type, 'SERIAL') === false
                     && stristr($type, 'INCREMENT') === false;
@@ -208,7 +208,7 @@ trait CRUD
 
         foreach ($criteria->keys() as $field) {
             $property = static::camelToSnake($field);
-            if (!$model->dbProperties->offsetExists($property)) {
+            if (!$model->getDBProperties()->offsetExists($property)) {
                 throw new DBException("Invalid criteria \"{$field}\"!");
             }
         }

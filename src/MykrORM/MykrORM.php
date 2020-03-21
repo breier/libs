@@ -69,6 +69,19 @@ abstract class MykrORM
     abstract protected function getDSN(): string;
 
     /**
+     * Get DB Properties (ensure it is an ExtendedArray instance)
+     */
+    protected function getDBProperties(): ExtendedArray
+    {
+        if ($this->dbProperties instanceof ExtendedArray) {
+            return $this->dbProperties;
+        }
+
+        $this->dbProperties = new ExtendedArray($this->dbProperties);
+        return $this->dbProperties;
+    }
+
+    /**
      * Get PDO Connection
      *
      * @throws DBException
@@ -109,9 +122,9 @@ abstract class MykrORM
             throw new DBException('Property does not exist!');
         }
 
-        $dbFields = $this->dbProperties->keys();
+        $dbFields = $this->getDBProperties()->keys();
         if (!$dbFields->contains(static::camelToSnake($propertyName))) {
-            throw new DBException('Property does not exist!');
+            throw new DBException('Property is not DB property!');
         }
 
         return $this->{$propertyName};

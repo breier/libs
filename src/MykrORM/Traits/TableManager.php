@@ -45,7 +45,7 @@ trait TableManager
         }
 
         $this->alterTable(
-            $this->dbProperties->keys()->diff(array_keys($fields))
+            $this->getDBProperties()->keys()->diff(array_keys($fields))
         );
     }
 
@@ -56,11 +56,11 @@ trait TableManager
      */
     private function createTable(): void
     {
-        $fields = $this->dbProperties->map(
+        $fields = $this->getDBProperties()->map(
             function ($type, $field) {
                 return "{$field} {$type}";
             },
-            $this->dbProperties->keys()->getArrayCopy()
+            $this->getDBProperties()->keys()->getArrayCopy()
         )->implode(', ');
 
         try {
@@ -87,7 +87,7 @@ trait TableManager
             try {
                 $this->getConnection()->exec(
                     "ALTER TABLE {$this->dbTableName} ADD {$field} "
-                    . $this->dbProperties->offsetGet($field)
+                    . $this->getDBProperties()->offsetGet($field)
                 );
             } catch (PDOException $e) {
                 throw new DBException($e->getMessage(), $e->getCode(), $e);
