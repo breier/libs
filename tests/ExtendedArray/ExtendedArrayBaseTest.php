@@ -229,7 +229,7 @@ class ExtendedArrayBaseTest extends TestCase
         $this->extendedArray->next();
         next($this->plainArray);
 
-        $magicStringFromObject = sprintf("%s", $this->extendedArray);
+        $magicStringFromObject = sprintf('%s', $this->extendedArray);
         $this->assertSame(
             $magicStringFromObject,
             $this->extendedArray->jsonSerialize()
@@ -239,7 +239,7 @@ class ExtendedArrayBaseTest extends TestCase
             $this->extendedArray->key()
         );
 
-        $this->assertSame('{}', sprintf("%s", $this->emptyArray));
+        $this->assertSame('{}', sprintf('%s', $this->emptyArray));
     }
 
     /**

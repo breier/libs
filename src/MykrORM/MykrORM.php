@@ -102,7 +102,7 @@ abstract class MykrORM
     }
 
     /**
-     * Automatic Getters [DB fields are "never private"]
+     * Automatic Getters [DB fields are 'never private']
      *
      * @return mixed
      * @throws DBException
@@ -113,7 +113,7 @@ abstract class MykrORM
         if (preg_match('/^get[A-Z][\w\d]*/', $name) !== 1) {
             throw new UndefinedMethodException(
                 'Attempted to call an undefined method named'
-                . " \"{$name}\" of class \"{" . static::class . "}\"."
+                . ' "' . $name . '" of class "{' . static::class . '}".'
             );
         }
 

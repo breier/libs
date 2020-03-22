@@ -24,7 +24,7 @@ trait TableManager
 {
     /**
      * Create this table if it doesn't exist
-     * And "alter" it if necessary
+     * And 'alter' it if necessary
      *
      * @throws DBException
      */

@@ -196,12 +196,12 @@ trait CRUD
     public static function validateCriteria($criteria): bool
     {
         if (!ExtendedArray::isArray($criteria)) {
-            throw new DBException("Invalid criteria format!");
+            throw new DBException('Invalid criteria format!');
         }
 
         $criteria = new ExtendedArray($criteria);
         if (!$criteria->count()) {
-            throw new DBException("Invalid criteria!");
+            throw new DBException('Invalid criteria!');
         }
 
         $model = new static();
@@ -209,7 +209,7 @@ trait CRUD
         foreach ($criteria->keys() as $field) {
             $property = static::camelToSnake($field);
             if (!$model->getDBProperties()->offsetExists($property)) {
-                throw new DBException("Invalid criteria \"{$field}\"!");
+                throw new DBException("Invalid criteria '{$field}'!");
             }
         }
 

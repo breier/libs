@@ -116,7 +116,7 @@ class ExtendedArray extends ExtendedArrayBase
 
     /**
      * Filter, poly-fill for `array_filter`
-     * When using flag "both", $value goes first, then $key.
+     * When using flag 'both', $value goes first, then $key.
      *
      * @param callable $callback Function to use
      * @param int      $flag     (ARRAY_FILTER_USE_KEY, ARRAY_FILTER_USE_BOTH)
@@ -133,7 +133,7 @@ class ExtendedArray extends ExtendedArrayBase
         }
         return new static(
             call_user_func_array(
-                "array_filter",
+                'array_filter',
                 [$this->getArrayCopy(), $callback, $flag]
             )
         );
@@ -253,7 +253,7 @@ class ExtendedArray extends ExtendedArrayBase
     {
         return new static(
             call_user_func_array(
-                "array_map",
+                'array_map',
                 array_merge([$callback, $this->getArrayCopy()], $params)
             )
         );
