@@ -23,9 +23,8 @@ This is a code example of a model that extends MykrORM
 namespace App\Model;
 
 use DateTime;
-use Breier\ExtendedArray\ExtendedArray;
-use Breier\MykrORM\Exception\DBException;
 use Breier\MykrORM\MykrORM;
+use Breier\MykrORM\Exception\DBException;
 
 class Session extends MykrORM
 {
@@ -42,11 +41,11 @@ class Session extends MykrORM
   {
     parent::__construct();
 
-    $this->dbProperties = new ExtendedArray([
+    $this->dbProperties = [
       'token' => 'CHAR(64) NOT NULL PRIMARY KEY',
       'email' => 'VARCHAR(64) NOT NULL',
       'start_time' => 'TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP',
-    ]);
+    ];
   }
 
   public static function validateCriteria($criteria): bool
@@ -116,22 +115,6 @@ and it's also the base for every model you wish to create.
 * It provides automatic getters via `__call` for related DB properties;
 * It maps setters via `__set` for `fetchObject()` PDO mode;
 
-### `protected function getConnection(): PDO`
-Gets the stored PDO object with a valid connection.
-<details>
-  <summary>Code Example</summary>
-
-  ```php
-  class Test extends MykrORM
-  {
-    public function test(): void
-    {
-      $this->getConnection()->query('SELECT * FROM test');
-    }
-  }
-  ```
-</details>
-
 ### `abstract protected function getDSN(): string`
 Returns the DSN for PDO connection (has to be implemented by the extending class).
 <details>
@@ -149,6 +132,38 @@ Returns the DSN for PDO connection (has to be implemented by the extending class
   ```
 </details>
 
+### `protected function getDBProperties(): ExtendedArray`
+Get DB Properties (ensure it is an ExtendedArray instance)
+<details>
+  <summary>Code Example</summary>
+
+  ```php
+  class Test extends MykrORM
+  {
+    public function test(): void
+    {
+      $this->getDBProperties()->keys()->join('/'); // 'token/email/start_time'
+    }
+  }
+  ```
+</details>
+
+### `protected function getConnection(): PDO`
+Gets the stored PDO object with a valid connection.
+<details>
+  <summary>Code Example</summary>
+
+  ```php
+  class Test extends MykrORM
+  {
+    public function test(): void
+    {
+      $this->getConnection()->query('SELECT * FROM test');
+    }
+  }
+  ```
+</details>
+
 ### `public function __call(string $name, array $arguments)`
 Provides automatic getters for DB properties.
 <details>
@@ -158,12 +173,12 @@ Provides automatic getters for DB properties.
   class Test extends MykrORM
   {
     protected $test = 1234;
-    protected $other = "private";
+    protected $other = "no-getter";
     public __construct()
     {
-      $this->dbProperties = new ExtendedArray([
+      $this->dbProperties = [
         'test' => 'INT NOT NULL PRIMARY KEY',
-      ]);
+      ];
     }
   }
   (new Test())->getTest(); // 1234
@@ -182,9 +197,9 @@ Maps setters automatically for `fetchObject()` PDO mode.
     protected $testName = 'test';
     public __construct()
     {
-      $this->dbProperties = new ExtendedArray([
+      $this->dbProperties = [
         'test_name' => 'CHAR(4) NOT NULL PRIMARY KEY',
-      ]);
+      ];
     }
     public setTestName(string $value): string
     {
@@ -263,9 +278,7 @@ _\* There's a criteria validator in place here that can be further implemented b
   ```php
   $test = Test::find(['test_name' => 'what']); // ExtendedArray
   $test->first()->element(); // Test Model instance (or null)
-
-  $otherTest = Test::find(['test_name' => ['what', 'is', 'up']]); // ExtendedArray
-  $otherTest->next()->element(); // Test Model instance of second row (or null)
+  $test->next()->element(); // Test Model instance of second row (or null)
   ```
 </details>
 
@@ -300,16 +313,37 @@ Delete a row of the model table with current properties.
   ```
 </details>
 
+### `protected function findPrimaryKey(): string`
+Get DB property set as 'PRIMARY KEY' (or the first index if not found).
+<details>
+  <summary>Code Example</summary>
+
+  ```php
+  class Test extends MykrORM
+  {
+    public __construct()
+    {
+      $this->dbProperties = [
+        'test_name' => 'CHAR(4) NOT NULL PRIMARY KEY',
+      ];
+    }
+    public function test(): void
+    {
+      $this->findPrimaryKey(); // 'test_name'
+    }
+  }
+  ```
+</details>
+
 ### `public function getProperties(): ExtendedArray`
 Get database available properties in an associative array manner.
 <details>
   <summary>Code Example</summary>
 
   ```php
-  $test = Test::find(['test_name' => 'soap']);
-  if ($test->count()) {
-    print($test->current()->getProperties()); // {"test_name":"soap"}
-  }
+  $test = new Test();
+  $test->setTestName('soap');
+  print($test->getProperties()); // {"test_name":"soap"}
   ```
 </details>
 
@@ -319,9 +353,10 @@ Make sure that criteria is not empty and that any key in it matches "dbPropertie
   <summary>Code Example</summary>
 
   ```php
-  if (Test::validateCriteria(['test_name' => 'soap'])) {
-    $test = Test::find(['test_name' => 'soap']);
-  }
+  Test::validateCriteria(['test_name' => null]); // true
+  Test::validateCriteria(['test_name' => 'soap']); // true
+  Test::validateCriteria(['test_non_existent' => 'soap']); // Throws DBException
+  Test::validateCriteria([]); // Throws DBException
   ```
 </details>
 
@@ -342,7 +377,7 @@ Checks if a table exists for the current extending model.
     public function test(): void
     {
       $this->dbTableName = 'different_test';
-      $this->createTableIfNotExists();
+      $this->createTableIfNotExists(); // creates new table with same DB properties
       ...
     }
   }
