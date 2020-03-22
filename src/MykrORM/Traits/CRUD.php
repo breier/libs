@@ -29,10 +29,6 @@ trait CRUD
      */
     public function create(): void
     {
-        if (empty($this->getDBProperties())) {
-            throw new DBException("Invalid DB properties!");
-        }
-
         $this->createTableIfNotExists();
 
         $parameters = $this->getProperties();

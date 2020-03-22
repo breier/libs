@@ -30,6 +30,10 @@ trait TableManager
      */
     protected function createTableIfNotExists(): void
     {
+        if ($this->getDBProperties()->count() === 0) {
+            throw new DBException('Empty DB properties!');
+        }
+
         try {
             $result = $this->getConnection()->query(
                 "SELECT * FROM {$this->dbTableName} LIMIT 1"

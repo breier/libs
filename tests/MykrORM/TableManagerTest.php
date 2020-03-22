@@ -73,9 +73,23 @@ class TableManagerTest extends TestCase
      */
     public function testFailCreateTableIfNotExists(): void
     {
-        // Fail create
+        // Fail empty
+        $this->testModel->emptyDBProperties();
         try {
-            $this->testModel->insertExtraIntoDBProperties('{:?+=²}¹£¢');
+            $this->testModel->exposedCreateTableIfNotExists();
+
+            $this->assertTrue(false); // Hasn't thrown an exception
+        } catch (DBException $e) {
+            $this->assertSame(
+                'Empty DB properties!',
+                $e->getMessage()
+            );
+        }
+
+        // Fail create
+        $this->testModel = new MykrORMTestModel();
+        $this->testModel->insertExtraIntoDBProperties('{:?+=²}¹£¢');
+        try {
             $this->testModel->exposedCreateTableIfNotExists();
 
             $this->assertTrue(false); // Hasn't thrown an exception
