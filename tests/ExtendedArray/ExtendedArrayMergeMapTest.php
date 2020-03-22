@@ -208,6 +208,8 @@ class ExtendedArrayMergeMapTest extends TestCase
                 $this->extendedArray,
                 [1, null]
             );
+
+            $this->assertTrue(false); // Hasn't thrown an exception
         } catch (\InvalidArgumentException $e) {
             $this->assertSame(
                 'Second parameter has to be an array of arrays!',

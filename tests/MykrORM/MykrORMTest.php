@@ -69,7 +69,9 @@ class MykrORMTest extends TestCase
     {
         try {
             $this->testModel->testDSN = 'invalid';
-            $fail = $this->testModel->getTestConn();
+            $this->testModel->exposedGetConnection();
+
+            $this->assertTrue(false); // Hasn't thrown an exception
         } catch (DBException $e) {
             $this->assertSame(
                 'invalid data source name',
@@ -79,7 +81,9 @@ class MykrORMTest extends TestCase
 
         try {
             $this->testModel->testDSN = 'mysql:user=not;dbname=exists';
-            $fail = $this->testModel->getTestConn();
+            $this->testModel->exposedGetConnection();
+
+            $this->assertTrue(false); // Hasn't thrown an exception
         } catch (DBException $e) {
             $this->assertSame(
                 'SQLSTATE[HY000] [2002] No such file or directory',
@@ -106,7 +110,9 @@ class MykrORMTest extends TestCase
 
         try {
             $this->testModel->setExtra(321);
-            $fail = $this->testModel->getExtra();
+            $this->testModel->getExtra();
+
+            $this->assertTrue(false); // Hasn't thrown an exception
         } catch (DBException $e) {
             $this->assertSame(
                 'Property is not DB property!',
@@ -115,7 +121,9 @@ class MykrORMTest extends TestCase
         }
 
         try {
-            $fail = $this->testModel->getNonExistent();
+            $this->testModel->getNonExistent();
+
+            $this->assertTrue(false); // Hasn't thrown an exception
         } catch (DBException $e) {
             $this->assertSame(
                 'Property does not exist!',
@@ -124,7 +132,9 @@ class MykrORMTest extends TestCase
         }
 
         try {
-            $fail = $this->testModel->callUndefined();
+            $this->testModel->callUndefined();
+
+            $this->assertTrue(false); // Hasn't thrown an exception
         } catch (UndefinedMethodException $e) {
             $this->assertSame(
                 'Attempted to call an undefined method named "callUndefined"'

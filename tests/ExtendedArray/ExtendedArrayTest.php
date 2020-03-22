@@ -570,6 +570,8 @@ class ExtendedArrayTest extends TestCase
          */
         try {
             ExtendedArray::fromJSON($fromJSON, 2);
+
+            $this->assertTrue(false); // Hasn't thrown an exception
         } catch (JsonException $e) {
             $this->assertSame(
                 'Maximum stack depth exceeded',
@@ -582,6 +584,8 @@ class ExtendedArrayTest extends TestCase
          */
         try {
             ExtendedArray::fromJSON(substr($fromJSON, 0, 50));
+
+            $this->assertTrue(false); // Hasn't thrown an exception
         } catch (JsonException $e) {
             $this->assertSame(
                 'Control character error, possibly incorrectly encoded',
@@ -594,6 +598,8 @@ class ExtendedArrayTest extends TestCase
          */
         try {
             ExtendedArray::fromJSON('invalid');
+
+            $this->assertTrue(false); // Hasn't thrown an exception
         } catch (JsonException $e) {
             $this->assertSame(
                 'Syntax error',
@@ -1082,6 +1088,8 @@ class ExtendedArrayTest extends TestCase
 
         try {
             $this->emptyArray->offsetGetPosition(0);
+
+            $this->assertTrue(false); // Hasn't thrown an exception
         } catch (\OutOfBoundsException $e) {
             $this->assertSame(
                 'Seek position 0 is out of range',

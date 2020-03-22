@@ -139,4 +139,14 @@ class MykrORMTestModel extends MykrORM
     {
         $this->getDBProperties()->offsetSet('extra', $type);
     }
+
+    /**
+     * Empty DB Properties
+     */
+    public function emptyDBProperties(): void
+    {
+        foreach ($this->getDBProperties()->keys() as $field) {
+            $this->getDBProperties()->offsetUnset($field);
+        }
+    }
 }
