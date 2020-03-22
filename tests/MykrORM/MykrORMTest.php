@@ -109,8 +109,8 @@ class MykrORMTest extends TestCase
         $this->assertSame('anything shorter then 256', $this->testModel->getText());
 
         try {
-            $this->testModel->setExtra(321);
-            $this->testModel->getExtra();
+            $this->testModel->setExtraProp(321);
+            $this->testModel->getExtraProp();
 
             $this->assertTrue(false); // Hasn't thrown an exception
         } catch (DBException $e) {
@@ -147,9 +147,9 @@ class MykrORMTest extends TestCase
     /**
      * Test __set
      *
-     * It's only covered by PDO::fetchObject() @ CRUD
-     *
-     * So I'm just skipping it here
+     * It's covered by PDO::fetchObject() @ CRUD::find
+     * by setting a composed word property at the model:
+     * 'extra_prop' => 'setExtraProp()' / 'getExtraProp()'
      */
 
     /**

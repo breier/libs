@@ -31,7 +31,7 @@ class MykrORMTestModel extends MykrORM
     /**
      * Extra property
      */
-    protected $extra;
+    protected $extraProp;
 
     /**
      * Test-able DSN
@@ -129,23 +129,23 @@ class MykrORMTestModel extends MykrORM
     }
 
     /**
-     * Set Extra (non DB Property)
+     * Set Extra Property (non DB Property)
      *
      * @param mixed $value Anything
      *
      * @return mixed
      */
-    public function setExtra($value)
+    public function setExtraProp($value)
     {
-        $this->extra = $value;
+        $this->extraProp = $value;
     }
 
     /**
-     * Insert Extra to DB Properties
+     * Insert Extra Property to DB Properties
      */
     public function insertExtraIntoDBProperties(string $type): void
     {
-        $this->getDBProperties()->offsetSet('extra', $type);
+        $this->getDBProperties()->offsetSet('extra_prop', $type);
     }
 
     /**

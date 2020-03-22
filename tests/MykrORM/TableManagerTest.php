@@ -49,11 +49,11 @@ class TableManagerTest extends TestCase
         // Try again with data but no alteration
         $this->testModel->exposedCreateTableIfNotExists();
 
-        // Try altering the table (add extra column)
+        // Try altering the table (add extra_prop column)
         $this->testModel->insertExtraIntoDBProperties('TEXT');
 
         $this->testModel->exposedCreateTableIfNotExists();
-        $this->testModel->setExtra('extra update');
+        $this->testModel->setExtraProp('extra property update');
         $this->testModel->update(['id' => 1]);
 
         $newModelList = MykrORMTestModel::find(['id' => 1]);
@@ -61,8 +61,8 @@ class TableManagerTest extends TestCase
         $newModel->insertExtraIntoDBProperties('TEXT');
 
         $this->assertSame(
-            $newModel->getExtra(),
-            $this->testModel->getExtra()
+            $newModel->getExtraProp(),
+            $this->testModel->getExtraProp()
         );
 
         $this->testModel->destroyDB();

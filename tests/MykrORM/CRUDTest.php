@@ -132,8 +132,8 @@ class CRUDTest extends TestCase
                 'expect' => ['exception' => "Invalid criteria 'not-property'!"],
             ],
             'not-db-property' => [
-                'criteria' => ['extra' => 123],
-                'expect' => ['exception' => "Invalid criteria 'extra'!"],
+                'criteria' => ['extra_prop' => 123],
+                'expect' => ['exception' => "Invalid criteria 'extra_prop'!"],
             ],
             'no-db' => [
                 'criteria' => ['id' => 123],
