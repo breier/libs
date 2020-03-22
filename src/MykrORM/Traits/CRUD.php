@@ -98,11 +98,11 @@ trait CRUD
      */
     public function update($criteria): void
     {
-        $original = static::find($criteria);
-        if ($original->count() !== 1) {
+        $originalList = static::find($criteria);
+        if ($originalList->count() !== 1) {
             throw new DBException(static::class . ' Not Found!');
         }
-        $original = $original->first()->element();
+        $original = $originalList->first()->element();
 
         $parameters = $this->getProperties();
         $placeholders = $parameters->keys()->map(
@@ -112,13 +112,13 @@ trait CRUD
         );
 
         $model = new static();
-        $firstField = $model->getDBProperties()->keys()->first()->element();
-        $firstGetter = 'get' . static::snakeToCamel($firstField);
-        $parameters->append($original->{$firstGetter}());
+        $primaryField = $model->findPrimaryKey();
+        $primaryGetter = 'get' . static::snakeToCamel($primaryField);
+        $parameters->append($original->{$primaryGetter}());
 
         $query = "UPDATE {$model->dbTableName}"
             . " SET {$placeholders->implode(', ')}"
-            . " WHERE {$firstField} = ?";
+            . " WHERE {$primaryField} = ?";
 
         $this->getConnection()->beginTransaction();
         try {
@@ -139,19 +139,19 @@ trait CRUD
     public function delete(): void
     {
         $model = new static();
-        $firstField = $model->getDBProperties()->keys()->first()->element();
-        $firstGetter = 'get' . static::snakeToCamel($firstField);
-        $firstValue = $this->{$firstGetter}();
-        if (empty($firstValue)) {
-            throw new DBException("'{$firstField}' is empty!");
+        $primaryField = $model->findPrimaryKey();
+        $primaryGetter = 'get' . static::snakeToCamel($primaryField);
+        $primaryValue = $this->{$primaryGetter}();
+        if (empty($primaryValue)) {
+            throw new DBException("'{$primaryField}' is empty!");
         }
 
-        $query = "DELETE FROM {$model->dbTableName} WHERE {$firstField} = ?";
+        $query = "DELETE FROM {$model->dbTableName} WHERE {$primaryField} = ?";
 
         $this->getConnection()->beginTransaction();
         try {
             $preparedStatement = $this->getConnection()->prepare($query);
-            $preparedStatement->execute([$firstValue]);
+            $preparedStatement->execute([$primaryValue]);
             if ($preparedStatement->rowCount() !== 1) {
                 throw new PDOException(static::class . ' Not Found!');
             }
@@ -163,23 +163,32 @@ trait CRUD
     }
 
     /**
+     * Find Primary Key
+     */
+    protected function findPrimaryKey(): string
+    {
+        foreach ($this->getDBProperties() as $field => $type) {
+            if (preg_match('/PRIMARY KEY/', strtoupper($type) === 1)) {
+                return $field;
+            }
+        }
+
+        return $this->getDBProperties()->keys()->first()->element();
+    }
+
+    /**
      * Prepare Fields for insertion
      */
     public function getProperties(): ExtendedArray
     {
-        $allowedFields = $this->getDBProperties()->filter(
-            function ($type) {
-                return stristr($type, 'SERIAL') === false
-                    && stristr($type, 'INCREMENT') === false;
-            }
-        );
+        $propertyFields = $this->getDBProperties();
 
-        foreach ($allowedFields as $field => &$value) {
+        foreach ($propertyFields as $field => &$value) {
             $getter = 'get' . static::snakeToCamel($field);
             $value = $this->{$getter}();
         }
 
-        return $allowedFields->filter();
+        return $propertyFields->filter();
     }
 
     /**

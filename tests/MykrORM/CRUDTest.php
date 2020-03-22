@@ -58,7 +58,7 @@ class CRUDTest extends TestCase
      */
     public function testCreateFailure(): void
     {
-        $this->testModel->setId(-123);
+        $this->testModel->setId('somethingElse');
 
         try {
             $this->testModel->create();
@@ -66,7 +66,7 @@ class CRUDTest extends TestCase
             $this->assertTrue(false); // Hasn't thrown an exception
         } catch (DBException $e) {
             $this->assertSame(
-                'SQLSTATE[HY000]: General error: 1 near ")": syntax error',
+                'SQLSTATE[HY000]: General error: 20 datatype mismatch',
                 $e->getMessage()
             );
         }

@@ -105,9 +105,9 @@ class MykrORMTestModel extends MykrORM
     }
 
     /**
-     * Set ID
+     * Set ID (no strict type int so test can fail)
      */
-    public function setId(int $value): int
+    public function setId($value)
     {
         return $this->id = $value;
     }
