@@ -64,8 +64,7 @@ trait CRUD
         $placeholders = $criteria->map(
             function ($value, $field) {
                 $property = static::camelToSnake($field);
-                $operator = is_array($value) ? 'IN' : '=';
-                return "{$property} {$operator} :{$field}";
+                return "{$property} = :{$field}";
             },
             $criteria->keys()->getArrayCopy()
         )->implode(' AND ');

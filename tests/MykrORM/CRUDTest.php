@@ -73,40 +73,6 @@ class CRUDTest extends TestCase
     }
 
     /**
-     * Test Find Multiple Entries in the table
-     *
-     * TEMPORARILY DISABLED (sqlite doesn't seem to support it)
-     */
-    public function findMultiple(): void
-    {
-        $this->testModel->setText('success one');
-        $this->testModel->create();
-        $this->testModel->setText('success two');
-        $this->testModel->create();
-        $this->testModel->setText('success three');
-        $this->testModel->create();
-
-        $newModelList = MykrORMTestModel::find(['id' => [1, 2, 3]]);
-
-        $this->assertSame(
-            'success one',
-            $newModelList->first()->element()->getText()
-        );
-
-        $this->assertSame(
-            'success two',
-            $newModelList->next()->element()->getText()
-        );
-
-        $this->assertSame(
-            'success three',
-            $newModelList->last()->element()->getText()
-        );
-
-        $this->testModel->destroyDB();
-    }
-
-    /**
      * Test Fail Find Entry in the table
      *
      * @dataProvider findProvider
