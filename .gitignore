@@ -3,3 +3,4 @@
 /tests/temp
 /cov.xml
 .phpunit.result.cache
+testing.sqlite3
