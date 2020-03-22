@@ -67,7 +67,7 @@ class MykrORMTestModel extends MykrORM
     /**
      * Expose Get Connection
      */
-    public function getTestConn(): PDO
+    public function exposedGetConnection(): PDO
     {
         return $this->getConnection();
     }

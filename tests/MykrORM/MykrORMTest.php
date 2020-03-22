@@ -56,10 +56,10 @@ class MykrORMTest extends TestCase
     public function testGetConnection(): void
     {
         // Successful New Connection
-        $this->assertTrue($this->testModel->getTestConn() instanceof PDO);
+        $this->assertTrue($this->testModel->exposedGetConnection() instanceof PDO);
 
         // Successful Stored Connection
-        $this->assertTrue($this->testModel->getTestConn() instanceof PDO);
+        $this->assertTrue($this->testModel->exposedGetConnection() instanceof PDO);
     }
 
     /**
