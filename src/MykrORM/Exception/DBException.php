@@ -38,11 +38,6 @@ class DBException extends Exception
             return;
         }
 
-        if (empty($e)) {
-            parent::__construct($message, $code);
-            return;
-        }
-
         parent::__construct($message, $code, $e);
     }
 }
