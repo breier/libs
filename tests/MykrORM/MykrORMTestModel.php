@@ -51,7 +51,11 @@ class MykrORMTestModel extends MykrORM
      */
     public function destroyDB(): bool
     {
-        return unlink(__DIR__ . '/../../testing.sqlite3');
+        if (file_exists(__DIR__ . '/../../testing.sqlite3')) {
+            return unlink(__DIR__ . '/../../testing.sqlite3');
+        }
+
+        return false;
     }
 
     /**
