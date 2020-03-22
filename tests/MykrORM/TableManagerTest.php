@@ -56,8 +56,8 @@ class TableManagerTest extends TestCase
         $this->testModel->setExtra('extra update');
         $this->testModel->update(['id' => 1]);
 
-        $newModelResponse = MykrORMTestModel::find(['id' => 1]);
-        $newModel = $newModelResponse->current();
+        $newModelList = MykrORMTestModel::find(['id' => 1]);
+        $newModel = $newModelList->current();
         $newModel->insertExtraIntoDBProperties('TEXT');
 
         $this->assertSame(
@@ -65,7 +65,7 @@ class TableManagerTest extends TestCase
             $this->testModel->getExtra()
         );
 
-        @unlink(__DIR__ . '/../../testing.sqlite3');
+        $this->testModel->destroyDB();
     }
 
     /**
@@ -99,16 +99,16 @@ class TableManagerTest extends TestCase
                 $e->getMessage()
             );
         }
-
-        @unlink(__DIR__ . '/../../testing.sqlite3');
+        $this->testModel->destroyDB();
 
         // Fail alter
         $this->testModel = new MykrORMTestModel();
         $this->testModel->exposedCreateTableIfNotExists();
         $this->testModel->setText('first creation test');
         $this->testModel->create();
+
+        $this->testModel->insertExtraIntoDBProperties('{:?+=²}¹£¢');
         try {
-            $this->testModel->insertExtraIntoDBProperties('{:?+=²}¹£¢');
             $this->testModel->exposedCreateTableIfNotExists();
 
             $this->assertTrue(false); // Hasn't thrown an exception
@@ -118,7 +118,6 @@ class TableManagerTest extends TestCase
                 $e->getMessage()
             );
         }
-
-        @unlink(__DIR__ . '/../../testing.sqlite3');
+        $this->testModel->destroyDB();
     }
 }

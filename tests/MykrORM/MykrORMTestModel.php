@@ -47,6 +47,14 @@ class MykrORMTestModel extends MykrORM
     }
 
     /**
+     * Destroy Database File
+     */
+    public function destroyDB(): bool
+    {
+        return unlink(__DIR__ . '/../../testing.sqlite3');
+    }
+
+    /**
      * Set test table name
      */
     public function __construct(string $tableName = null)
