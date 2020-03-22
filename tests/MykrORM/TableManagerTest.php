@@ -31,6 +31,8 @@ class TableManagerTest extends TestCase
     public function setUp(): void
     {
         $this->testModel = new MykrORMTestModel();
+        $this->testModel->destroyDB();
+        $this->testModel = new MykrORMTestModel();
     }
 
     /**
@@ -64,8 +66,6 @@ class TableManagerTest extends TestCase
             $newModel->getExtraProp(),
             $this->testModel->getExtraProp()
         );
-
-        $this->testModel->destroyDB();
     }
 
     /**
@@ -118,6 +118,5 @@ class TableManagerTest extends TestCase
                 $e->getMessage()
             );
         }
-        $this->testModel->destroyDB();
     }
 }
