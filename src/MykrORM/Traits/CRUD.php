@@ -97,9 +97,15 @@ trait CRUD
      */
     public function update($criteria): void
     {
-        $originalList = static::find($criteria);
-        if ($originalList->count() !== 1) {
+        try {
+            $originalList = static::find($criteria);
+        } catch (DBException $e) {
             throw new DBException(static::class . ' Not Found!');
+        }
+
+        if ($originalList->count() !== 1) {
+            $jsonCriteria = (new ExtendedArray($criteria))->jsonSerialize();
+            throw new DBException("'{$jsonCriteria}' Not Found!");
         }
         $original = $originalList->first()->element();
 
@@ -152,7 +158,7 @@ trait CRUD
             $preparedStatement = $this->getConnection()->prepare($query);
             $preparedStatement->execute([$primaryValue]);
             if ($preparedStatement->rowCount() !== 1) {
-                throw new PDOException(static::class . ' Not Found!');
+                throw new PDOException("'{$primaryField}' Not Found!");
             }
             $this->getConnection()->commit();
         } catch (PDOException $e) {
@@ -167,7 +173,7 @@ trait CRUD
     protected function findPrimaryKey(): string
     {
         foreach ($this->getDBProperties() as $field => $type) {
-            if (preg_match('/PRIMARY KEY/', strtoupper($type) === 1)) {
+            if (preg_match('/PRIMARY KEY/', strtoupper($type)) === 1) {
                 return $field;
             }
         }
