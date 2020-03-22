@@ -213,7 +213,7 @@ abstract class ExtendedArrayBase extends ArrayIterator
 
     /**
      * Extending NatCaseSort Method to update position map
-     * Sort elements using case insensitive "natural order"
+     * Sort elements using case insensitive 'natural order'
      */
     public function natcasesort(): ExtendedArrayBase
     {
@@ -226,7 +226,7 @@ abstract class ExtendedArrayBase extends ArrayIterator
 
     /**
      * Extending NatSort Method to update position map
-     * Sort elements using "natural order"
+     * Sort elements using 'natural order'
      */
     public function natsort(): ExtendedArrayBase
     {
@@ -248,7 +248,7 @@ abstract class ExtendedArrayBase extends ArrayIterator
     }
 
     /**
-     * Extending Offset Exists Method to behave like "array_key_exists"
+     * Extending Offset Exists Method to behave like 'array_key_exists'
      * Validate element index
      *
      * @param mixed $index To check

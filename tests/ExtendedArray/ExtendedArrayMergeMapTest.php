@@ -9,7 +9,7 @@
  * @package  Breier/Libs
  * @author   Andre Breier <andre@breier.net.br>
  * @license  GPLv3 https://www.gnu.org/licenses/gpl-3.0.en.html
- * @link     php vendor/phpunit/phpunit/phpunit tests/ExtendedArrayMergeMapTest.php
+ * @link     php vendor/bin/phpunit tests/ExtendedArray/ExtendedArrayMergeMapTest.php
  */
 
 namespace Test\ExtendedArray;
@@ -208,6 +208,8 @@ class ExtendedArrayMergeMapTest extends TestCase
                 $this->extendedArray,
                 [1, null]
             );
+
+            $this->assertTrue(false); // Hasn't thrown an exception
         } catch (\InvalidArgumentException $e) {
             $this->assertSame(
                 'Second parameter has to be an array of arrays!',

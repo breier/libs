@@ -9,7 +9,7 @@
  * @package  Breier/Libs
  * @author   Andre Breier <andre@breier.net.br>
  * @license  GPLv3 https://www.gnu.org/licenses/gpl-3.0.en.html
- * @link     php vendor/phpunit/phpunit/phpunit tests/ExtendedArrayBaseTest.php
+ * @link     php vendor/bin/phpunit tests/ExtendedArray/ExtendedArrayBaseTest.php
  */
 
 namespace Test\ExtendedArray;
@@ -158,8 +158,9 @@ class ExtendedArrayBaseTest extends TestCase
          * String
          */
         try {
-            $null = new ExtendedArray('non-array');
-            $this->assertFalse($null);
+            new ExtendedArray('non-array');
+
+            $this->assertTrue(false); // Hasn't thrown an exception
         } catch (InvalidArgumentException $e) {
             $this->assertSame(
                 'Only array types are accepted as parameter!',
@@ -171,8 +172,9 @@ class ExtendedArrayBaseTest extends TestCase
          * Integer
          */
         try {
-            $null = new ExtendedArray(123);
-            $this->assertFalse($null);
+            new ExtendedArray(123);
+
+            $this->assertTrue(false); // Hasn't thrown an exception
         } catch (InvalidArgumentException $e) {
             $this->assertSame(
                 'Only array types are accepted as parameter!',
@@ -184,8 +186,9 @@ class ExtendedArrayBaseTest extends TestCase
          * Boolean
          */
         try {
-            $null = new ExtendedArray(true);
-            $this->assertFalse($null);
+            new ExtendedArray(true);
+
+            $this->assertTrue(false); // Hasn't thrown an exception
         } catch (InvalidArgumentException $e) {
             $this->assertSame(
                 'Only array types are accepted as parameter!',
@@ -197,8 +200,9 @@ class ExtendedArrayBaseTest extends TestCase
          * Float
          */
         try {
-            $null = new ExtendedArray(123.456789);
-            $this->assertFalse($null);
+            new ExtendedArray(123.456789);
+
+            $this->assertTrue(false); // Hasn't thrown an exception
         } catch (InvalidArgumentException $e) {
             $this->assertSame(
                 'Only array types are accepted as parameter!',
@@ -211,8 +215,9 @@ class ExtendedArrayBaseTest extends TestCase
          */
         try {
             $object = (object) ['invalid'];
-            $null = new ExtendedArray($object);
-            $this->assertFalse($null);
+            new ExtendedArray($object);
+
+            $this->assertTrue(false); // Hasn't thrown an exception
         } catch (InvalidArgumentException $e) {
             $this->assertSame(
                 'Only array types are accepted as parameter!',
@@ -229,7 +234,7 @@ class ExtendedArrayBaseTest extends TestCase
         $this->extendedArray->next();
         next($this->plainArray);
 
-        $magicStringFromObject = sprintf("%s", $this->extendedArray);
+        $magicStringFromObject = sprintf('%s', $this->extendedArray);
         $this->assertSame(
             $magicStringFromObject,
             $this->extendedArray->jsonSerialize()
@@ -239,7 +244,7 @@ class ExtendedArrayBaseTest extends TestCase
             $this->extendedArray->key()
         );
 
-        $this->assertSame('{}', sprintf("%s", $this->emptyArray));
+        $this->assertSame('{}', sprintf('%s', $this->emptyArray));
     }
 
     /**
