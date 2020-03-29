@@ -3,7 +3,7 @@
     "description": "A Collection of Minimalist Libraries",
     "license": "GPL-3.0-or-later",
     "keywords": ["php", "extend", "array", "list", "collection", "orm", "database"],
-    "version": "2.0.1",
+    "version": "2.1.0",
     "type": "library",
     "authors": [
         {
