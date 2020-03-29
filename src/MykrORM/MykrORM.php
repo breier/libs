@@ -38,11 +38,10 @@ abstract class MykrORM
     private $dbOptions = [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_NAMED,
-        PDO::ATTR_EMULATE_PREPARES => false,
     ];
 
     /**
-     * @var string Table Name
+     * @var string DB Table Name
      */
     protected $dbTableName;
 
@@ -50,6 +49,11 @@ abstract class MykrORM
      * @var ExtendedArray DB Properties (table columns)
      */
     protected $dbProperties;
+
+    /**
+     * @var array DB Constructor Args
+     */
+    protected $dbConstructorArgs = [];
 
     /**
      * Set defaults
