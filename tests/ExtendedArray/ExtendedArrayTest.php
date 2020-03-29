@@ -248,6 +248,23 @@ class ExtendedArrayTest extends TestCase
     }
 
     /**
+     * Test Array Diff Fail
+     */
+    public function testArrayDiffFail(): void
+    {
+        try {
+            $this->extendedArray->diff('non-array');
+
+            $this->assertTrue(false); // Hasn't thrown an exception
+        } catch (\InvalidArgumentException $e) {
+            $this->assertSame(
+                'Only array types are accepted as parameter!',
+                $e->getMessage()
+            );
+        }
+    }
+
+    /**
      * Test Explode
      *
      * @return void
