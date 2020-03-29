@@ -56,29 +56,37 @@ trait CRUD
      *
      * @throws DBException
      */
-    public static function find($criteria): ExtendedArray
+    public function find($criteria): ExtendedArray
     {
-        self::validateCriteria($criteria);
+        $this->validateCriteria($criteria);
         $criteria = new ExtendedArray($criteria);
 
-        $placeholders = $criteria->map(
-            function ($value, $field) {
-                $property = static::camelToSnake($field);
-                return "{$property} = :{$field}";
-            },
-            $criteria->keys()->getArrayCopy()
-        )->implode(' AND ');
+        $whereClause = '';
+        if ($criteria->count()) {
+            $placeholders = $criteria->map(
+                function ($value, $field) {
+                    $property = static::camelToSnake($field);
+                    return "{$property} = :{$field}";
+                },
+                $criteria->keys()->getArrayCopy()
+            )->implode(' AND ');
+
+            $whereClause = " WHERE {$placeholders}";
+        }
 
         try {
-            $model = new static();
-
-            $preparedStatement = $model->getConnection()->prepare(
-                "SELECT * FROM {$model->dbTableName} WHERE {$placeholders}"
+            $preparedStatement = $this->getConnection()->prepare(
+                "SELECT * FROM {$this->dbTableName}{$whereClause}"
             );
             $preparedStatement->execute($criteria->getArrayCopy());
 
             $result = new ExtendedArray();
-            while ($row = $preparedStatement->fetchObject(static::class)) {
+            while (
+                $row = $preparedStatement->fetchObject(
+                    static::class,
+                    $this->dbConstructorArgs
+                )
+            ) {
                 $result->append($row);
             }
 
@@ -98,7 +106,14 @@ trait CRUD
     public function update($criteria): void
     {
         try {
-            $originalList = static::find($criteria);
+            $this->validateCriteria($criteria);
+
+            $criteria = new ExtendedArray($criteria);
+            if ($criteria->count() === 0) {
+                throw new DBException('');
+            }
+
+            $originalList = $this->find($criteria);
         } catch (DBException $e) {
             throw new DBException(static::class . ' Not Found!');
         }
@@ -116,12 +131,11 @@ trait CRUD
             }
         );
 
-        $model = new static();
-        $primaryField = $model->findPrimaryKey();
+        $primaryField = $this->findPrimaryKey();
         $primaryGetter = 'get' . static::snakeToCamel($primaryField);
         $parameters->append($original->{$primaryGetter}());
 
-        $query = "UPDATE {$model->dbTableName}"
+        $query = "UPDATE {$this->dbTableName}"
             . " SET {$placeholders->implode(', ')}"
             . " WHERE {$primaryField} = ?";
 
@@ -143,22 +157,23 @@ trait CRUD
      */
     public function delete(): void
     {
-        $model = new static();
-        $primaryField = $model->findPrimaryKey();
+        $primaryField = $this->findPrimaryKey();
         $primaryGetter = 'get' . static::snakeToCamel($primaryField);
         $primaryValue = $this->{$primaryGetter}();
         if (empty($primaryValue)) {
             throw new DBException("'{$primaryField}' is empty!");
         }
 
-        $query = "DELETE FROM {$model->dbTableName} WHERE {$primaryField} = ?";
+        $query = "DELETE FROM {$this->dbTableName} WHERE {$primaryField} = ?";
 
         $this->getConnection()->beginTransaction();
         try {
             $preparedStatement = $this->getConnection()->prepare($query);
             $preparedStatement->execute([$primaryValue]);
             if ($preparedStatement->rowCount() !== 1) {
-                throw new PDOException("'{$primaryField}' Not Found!");
+                throw new PDOException(
+                    "'{$primaryField}' was not found or unique!"
+                );
             }
             $this->getConnection()->commit();
         } catch (PDOException $e) {
@@ -203,22 +218,17 @@ trait CRUD
      *
      * @throws DBException
      */
-    public static function validateCriteria($criteria): bool
+    public function validateCriteria($criteria): bool
     {
         if (!ExtendedArray::isArray($criteria)) {
             throw new DBException('Invalid criteria format!');
         }
 
         $criteria = new ExtendedArray($criteria);
-        if (!$criteria->count()) {
-            throw new DBException('Invalid criteria!');
-        }
-
-        $model = new static();
 
         foreach ($criteria->keys() as $field) {
             $property = static::camelToSnake($field);
-            if (!$model->getDBProperties()->offsetExists($property)) {
+            if (!$this->getDBProperties()->offsetExists($property)) {
                 throw new DBException("Invalid criteria '{$field}'!");
             }
         }

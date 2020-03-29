@@ -48,7 +48,7 @@ class Session extends MykrORM
     ];
   }
 
-  public static function validateCriteria($criteria): bool
+  public function validateCriteria($criteria): bool
   {
     parent::validateCriteria($criteria);
     if ($criteria->count() > 1) {
@@ -92,11 +92,8 @@ created in the database.
 
 If you update the model adding more columns they will be added on creation as well.
 
-While Create, Update and Delete are instance methods, "Read" (`find`) is static
-and returns an ExtendedArray of instances of the Model.
-```php
-$session = Session::find(['token' => $AuthrizationBearerToken]);
-```
+While Create, Update and Delete deal with the current instance,
+"Read" (`find`) returns an ExtendedArray of instances of the Model.
 
 Properties listed in $this->dbProperties should be declared with protected visibility.
 MykrORM will provide automatic getters for them.
@@ -109,9 +106,10 @@ and it's also the base for every model you wish to create.
 * It sets these default PDO options:
   * `PDO::ATTR_ERRMODE` -> `PDO::ERRMODE_EXCEPTION`
   * `PDO::ATTR_DEFAULT_FETCH_MODE` -> `PDO::FETCH_NAMED`
-  * `PDO::ATTR_EMULATE_PREPARES` -> `false`
 * It sets the DB table name based on the model class name that extended from it.
 <br>But you can override it by setting `$this->dbTableName` before `parent::__construct()`;
+* If you use parameters for the extended `__construct` you also need to set
+<br>`$this->dbConstructorArgs` as an array containing the parameters' values in it;
 * It provides automatic getters via `__call` for related DB properties;
 * It maps setters via `__set` for `fetchObject()` PDO mode;
 
@@ -267,8 +265,8 @@ Insert new row to the model table with current properties.
   ```
 </details>
 
-### `public static function find($criteria): ExtendedArray`
-`[static]` Get all rows of the model table that matches $criteria
+### `public function find($criteria): ExtendedArray`
+Get all rows of the model table that matches $criteria
 (returns an ExtendedArray with model instances).
 
 _\* There's a criteria validator in place here that can be further implemented by the model._
@@ -276,7 +274,8 @@ _\* There's a criteria validator in place here that can be further implemented b
   <summary>Code Example</summary>
 
   ```php
-  $test = Test::find(['test_name' => 'what']); // ExtendedArray
+  $testModel = new Test();
+  $test = $testModel->find(['test_name' => 'what']); // ExtendedArray
   $test->first()->element(); // Test Model instance (or null)
   $test->next()->element(); // Test Model instance of second row (or null)
   ```
@@ -290,7 +289,7 @@ _\* It internally uses `find` to get the original object._
   <summary>Code Example</summary>
 
   ```php
-  $test = Test::find(['test_name' => 'what']);
+  $test = (new Test())->find(['test_name' => 'what']);
   if ($test->count()) {
     $testModel = $test->first()->element();
     $testModel->setTestName('soap');
@@ -305,7 +304,7 @@ Delete a row of the model table with current properties.
   <summary>Code Example</summary>
 
   ```php
-  $test = Test::find(['test_name' => 'soap']);
+  $test = (new Test())->find(['test_name' => 'soap']);
   if ($test->count()) {
     $testModel = $test->first()->element();
     $testModel->delete();
@@ -347,16 +346,17 @@ Get database available properties in an associative array manner.
   ```
 </details>
 
-### `public static function validateCriteria($criteria): bool`
-Make sure that criteria is not empty and that any key in it matches "dbProperties".
+### `public function validateCriteria($criteria): bool`
+Make sure that any key in the criteria matches "dbProperties".
 <details>
   <summary>Code Example</summary>
 
   ```php
-  Test::validateCriteria(['test_name' => null]); // true
-  Test::validateCriteria(['test_name' => 'soap']); // true
-  Test::validateCriteria(['test_non_existent' => 'soap']); // Throws DBException
-  Test::validateCriteria([]); // Throws DBException
+  $testModel = new Test();
+  $testModel->validateCriteria([]); // true
+  $testModel->validateCriteria(['test_name' => null]); // true
+  $testModel->validateCriteria(['test_name' => 'soap']); // true
+  $testModel->validateCriteria(['test_non_existent' => 'soap']); // Throws DBException
   ```
 </details>
 
