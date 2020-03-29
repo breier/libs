@@ -58,7 +58,7 @@ class TableManagerTest extends TestCase
         $this->testModel->setExtraProp('extra property update');
         $this->testModel->update(['id' => 1]);
 
-        $newModelList = MykrORMTestModel::find(['id' => 1]);
+        $newModelList = $this->testModel->find(['id' => 1]);
         $newModel = $newModelList->current();
         $newModel->insertExtraIntoDBProperties('TEXT');
 

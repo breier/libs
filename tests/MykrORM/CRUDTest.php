@@ -45,7 +45,7 @@ class CRUDTest extends TestCase
         $this->testModel->setText('success creation');
         $this->testModel->create();
 
-        $newModelList = MykrORMTestModel::find(['id' => 1]);
+        $newModelList = $this->testModel->find(['id' => 1]);
         $newModel = $newModelList->current();
 
         $this->assertSame(
@@ -88,7 +88,7 @@ class CRUDTest extends TestCase
         $this->testModel->create();
         $this->testModel->create();
 
-        $newModelList = MykrORMTestModel::find(['text' => 'same text']);
+        $newModelList = $this->testModel->find(['text' => 'same text']);
 
         $this->assertSame(2, $newModelList->count());
         $this->assertEquals(1, $newModelList->first()->element()->getId());
@@ -102,28 +102,29 @@ class CRUDTest extends TestCase
      */
     public function testFailFind($criteria, $expect, $exec = null): void
     {
+        $this->testModel->destroyDB();
+        $this->testModel = new MykrORMTestModel();
+
+        $this->testModel->setDate('2020-03-22 17:16:15');
+        $this->testModel->setText('success creation');
+        $this->testModel->create();
+
         if (!empty($exec)) {
             eval($exec); // dangerous uh 8)
         }
 
-        if (empty($expect['exception'])) {
-            $newModelList = MykrORMTestModel::find($criteria);
+        if ($expect instanceof MykrORMTestModel || empty($expect['exception'])) {
+            $newModelList = $this->testModel->find($criteria);
             $newModel = $newModelList->current();
 
-            $this->assertSame(
-                $newModel,
-                $expect
-            );
+            $this->assertEquals($newModel, $expect);
         } else {
             try {
-                MykrORMTestModel::find($criteria);
+                $this->testModel->find($criteria);
 
                 $this->assertTrue(false); // Hasn't thrown an exception
             } catch (DBException $e) {
-                $this->assertSame(
-                    $expect['exception'],
-                    $e->getMessage()
-                );
+                $this->assertSame($expect['exception'], $e->getMessage());
             }
         }
     }
@@ -133,6 +134,11 @@ class CRUDTest extends TestCase
      */
     public function findProvider(): array
     {
+        $emptyTestModel = new MykrORMTestModel();
+        $emptyTestModel->setDate('2020-03-22 17:16:15');
+        $emptyTestModel->setText('success creation');
+        $emptyTestModel->setId('1');
+
         return [
             'not-there' => [
                 'criteria' => ['id' => 5],
@@ -144,7 +150,7 @@ class CRUDTest extends TestCase
             ],
             'empty' => [
                 'criteria' => [],
-                'expect' => ['exception' => 'Invalid criteria!'],
+                'expect' => $emptyTestModel,
             ],
             'not-array' => [
                 'criteria' => 'not-array',
@@ -163,7 +169,8 @@ class CRUDTest extends TestCase
                 'expect' => [
                     'exception' => 'SQLSTATE[HY000]: General error: 1 no such table: mykrormtestmodel'
                 ],
-                'exec' => '$this->testModel->destroyDB();',
+                'exec' => '$this->testModel->destroyDB();'
+                    . ' $this->testModel = new \Test\MykrORM\MykrORMTestModel();',
             ],
         ];
     }
@@ -200,7 +207,7 @@ class CRUDTest extends TestCase
         if (empty($expect['exception'])) {
             $this->testModel->update($criteria);
 
-            $newModelList = MykrORMTestModel::find($criteria);
+            $newModelList = $this->testModel->find($criteria);
             $newModel = $newModelList->current();
 
             $this->assertEquals(
@@ -268,7 +275,16 @@ class CRUDTest extends TestCase
                     'setDate' => '2020-03-22 17:16:15',
                 ],
                 'expect' => ['exception' => 'Test\MykrORM\MykrORMTestModel Not Found!'],
-                'exec' => '$this->testModel->destroyDB();',
+                'exec' => '$this->testModel->destroyDB();'
+                    . ' $this->testModel = new \Test\MykrORM\MykrORMTestModel();',
+            ],
+            'fail-empty' => [
+                'criteria' => [],
+                'update' => [
+                    'setId' => 3,
+                    'setDate' => '2020-03-22 17:16:15',
+                ],
+                'expect' => ['exception' => 'Test\MykrORM\MykrORMTestModel Not Found!'],
             ],
             'fail-criteria' => [
                 'criteria' => ['id' => 5],
@@ -310,11 +326,11 @@ class CRUDTest extends TestCase
             );
         }
 
-        $newModelList = MykrORMTestModel::find(['text' => 'to be deleted']);
+        $newModelList = $this->testModel->find(['text' => 'to be deleted']);
         $newModel = $newModelList->current();
         $newModel->delete();
 
-        $newModelList = MykrORMTestModel::find(['text' => 'to be deleted']);
+        $newModelList = $this->testModel->find(['text' => 'to be deleted']);
         $this->assertNull($newModelList->current());
 
         try {
@@ -323,7 +339,7 @@ class CRUDTest extends TestCase
             $this->assertTrue(false); // Hasn't thrown an exception
         } catch (DBException $e) {
             $this->assertSame(
-                "'id' Not Found!",
+                "'id' was not found or unique!",
                 $e->getMessage()
             );
         }

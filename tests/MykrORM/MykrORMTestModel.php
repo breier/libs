@@ -63,6 +63,8 @@ class MykrORMTestModel extends MykrORM
      */
     public function __construct(string $tableName = null)
     {
+        $this->dbConstructorArgs = [$tableName];
+
         if (!empty($tableName)) {
             $this->dbTableName = $tableName;
         }
