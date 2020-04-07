@@ -13,6 +13,8 @@
 
 namespace Breier\MykrORM\Traits;
 
+use PDO;
+use PDOStatement;
 use PDOException;
 use Breier\ExtendedArray\ExtendedArray;
 use Breier\MykrORM\Exception\DBException;
@@ -41,7 +43,8 @@ trait CRUD
         $this->getConnection()->beginTransaction();
         try {
             $preparedStatement = $this->getConnection()->prepare($query);
-            $preparedStatement->execute($parameters->values()->getArrayCopy());
+            $this->bindIndexedParams($preparedStatement, $parameters);
+            $preparedStatement->execute();
             $this->getConnection()->commit();
         } catch (PDOException $e) {
             $this->getConnection()->rollBack();
@@ -63,12 +66,11 @@ trait CRUD
 
         $whereClause = '';
         if ($criteria->count()) {
-            $placeholders = $criteria->map(
-                function ($value, $field) {
+            $placeholders = $criteria->keys()->map(
+                function ($field) {
                     $property = static::camelToSnake($field);
-                    return "{$property} = :{$field}";
-                },
-                $criteria->keys()->getArrayCopy()
+                    return "{$property} = ?";
+                }
             )->implode(' AND ');
 
             $whereClause = " WHERE {$placeholders}";
@@ -78,7 +80,8 @@ trait CRUD
             $preparedStatement = $this->getConnection()->prepare(
                 "SELECT * FROM {$this->dbTableName}{$whereClause}"
             );
-            $preparedStatement->execute($criteria->getArrayCopy());
+            $this->bindIndexedParams($preparedStatement, $criteria);
+            $preparedStatement->execute();
 
             $result = new ExtendedArray();
             while (
@@ -142,7 +145,8 @@ trait CRUD
         $this->getConnection()->beginTransaction();
         try {
             $preparedStatement = $this->getConnection()->prepare($query);
-            $preparedStatement->execute($parameters->values()->getArrayCopy());
+            $this->bindIndexedParams($preparedStatement, $parameters);
+            $preparedStatement->execute();
             $this->getConnection()->commit();
         } catch (PDOException $e) {
             $this->getConnection()->rollBack();
@@ -183,35 +187,6 @@ trait CRUD
     }
 
     /**
-     * Find Primary Key
-     */
-    protected function findPrimaryKey(): string
-    {
-        foreach ($this->getDBProperties() as $field => $type) {
-            if (preg_match('/PRIMARY KEY/', strtoupper($type)) === 1) {
-                return $field;
-            }
-        }
-
-        return $this->getDBProperties()->keys()->first()->element();
-    }
-
-    /**
-     * Prepare Fields for insertion
-     */
-    public function getProperties(): ExtendedArray
-    {
-        $propertyFields = $this->getDBProperties();
-
-        foreach ($propertyFields as $field => &$value) {
-            $getter = 'get' . static::snakeToCamel($field);
-            $value = $this->{$getter}();
-        }
-
-        return $propertyFields->filter();
-    }
-
-    /**
      * Validate Criteria
      *
      * @param array|ExtendedArray $criteria
@@ -234,5 +209,56 @@ trait CRUD
         }
 
         return true;
+    }
+
+    /**
+     * Prepare Fields for insertion
+     */
+    protected function getProperties(): ExtendedArray
+    {
+        $propertyFields = new ExtendedArray($this->getDBProperties());
+
+        foreach ($propertyFields as $field => &$value) {
+            $getter = 'get' . static::snakeToCamel($field);
+            $value = $this->{$getter}();
+        }
+
+        return $propertyFields;
+    }
+
+    /**
+     * Bind Statement Parameters using dynamic PDO types
+     */
+    protected function bindIndexedParams(
+        PDOStatement $statement,
+        ExtendedArray $parameters
+    ): void {
+        $index = 0;
+
+        foreach ($parameters as &$value) {
+            if (is_null($value)) {
+                $PDOParamType = PDO::PARAM_NULL;
+            } elseif (is_bool($value)) {
+                $PDOParamType = PDO::PARAM_BOOL;
+            } else {
+                $PDOParamType = PDO::PARAM_STR;
+            }
+
+            $statement->bindParam(++$index, $value, $PDOParamType);
+        }
+    }
+
+    /**
+     * Find Primary Key
+     */
+    protected function findPrimaryKey(): string
+    {
+        foreach ($this->getDBProperties() as $field => $type) {
+            if (preg_match('/PRIMARY KEY/', strtoupper($type)) === 1) {
+                return $field;
+            }
+        }
+
+        return $this->getDBProperties()->keys()->first()->element();
     }
 }

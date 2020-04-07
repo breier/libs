@@ -13,6 +13,7 @@
 
 namespace Test\MykrORM;
 
+use Breier\ExtendedArray\ExtendedArray;
 use Breier\MykrORM\MykrORM;
 use PDO;
 
@@ -61,9 +62,9 @@ class MykrORMTestModel extends MykrORM
     /**
      * Set test table name
      */
-    public function __construct(string $tableName = null)
+    public function __construct(?string $tableName = null)
     {
-        $this->dbConstructorArgs = [$tableName];
+        $this->dbConstructorArgs = $tableName ? [$tableName] : [];
 
         if (!empty($tableName)) {
             $this->dbTableName = $tableName;
@@ -108,6 +109,14 @@ class MykrORMTestModel extends MykrORM
     public function exposedCreateTableIfNotExists(): void
     {
         $this->createTableIfNotExists();
+    }
+
+    /**
+     * Expose Get Properties
+     */
+    public function exposedGetProperties(): ExtendedArray
+    {
+        return $this->getProperties();
     }
 
     /**

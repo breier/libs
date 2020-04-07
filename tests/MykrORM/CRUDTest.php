@@ -180,10 +180,10 @@ class CRUDTest extends TestCase
      *
      * @dataProvider updateProvider
      */
-    public function testUpdate($criteria, $update, $expect, $exec = null): void
+    public function testUpdate($model, $criteria, $update, $expect, $exec = null): void
     {
         $this->testModel->destroyDB();
-        $this->testModel = new MykrORMTestModel();
+        $this->testModel = new $model();
 
         foreach ($update as $setter => $value) {
             if (!empty($value['create'])) {
@@ -211,7 +211,7 @@ class CRUDTest extends TestCase
             $newModel = $newModelList->current();
 
             $this->assertEquals(
-                $newModel->getProperties()->getArrayCopy(),
+                $newModel->exposedGetProperties()->getArrayCopy(),
                 $expect
             );
         } else {
@@ -235,16 +235,20 @@ class CRUDTest extends TestCase
     {
         return [
             'success-one' => [
+                'model' => '\Test\MykrORM\MykrORMTestModel',
                 'criteria' => ['id' => 1],
                 'update' => [
+                    'setId' => 1,
                     'setDate' => '2020-03-22 17:16:15',
                 ],
                 'expect' => [
                     'id' => '1',
                     'date' => '2020-03-22 17:16:15',
+                    'text' => null,
                 ],
             ],
             'success-two' => [
+                'model' => '\Test\MykrORM\MykrORMTestModel',
                 'criteria' => ['id' => 2],
                 'update' => [
                     'setId' => 2,
@@ -253,9 +257,11 @@ class CRUDTest extends TestCase
                 'expect' => [
                     'id' => '2',
                     'date' => '2020-03-22 17:16:15',
+                    'text' => null,
                 ],
             ],
             'success-three' => [
+                'model' => '\Test\MykrORM\MykrORMTestModel',
                 'criteria' => ['id' => 3],
                 'update' => [
                     'setId' => 3,
@@ -268,7 +274,20 @@ class CRUDTest extends TestCase
                     'text' => 'testing text',
                 ],
             ],
+            'success-false' => [
+                'model' => '\Test\MykrORM\MykrORMTestFalseModel',
+                'criteria' => ['name' => 1],
+                'update' => [
+                    'setName' => 1,
+                    'setIsValid' => false,
+                ],
+                'expect' => [
+                    'name' => '1',
+                    'is_valid' => false,
+                ],
+            ],
             'fail-table' => [
+                'model' => '\Test\MykrORM\MykrORMTestModel',
                 'criteria' => ['id' => 4],
                 'update' => [
                     'setId' => 3,
@@ -279,6 +298,7 @@ class CRUDTest extends TestCase
                     . ' $this->testModel = new \Test\MykrORM\MykrORMTestModel();',
             ],
             'fail-empty' => [
+                'model' => '\Test\MykrORM\MykrORMTestModel',
                 'criteria' => [],
                 'update' => [
                     'setId' => 3,
@@ -287,6 +307,7 @@ class CRUDTest extends TestCase
                 'expect' => ['exception' => 'Test\MykrORM\MykrORMTestModel Not Found!'],
             ],
             'fail-criteria' => [
+                'model' => '\Test\MykrORM\MykrORMTestModel',
                 'criteria' => ['id' => 5],
                 'update' => [
                     'setId' => 3,
@@ -295,6 +316,7 @@ class CRUDTest extends TestCase
                 'expect' => ['exception' => '\'{"id":5}\' Not Found!'],
             ],
             'fail-data' => [
+                'model' => '\Test\MykrORM\MykrORMTestModel',
                 'criteria' => ['id' => 6],
                 'update' => [
                     'setId' => ['create' => 6, 'update' => 'nonsense'],

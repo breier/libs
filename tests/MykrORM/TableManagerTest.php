@@ -56,6 +56,7 @@ class TableManagerTest extends TestCase
 
         $this->testModel->exposedCreateTableIfNotExists();
         $this->testModel->setExtraProp('extra property update');
+        $this->testModel->setId(1);
         $this->testModel->update(['id' => 1]);
 
         $newModelList = $this->testModel->find(['id' => 1]);

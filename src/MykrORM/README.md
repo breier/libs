@@ -48,18 +48,6 @@ class Session extends MykrORM
     ];
   }
 
-  public function validateCriteria($criteria): bool
-  {
-    parent::validateCriteria($criteria);
-    if ($criteria->count() > 1) {
-      throw new DBException("Invalid criteria!");
-    }
-    if (!$criteria->offsetExists('token')) {
-      throw new DBException("Invalid criteria!");
-    }
-    return true;
-  }
-
   public function setToken(string $value = ''): string
   {
     if (strlen($value) === 64) {
@@ -312,6 +300,63 @@ Delete a row of the model table with current properties.
   ```
 </details>
 
+### `public function validateCriteria($criteria): bool`
+Make sure that any key in the criteria matches "dbProperties".
+<details>
+  <summary>Code Example</summary>
+
+  ```php
+  $testModel = new Test();
+  $testModel->validateCriteria([]); // true
+  $testModel->validateCriteria(['test_name' => null]); // true
+  $testModel->validateCriteria(['test_name' => 'soap']); // true
+  $testModel->validateCriteria(['test_non_existent' => 'soap']); // Throws DBException
+  ```
+</details>
+
+### `protected function getProperties(): ExtendedArray`
+Get database available properties in an associative array manner.
+<details>
+  <summary>Code Example</summary>
+
+  ```php
+  $test = new Test();
+  $test->setTestName('soap');
+  print($test->getProperties()); // {"test_name":"soap"}
+  ```
+</details>
+
+### `protected function bindIndexedParams(PDOStatement $statement, ExtendedArray $parameters): void`
+Binds parameters to indexed (?) placeholders in the prepared statement.
+<details>
+  <summary>Code Example</summary>
+
+  ```php
+  class Test extends MykrORM
+  {
+    protected $testName = 'test';
+    public __construct()
+    {
+      $this->dbProperties = [
+        'test_name' => 'CHAR(4) NOT NULL PRIMARY KEY',
+      ];
+    }
+    public setTestName(string $value): string
+    {
+      $this->testName = $value;
+    }
+    public testUpdate(): void
+    {
+      $query = "UPDATE {$this->dbTableName} SET test_name = ? WHERE test_name = ?";
+      $parameters = new ExtendedArray(['test_name' => 'newValue', 0 => 'oldValue']);
+      $preparedStatement = $this->getConnection()->prepare($query);
+      $this->bindIndexedParams($preparedStatement, $parameters);
+      $preparedStatement->execute();
+    }
+  }
+  ```
+</details>
+
 ### `protected function findPrimaryKey(): string`
 Get DB property set as 'PRIMARY KEY' (or the first index if not found).
 <details>
@@ -331,32 +376,6 @@ Get DB property set as 'PRIMARY KEY' (or the first index if not found).
       $this->findPrimaryKey(); // 'test_name'
     }
   }
-  ```
-</details>
-
-### `public function getProperties(): ExtendedArray`
-Get database available properties in an associative array manner.
-<details>
-  <summary>Code Example</summary>
-
-  ```php
-  $test = new Test();
-  $test->setTestName('soap');
-  print($test->getProperties()); // {"test_name":"soap"}
-  ```
-</details>
-
-### `public function validateCriteria($criteria): bool`
-Make sure that any key in the criteria matches "dbProperties".
-<details>
-  <summary>Code Example</summary>
-
-  ```php
-  $testModel = new Test();
-  $testModel->validateCriteria([]); // true
-  $testModel->validateCriteria(['test_name' => null]); // true
-  $testModel->validateCriteria(['test_name' => 'soap']); // true
-  $testModel->validateCriteria(['test_non_existent' => 'soap']); // Throws DBException
   ```
 </details>
 
