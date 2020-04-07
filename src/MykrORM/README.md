@@ -74,11 +74,13 @@ class Session extends MykrORM
 }
 ```
 
-### Further Examples
+### Further Information
 The first time you try to "Create" an entry of that model, the table will be
 created in the database.
 
 If you update the model adding more columns they will be added on creation as well.
+
+_\*If you have a boolean DB property you have to set it as DEFAULT FALSE to work properly._
 
 While Create, Update and Delete deal with the current instance,
 "Read" (`find`) returns an ExtendedArray of instances of the Model.
