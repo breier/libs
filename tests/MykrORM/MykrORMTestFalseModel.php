@@ -43,7 +43,7 @@ class MykrORMTestFalseModel extends MykrORM
     {
         $this->dbProperties = [
             'name' => 'TEXT',
-            'is_valid' => 'BOOL DEFAULT FALSE',
+            'is_valid' => 'BOOL',
         ];
 
         parent::__construct();

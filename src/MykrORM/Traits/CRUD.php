@@ -33,7 +33,12 @@ trait CRUD
     {
         $this->createTableIfNotExists();
 
-        $parameters = $this->getProperties()->filter();
+        $parameters = $this->getProperties()->filter(
+            function ($item) {
+                return !is_null($item);
+            }
+        );
+
         $placeholders = ExtendedArray::fill(0, $parameters->count(), '?');
 
         $query = "INSERT INTO {$this->dbTableName}"

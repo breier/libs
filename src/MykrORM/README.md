@@ -80,8 +80,6 @@ created in the database.
 
 If you update the model adding more columns they will be added on creation as well.
 
-_\*If you have a boolean DB property you have to set it as DEFAULT FALSE to work properly._
-
 While Create, Update and Delete deal with the current instance,
 "Read" (`find`) returns an ExtendedArray of instances of the Model.
 
