@@ -227,6 +227,31 @@ trait CRUD
     }
 
     /**
+     * Validate Criteria
+     *
+     * @param array|ExtendedArray $criteria
+     *
+     * @throws DBException
+     */
+    final protected function validateCriteria($criteria): bool
+    {
+        if (!ExtendedArray::isArray($criteria)) {
+            throw new DBException('Invalid criteria format!');
+        }
+
+        $criteria = new ExtendedArray($criteria);
+
+        foreach ($criteria->keys() as $field) {
+            $property = self::camelToSnake($field);
+            if (!$this->getDBProperties()->offsetExists($property)) {
+                throw new DBException("Invalid criteria '{$field}'!");
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Find Primary Key
      */
     protected function findPrimaryKey(): ExtendedArray
@@ -244,30 +269,5 @@ trait CRUD
             'as_db_field' => $primaryField,
             'asProperty' => lcfirst(self::snakeToCamel($primaryField)),
         ]);
-    }
-
-    /**
-     * Validate Criteria
-     *
-     * @param array|ExtendedArray $criteria
-     *
-     * @throws DBException
-     */
-    private function validateCriteria($criteria): bool
-    {
-        if (!ExtendedArray::isArray($criteria)) {
-            throw new DBException('Invalid criteria format!');
-        }
-
-        $criteria = new ExtendedArray($criteria);
-
-        foreach ($criteria->keys() as $field) {
-            $property = self::camelToSnake($field);
-            if (!$this->getDBProperties()->offsetExists($property)) {
-                throw new DBException("Invalid criteria '{$field}'!");
-            }
-        }
-
-        return true;
     }
 }

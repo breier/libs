@@ -344,6 +344,25 @@ _\* Specially useful to detect booleans and nulls and bind them properly._
   ```
 </details>
 
+### `final protected function validateCriteria($criteria): bool`
+Make sure that any key in the criteria matches "dbProperties".
+<details>
+  <summary>Code Example</summary>
+
+  ```php
+  class Test extends MykrORM
+  {
+    public function test(): void
+    {
+      $this->validateCriteria([]); // true
+      $this->validateCriteria(['test_name' => null]); // true
+      $this->validateCriteria(['test_name' => 'soap']); // true
+      $this->validateCriteria(['test_non_existent' => 'soap']); // Throws DBException
+    }
+  }
+  ```
+</details>
+
 ### `protected function findPrimaryKey(): ExtendedArray`
 Get DB property set as 'PRIMARY KEY' (or the first index if not found).
 <details>
