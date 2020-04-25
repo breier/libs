@@ -273,13 +273,16 @@ class ExtendedArray extends ExtendedArrayBase
         $preparedParams = MergeMap::prepareMapParams($this, $params);
         $mappedArray = new static();
 
+        $useOriginalKeys = !count($params);
+        $index = 0;
+
         for (
             $this->first(), $preparedParams->first();
             $this->valid(), $preparedParams->valid();
             $this->next(), $preparedParams->next()
         ) {
             $mappedArray->offsetSet(
-                $this->key(),
+                $useOriginalKeys ? $this->key() : $index++,
                 call_user_func_array(
                     $callback,
                     $preparedParams->element()->getArrayCopy()
