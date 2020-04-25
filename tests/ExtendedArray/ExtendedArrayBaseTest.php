@@ -59,171 +59,65 @@ class ExtendedArrayBaseTest extends TestCase
     }
 
     /**
-     * Test Instantiate Array
+     * Test Instantiate
+     *
+     * @dataProvider instanceProvider
      */
-    public function testInstantiateArray(): void
+    public function testInstantiate($instance, $exception = false): void
     {
-        $this->extendedArray->next();
-        next($this->plainArray);
+        try {
+            $extendedArray = new ExtendedArray($instance);
+
+            if ($exception) {
+                $this->assertTrue(false); // Hasn't thrown an exception
+            }
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame(
+                'Only array types are accepted as parameter!',
+                $e->getMessage()
+            );
+            return;
+        }
+
+        $plainArray = $instance instanceof SplFixedArray
+            ? array_values($this->plainArray)
+            : $this->plainArray;
+
+        $extendedArray->next();
+        next($plainArray);
 
         $this->assertSame(
-            $this->plainArray,
-            $this->extendedArray->getArrayCopy()
+            $plainArray,
+            $extendedArray->getArrayCopy()
         );
         $this->assertSame(
-            array_keys($this->plainArray),
-            $this->extendedArray->keys()->getArrayCopy()
+            array_keys($plainArray),
+            $extendedArray->keys()->getArrayCopy()
         );
         $this->assertSame(
-            key($this->plainArray),
-            $this->extendedArray->key()
+            key($plainArray),
+            $extendedArray->key()
         );
     }
 
     /**
-     * Test Instantiate ArrayIterator
+     * Instantiate Provider
      */
-    public function testInstantiateArrayIterator(): void
+    public function instanceProvider(): array
     {
-        $newFromArrayIterator = new ExtendedArray($this->arrayIterator);
-        $newFromArrayIterator->next();
-        next($this->plainArray);
+        $this->setUp();
 
-        $this->assertSame(
-            $this->plainArray,
-            $newFromArrayIterator->getArrayCopy()
-        );
-        $this->assertSame(
-            array_keys($this->plainArray),
-            $newFromArrayIterator->keys()->getArrayCopy()
-        );
-        $this->assertSame(
-            key($this->plainArray),
-            $newFromArrayIterator->key()
-        );
-    }
-
-    /**
-     * Test Instantiate ArrayObject
-     */
-    public function testInstantiateArrayObject(): void
-    {
-        $newFromArrayObject = new ExtendedArray($this->arrayObject);
-        $newFromArrayObject->next();
-        next($this->plainArray);
-
-        $this->assertSame(
-            $this->plainArray,
-            $newFromArrayObject->getArrayCopy()
-        );
-        $this->assertSame(
-            array_keys($this->plainArray),
-            $newFromArrayObject->keys()->getArrayCopy()
-        );
-        $this->assertSame(
-            key($this->plainArray),
-            $newFromArrayObject->key()
-        );
-    }
-
-    /**
-     * Test Instantiate SplFixedArray
-     */
-    public function testInstantiateSplFixedArray(): void
-    {
-        $newFromSplFixedArray = new ExtendedArray($this->splFixedArray);
-        $newFromSplFixedArray->next();
-        $this->splFixedArray->next();
-
-        $this->assertSame(
-            $this->splFixedArray->toArray(),
-            $newFromSplFixedArray->getArrayCopy()
-        );
-        $this->assertSame(
-            array_keys($this->splFixedArray->toArray()),
-            $newFromSplFixedArray->keys()->getArrayCopy()
-        );
-        $this->assertSame(
-            $this->splFixedArray->key(),
-            $newFromSplFixedArray->key()
-        );
-    }
-
-    /**
-     * Test Throws for non-array types
-     */
-    public function testInstantiateThrowsInvalidArgumentException(): void
-    {
-        /**
-         * String
-         */
-        try {
-            new ExtendedArray('non-array');
-
-            $this->assertTrue(false); // Hasn't thrown an exception
-        } catch (InvalidArgumentException $e) {
-            $this->assertSame(
-                'Only array types are accepted as parameter!',
-                $e->getMessage()
-            );
-        }
-
-        /**
-         * Integer
-         */
-        try {
-            new ExtendedArray(123);
-
-            $this->assertTrue(false); // Hasn't thrown an exception
-        } catch (InvalidArgumentException $e) {
-            $this->assertSame(
-                'Only array types are accepted as parameter!',
-                $e->getMessage()
-            );
-        }
-
-        /**
-         * Boolean
-         */
-        try {
-            new ExtendedArray(true);
-
-            $this->assertTrue(false); // Hasn't thrown an exception
-        } catch (InvalidArgumentException $e) {
-            $this->assertSame(
-                'Only array types are accepted as parameter!',
-                $e->getMessage()
-            );
-        }
-
-        /**
-         * Float
-         */
-        try {
-            new ExtendedArray(123.456789);
-
-            $this->assertTrue(false); // Hasn't thrown an exception
-        } catch (InvalidArgumentException $e) {
-            $this->assertSame(
-                'Only array types are accepted as parameter!',
-                $e->getMessage()
-            );
-        }
-
-        /**
-         * Object
-         */
-        try {
-            $object = (object) ['invalid'];
-            new ExtendedArray($object);
-
-            $this->assertTrue(false); // Hasn't thrown an exception
-        } catch (InvalidArgumentException $e) {
-            $this->assertSame(
-                'Only array types are accepted as parameter!',
-                $e->getMessage()
-            );
-        }
+        return [
+            'array' => ['instance' => $this->extendedArray],
+            'array-iterator' => ['instance' => $this->arrayIterator],
+            'array-object' => ['instance' => $this->arrayObject],
+            'array-spl-fixed' => ['instance' => $this->splFixedArray],
+            'fail-non-array' => ['instance' => 'non-array', 'exception' => true],
+            'fail-non-array-int' => ['instance' => 123, 'exception' => true],
+            'fail-non-array-bool' => ['instance' => true, 'exception' => true],
+            'fail-non-array-float' => ['instance' => 123.456789, 'exception' => true],
+            'fail-non-array-object' => ['instance' => (object) ['invalid'], 'exception' => true],
+        ];
     }
 
     /**
@@ -354,42 +248,37 @@ class ExtendedArrayBaseTest extends TestCase
 
     /**
      * Test Is Array Object
+     *
+     * @dataProvider isArrayProvider
      */
-    public function testIsArrayObject(): void
+    public function testIsArrayObject($parameter, $expect = false): void
     {
-        $this->extendedArray->next();
-        next($this->plainArray);
-
-        $this->assertTrue(is_array($this->plainArray));
-        $this->assertTrue(
-            ExtendedArray::isArrayObject($this->extendedArray)
-        );
-        $this->assertTrue(
-            ExtendedArray::isArrayObject($this->arrayIterator)
-        );
-        $this->assertTrue(
-            ExtendedArray::isArrayObject($this->arrayObject)
-        );
-
-        $this->assertFalse(ExtendedArray::isArrayObject(null));
-        $this->assertFalse(ExtendedArray::isArrayObject(false));
-        $this->assertFalse(ExtendedArray::isArrayObject($this));
-        $this->assertFalse(ExtendedArray::isArrayObject(1024));
-        $this->assertFalse(
-            ExtendedArray::isArrayObject(
-                $this->extendedArray->serialize()
-            )
-        );
-        $this->assertFalse(
-            ExtendedArray::isArrayObject(
-                $this->extendedArray->jsonSerialize()
-            )
-        );
-
         $this->assertSame(
-            key($this->plainArray),
-            $this->extendedArray->key()
+            ExtendedArray::isArrayObject($parameter),
+            $expect
         );
+    }
+
+    /**
+     * Is Array Provider
+     */
+    public function isArrayProvider(): array
+    {
+        $this->setUp();
+
+        return [
+            'array-plain' => ['parameter' => $this->plainArray],
+            'array-extended' => ['parameter' => $this->extendedArray, 'expect' => true],
+            'array-iterator' => ['parameter' => $this->arrayIterator, 'expect' => true],
+            'array-object' => ['parameter' => $this->arrayObject, 'expect' => true],
+            'array-spl-fixed' => ['parameter' => $this->splFixedArray],
+            'fail-non-array-null' => ['parameter' => null],
+            'fail-non-array-bool' => ['parameter' => false],
+            'fail-non-array-object' => ['parameter' => $this],
+            'fail-non-array-int' => ['parameter' => 1024],
+            'fail-non-array-serial' => ['parameter' => $this->extendedArray->serialize()],
+            'fail-non-array-json' => ['parameter' => $this->extendedArray->jsonSerialize()],
+        ];
     }
 
     /**
@@ -846,7 +735,7 @@ class ExtendedArrayBaseTest extends TestCase
     }
 
     /**
-     * @test 1000 ElementArray takes less than 50ms
+     * @test Sorting ElementArray takes less than 50ms
      */
     public function executionTimeIsAcceptable(): void
     {
