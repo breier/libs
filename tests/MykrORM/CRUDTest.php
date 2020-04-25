@@ -42,15 +42,15 @@ class CRUDTest extends TestCase
         $this->testModel->destroyDB();
         $this->testModel = new MykrORMTestModel();
 
-        $this->testModel->setText('success creation');
+        $this->testModel->text = 'success creation';
         $this->testModel->create();
 
         $newModelList = $this->testModel->find(['id' => 1]);
         $newModel = $newModelList->current();
 
         $this->assertSame(
-            $newModel->getText(),
-            $this->testModel->getText()
+            $newModel->text,
+            $this->testModel->text
         );
     }
 
@@ -62,7 +62,7 @@ class CRUDTest extends TestCase
         $this->testModel->destroyDB();
         $this->testModel = new MykrORMTestModel();
 
-        $this->testModel->setId('somethingElse');
+        $this->testModel->id = 'somethingElse';
 
         try {
             $this->testModel->create();
@@ -84,15 +84,15 @@ class CRUDTest extends TestCase
         $this->testModel->destroyDB();
         $this->testModel = new MykrORMTestModel();
 
-        $this->testModel->setText('same text');
+        $this->testModel->text = 'same text';
         $this->testModel->create();
         $this->testModel->create();
 
         $newModelList = $this->testModel->find(['text' => 'same text']);
 
         $this->assertSame(2, $newModelList->count());
-        $this->assertEquals(1, $newModelList->first()->element()->getId());
-        $this->assertEquals(2, $newModelList->next()->element()->getId());
+        $this->assertEquals(1, $newModelList->first()->element()->id);
+        $this->assertEquals(2, $newModelList->next()->element()->id);
     }
 
     /**
@@ -105,8 +105,8 @@ class CRUDTest extends TestCase
         $this->testModel->destroyDB();
         $this->testModel = new MykrORMTestModel();
 
-        $this->testModel->setDate('2020-03-22 17:16:15');
-        $this->testModel->setText('success creation');
+        $this->testModel->date = '2020-03-22 17:16:15';
+        $this->testModel->text = 'success creation';
         $this->testModel->create();
 
         if (!empty($exec)) {
@@ -116,6 +116,10 @@ class CRUDTest extends TestCase
         if ($expect instanceof MykrORMTestModel || empty($expect['exception'])) {
             $newModelList = $this->testModel->find($criteria);
             $newModel = $newModelList->current();
+
+            if ($newModel) { // initializes DB properties
+                $newModel->exposedGetProperties();
+            }
 
             $this->assertEquals($newModel, $expect);
         } else {
@@ -135,9 +139,9 @@ class CRUDTest extends TestCase
     public function findProvider(): array
     {
         $emptyTestModel = new MykrORMTestModel();
-        $emptyTestModel->setDate('2020-03-22 17:16:15');
-        $emptyTestModel->setText('success creation');
-        $emptyTestModel->setId('1');
+        $emptyTestModel->date = '2020-03-22 17:16:15';
+        $emptyTestModel->text = 'success creation';
+        $emptyTestModel->id = '1';
 
         return [
             'not-there' => [
@@ -304,7 +308,7 @@ class CRUDTest extends TestCase
                     'setId' => 3,
                     'setDate' => '2020-03-22 17:16:15',
                 ],
-                'expect' => ['exception' => 'Test\MykrORM\MykrORMTestModel Not Found!'],
+                'expect' => ['exception' => 'Criteria cannot be empty!'],
             ],
             'fail-criteria' => [
                 'model' => '\Test\MykrORM\MykrORMTestModel',
@@ -334,7 +338,7 @@ class CRUDTest extends TestCase
      */
     public function testDelete(): void
     {
-        $this->testModel->setText('to be deleted');
+        $this->testModel->text = 'to be deleted';
         $this->testModel->create();
 
         try {

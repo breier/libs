@@ -18,7 +18,6 @@ use PHPUnit\Framework\TestCase;
 use Test\MykrORM\MykrORMTestModel;
 use Breier\MykrORM\MykrORM;
 use Breier\MykrORM\Exception\DBException;
-use Breier\MykrORM\Exception\UndefinedMethodException;
 use PDO;
 
 /**
@@ -93,55 +92,70 @@ class MykrORMTest extends TestCase
     }
 
     /**
-     * Test Auto Getters (__call)
+     * Test Auto Getters / Setters (__get, __set)
      *
      * Setters are defined by MykrORMTestModel
+     *
+     * @dataProvider getterSetterProvider
      */
-    public function testAutoGetters(): void
+    public function testAutoGetters($field, $value = null, $exception = null): void
     {
-        $this->testModel->setId(123);
-        $this->assertSame(123, $this->testModel->getId());
-
-        $this->testModel->setDate('2020-03-21 15:20:25');
-        $this->assertSame('2020-03-21 15:20:25', $this->testModel->getDate());
-
-        $this->testModel->setText('anything shorter then 256');
-        $this->assertSame('anything shorter then 256', $this->testModel->getText());
-
         try {
-            $this->testModel->setExtraProp(321);
-            $this->testModel->getExtraProp();
+            if (null !== $value) {
+                $this->testModel->{$field} = $value;
+            }
 
-            $this->assertTrue(false); // Hasn't thrown an exception
+            $result = $this->testModel->{$field};
+
+            if (null === $exception) {
+                $this->assertSame($value, $result);
+            } else {
+                $this->assertTrue(false); // Hasn't thrown an exception
+            }
         } catch (DBException $e) {
-            $this->assertSame(
-                'Property is not DB property!',
-                $e->getMessage()
-            );
+            $this->assertSame($exception, $e->getMessage());
         }
+    }
 
-        try {
-            $this->testModel->getNonExistent();
-
-            $this->assertTrue(false); // Hasn't thrown an exception
-        } catch (DBException $e) {
-            $this->assertSame(
-                'Property does not exist!',
-                $e->getMessage()
-            );
-        }
-
-        try {
-            $this->testModel->callUndefined();
-
-            $this->assertTrue(false); // Hasn't thrown an exception
-        } catch (UndefinedMethodException $e) {
-            $this->assertSame(
-                'Attempted to call an undefined method named "callUndefined"'
-                    . ' of class "{Test\MykrORM\MykrORMTestModel}".',
-                $e->getMessage()
-            );
-        }
+    /**
+     * Getter Setter Provider
+     */
+    public function getterSetterProvider(): array
+    {
+        return [
+            'success-set-id' => [
+                'field' => 'id',
+                'value' => 123,
+            ],
+            'success-set-date' => [
+                'field' => 'date',
+                'value' => '2020-03-21 15:20:25',
+            ],
+            'success-set-text' => [
+                'field' => 'text',
+                'value' => 'anything shorter then 256',
+            ],
+            'fail-set-non-db' => [
+                'field' => 'extraProp',
+                'value' => 321,
+                'exception' => 'Property is not DB property!',
+            ],
+            'fail-set-non-existent' => [
+                'field' => 'nonExistent',
+                'value' => 'nope',
+                'exception' => 'Property does not exist!',
+            ],
+            'fail-get-non-db' => [
+                'field' => 'extraProp',
+                'value' => null,
+                'exception' => 'Property is not DB property!',
+            ],
+            'fail-get-non-existent' => [
+                'field' => 'nonExistent',
+                'value' => null,
+                'exception' => 'Property does not exist!',
+            ],
+        ];
     }
 
     /**
@@ -149,7 +163,7 @@ class MykrORMTest extends TestCase
      *
      * It's covered by PDO::fetchObject() @ CRUD::find
      * by setting a composed word property at the model:
-     * 'extra_prop' => 'setExtraProp()' / 'getExtraProp()'
+     * 'extra_prop' => 'setExtraProp()' / '$extraProp'
      */
 
     /**

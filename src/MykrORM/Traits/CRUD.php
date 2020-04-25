@@ -58,7 +58,7 @@ trait CRUD
     }
 
     /**
-     * [Read] Get Existing Entry
+     * [Read] Get Existing Entries
      *
      * @param array|ExtendedArray $criteria
      *
@@ -73,7 +73,7 @@ trait CRUD
         if ($criteria->count()) {
             $placeholders = $criteria->keys()->map(
                 function ($field) {
-                    $property = static::camelToSnake($field);
+                    $property = self::camelToSnake($field);
                     return "{$property} = ?";
                 }
             )->implode(' AND ');
@@ -113,22 +113,21 @@ trait CRUD
      */
     public function update($criteria): void
     {
+        $this->validateCriteria($criteria);
+
+        $criteria = new ExtendedArray($criteria);
+        if ($criteria->count() === 0) {
+            throw new DBException('Criteria cannot be empty!');
+        }
+
         try {
-            $this->validateCriteria($criteria);
-
-            $criteria = new ExtendedArray($criteria);
-            if ($criteria->count() === 0) {
-                throw new DBException('');
-            }
-
             $originalList = $this->find($criteria);
         } catch (DBException $e) {
             throw new DBException(static::class . ' Not Found!');
         }
 
         if ($originalList->count() !== 1) {
-            $jsonCriteria = (new ExtendedArray($criteria))->jsonSerialize();
-            throw new DBException("'{$jsonCriteria}' Not Found!");
+            throw new DBException("'{$criteria->jsonSerialize()}' Not Found!");
         }
         $original = $originalList->first()->element();
 
@@ -140,12 +139,11 @@ trait CRUD
         );
 
         $primaryField = $this->findPrimaryKey();
-        $primaryGetter = 'get' . static::snakeToCamel($primaryField);
-        $parameters->append($original->{$primaryGetter}());
+        $parameters->append($original->{$primaryField->asProperty});
 
         $query = "UPDATE {$this->dbTableName}"
             . " SET {$placeholders->implode(', ')}"
-            . " WHERE {$primaryField} = ?";
+            . " WHERE {$primaryField->as_db_field} = ?";
 
         $this->getConnection()->beginTransaction();
         try {
@@ -167,13 +165,13 @@ trait CRUD
     public function delete(): void
     {
         $primaryField = $this->findPrimaryKey();
-        $primaryGetter = 'get' . static::snakeToCamel($primaryField);
-        $primaryValue = $this->{$primaryGetter}();
+        $primaryValue = $this->{$primaryField->asProperty};
         if (empty($primaryValue)) {
-            throw new DBException("'{$primaryField}' is empty!");
+            throw new DBException("'{$primaryField->asProperty}' is empty!");
         }
 
-        $query = "DELETE FROM {$this->dbTableName} WHERE {$primaryField} = ?";
+        $query = "DELETE FROM {$this->dbTableName}"
+            . " WHERE {$primaryField->as_db_field} = ?";
 
         $this->getConnection()->beginTransaction();
         try {
@@ -181,7 +179,7 @@ trait CRUD
             $preparedStatement->execute([$primaryValue]);
             if ($preparedStatement->rowCount() !== 1) {
                 throw new PDOException(
-                    "'{$primaryField}' was not found or unique!"
+                    "'{$primaryField->as_db_field}' was not found or unique!"
                 );
             }
             $this->getConnection()->commit();
@@ -192,40 +190,17 @@ trait CRUD
     }
 
     /**
-     * Validate Criteria
-     *
-     * @param array|ExtendedArray $criteria
+     * Get Detached DB Property Fields with current values
      *
      * @throws DBException
-     */
-    public function validateCriteria($criteria): bool
-    {
-        if (!ExtendedArray::isArray($criteria)) {
-            throw new DBException('Invalid criteria format!');
-        }
-
-        $criteria = new ExtendedArray($criteria);
-
-        foreach ($criteria->keys() as $field) {
-            $property = static::camelToSnake($field);
-            if (!$this->getDBProperties()->offsetExists($property)) {
-                throw new DBException("Invalid criteria '{$field}'!");
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Prepare Fields for insertion
      */
     protected function getProperties(): ExtendedArray
     {
         $propertyFields = new ExtendedArray($this->getDBProperties());
 
         foreach ($propertyFields as $field => &$value) {
-            $getter = 'get' . static::snakeToCamel($field);
-            $value = $this->{$getter}();
+            $propertyName = lcfirst(self::snakeToCamel($field));
+            $value = $this->{$propertyName};
         }
 
         return $propertyFields;
@@ -242,28 +217,57 @@ trait CRUD
 
         foreach ($parameters as &$value) {
             if (is_null($value)) {
-                $PDOParamType = PDO::PARAM_NULL;
+                $statement->bindParam(++$index, $value, PDO::PARAM_NULL);
             } elseif (is_bool($value)) {
-                $PDOParamType = PDO::PARAM_BOOL;
+                $statement->bindParam(++$index, $value, PDO::PARAM_BOOL);
             } else {
-                $PDOParamType = PDO::PARAM_STR;
+                $statement->bindParam(++$index, $value, PDO::PARAM_STR);
             }
-
-            $statement->bindParam(++$index, $value, $PDOParamType);
         }
     }
 
     /**
      * Find Primary Key
      */
-    protected function findPrimaryKey(): string
+    protected function findPrimaryKey(): ExtendedArray
     {
+        $primaryField = $this->getDBProperties()->keys()->first()->element();
+
         foreach ($this->getDBProperties() as $field => $type) {
             if (preg_match('/PRIMARY KEY/', strtoupper($type)) === 1) {
-                return $field;
+                $primaryField = $field;
+                break;
             }
         }
 
-        return $this->getDBProperties()->keys()->first()->element();
+        return new ExtendedArray([
+            'as_db_field' => $primaryField,
+            'asProperty' => lcfirst(self::snakeToCamel($primaryField)),
+        ]);
+    }
+
+    /**
+     * Validate Criteria
+     *
+     * @param array|ExtendedArray $criteria
+     *
+     * @throws DBException
+     */
+    private function validateCriteria($criteria): bool
+    {
+        if (!ExtendedArray::isArray($criteria)) {
+            throw new DBException('Invalid criteria format!');
+        }
+
+        $criteria = new ExtendedArray($criteria);
+
+        foreach ($criteria->keys() as $field) {
+            $property = self::camelToSnake($field);
+            if (!$this->getDBProperties()->offsetExists($property)) {
+                throw new DBException("Invalid criteria '{$field}'!");
+            }
+        }
+
+        return true;
     }
 }

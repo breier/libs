@@ -16,7 +16,7 @@ namespace Breier\MykrORM;
 use PDO;
 use PDOException;
 use Breier\ExtendedArray\ExtendedArray;
-use Breier\MykrORM\Exception\{DBException, UndefinedMethodException};
+use Breier\MykrORM\Exception\DBException;
 use Breier\MykrORM\Traits\{TableManager, CRUD};
 
 /**
@@ -40,19 +40,13 @@ abstract class MykrORM
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_NAMED,
     ];
 
-    /**
-     * @var string DB Table Name
-     */
+    /** @var string DB Table Name */
     protected $dbTableName;
 
-    /**
-     * @var ExtendedArray DB Properties (table columns)
-     */
+    /** @var ExtendedArray DB Properties (table columns) */
     protected $dbProperties;
 
-    /**
-     * @var array DB Constructor Args
-     */
+    /** @var array DB Constructor Args */
     protected $dbConstructorArgs = [];
 
     /**
@@ -106,28 +100,19 @@ abstract class MykrORM
     }
 
     /**
-     * Automatic Getters [DB fields are 'never private']
+     * Automatic Getters for DB fields
      *
      * @return mixed
      * @throws DBException
-     * @throws UndefinedMethodException
      */
-    public function __call(string $name, array $arguments)
+    public function __get(string $propertyName)
     {
-        if (preg_match('/^get[A-Z][\w\d]*/', $name) !== 1) {
-            throw new UndefinedMethodException(
-                'Attempted to call an undefined method named'
-                . ' "' . $name . '" of class "{' . static::class . '}".'
-            );
-        }
-
-        $propertyName = strtolower($name[3]) . substr($name, 4);
         if (!property_exists($this, $propertyName)) {
             throw new DBException('Property does not exist!');
         }
 
         $dbFields = $this->getDBProperties()->keys();
-        if (!$dbFields->contains(static::camelToSnake($propertyName))) {
+        if (!$dbFields->contains(self::camelToSnake($propertyName))) {
             throw new DBException('Property is not DB property!');
         }
 
@@ -135,20 +120,29 @@ abstract class MykrORM
     }
 
     /**
-     * Setter Mapper for PDO
+     * Setter Mapper for DB fields
+     *
+     * @throws DBException
      */
     public function __set(string $name, $value): void
     {
-        $setter = 'set' . static::snakeToCamel($name);
-        if (method_exists($this, $setter)) {
-            $this->{$setter}($value);
+        if (!property_exists($this, lcfirst(self::snakeToCamel($name)))) {
+            throw new DBException('Property does not exist!');
         }
+
+        $dbFields = $this->getDBProperties()->keys();
+        if ($dbFields->count() && !$dbFields->contains(self::camelToSnake($name))) {
+            throw new DBException('Property is not DB property!');
+        }
+
+        $setter = 'set' . self::snakeToCamel($name);
+        $this->{$setter}($value);
     }
 
     /**
      * Snake To Camel case
      */
-    protected static function snakeToCamel(string $string): string
+    final protected static function snakeToCamel(string $string): string
     {
         return str_replace('_', '', ucwords($string, '_'));
     }
@@ -156,7 +150,7 @@ abstract class MykrORM
     /**
      * Camel To Snake case
      */
-    protected static function camelToSnake(string $string): string
+    final protected static function camelToSnake(string $string): string
     {
         return strtolower(
             preg_replace(

@@ -84,7 +84,7 @@ While Create, Update and Delete deal with the current instance,
 "Read" (`find`) returns an ExtendedArray of instances of the Model.
 
 Properties listed in $this->dbProperties should be declared with protected visibility.
-MykrORM will provide automatic getters for them.
+MykrORM will provide automatic getters and setters for them.
 
 ## Methods in MykrORM
 This is the abstract class that implements the ORM
@@ -98,8 +98,9 @@ and it's also the base for every model you wish to create.
 <br>But you can override it by setting `$this->dbTableName` before `parent::__construct()`;
 * If you use parameters for the extended `__construct` you also need to set
 <br>`$this->dbConstructorArgs` as an array containing the parameters' values in it;
-* It provides automatic getters via `__call` for related DB properties;
-* It maps setters via `__set` for `fetchObject()` PDO mode;
+* It provides automatic getters via `__get` for related DB properties;
+* It maps setters via `__set` for `fetchObject()` PDO mode.
+<br>_(you have to declare public setters like `setPropertyName($value)`)_;
 
 ### `abstract protected function getDSN(): string`
 Returns the DSN for PDO connection (has to be implemented by the extending class).
@@ -150,7 +151,7 @@ Gets the stored PDO object with a valid connection.
   ```
 </details>
 
-### `public function __call(string $name, array $arguments)`
+### `public function __get(string $propertyName)`
 Provides automatic getters for DB properties.
 <details>
   <summary>Code Example</summary>
@@ -167,8 +168,8 @@ Provides automatic getters for DB properties.
       ];
     }
   }
-  (new Test())->getTest(); // 1234
-  (new Test())->getOther(); // throws DBException property is not DB property!
+  print((new Test())->test); // 1234
+  print((new Test())->other); // throws DBException property is not DB property!
   ```
 </details>
 
@@ -199,14 +200,14 @@ Maps setters automatically for `fetchObject()` PDO mode.
       $likeThis = $preparedStatement->fetchObject(static::class);
 
       if (!empty($likeThis)) {
-        $likeThis->getTestName(); // works because __set mapped 'test_name' to 'setTestName'
+        print($likeThis->testName); // works because __set mapped 'test_name' to 'setTestName'
       }
     }
   }
   ```
 </details>
 
-### `protected static function camelToSnake(string $string): string`
+### `final protected static function camelToSnake(string $string): string`
 `[static]` Converts Camel-Case to Snake-Case (from Property to DB).
 <details>
   <summary>Code Example</summary>
@@ -216,13 +217,13 @@ Maps setters automatically for `fetchObject()` PDO mode.
   {
     public function test(): void
     {
-      static::camelToSnake('anotherTestName'); // another_test_name
+      print(self::camelToSnake('anotherTestName')); // another_test_name
     }
   }
   ```
 </details>
 
-### `protected static function snakeToCamel(string $string): string`
+### `final protected static function snakeToCamel(string $string): string`
 `[static]` Converts Snake-Case to Camel-Case (from DB to Property).
 <details>
   <summary>Code Example</summary>
@@ -232,7 +233,7 @@ Maps setters automatically for `fetchObject()` PDO mode.
   {
     public function test(): void
     {
-      static::snakeToCamel('test_name'); // TestName
+      printt(self::snakeToCamel('test_name')); // TestName
     }
   }
   ```
@@ -248,7 +249,7 @@ Insert new row to the model table with current properties.
 
   ```php
   $test = new Test();
-  $test->setTestName('what');
+  $test->testName = 'what';
   $test->create();
   ```
 </details>
@@ -256,8 +257,6 @@ Insert new row to the model table with current properties.
 ### `public function find($criteria): ExtendedArray`
 Get all rows of the model table that matches $criteria
 (returns an ExtendedArray with model instances).
-
-_\* There's a criteria validator in place here that can be further implemented by the model._
 <details>
   <summary>Code Example</summary>
 
@@ -280,7 +279,7 @@ _\* It internally uses `find` to get the original object._
   $test = (new Test())->find(['test_name' => 'what']);
   if ($test->count()) {
     $testModel = $test->first()->element();
-    $testModel->setTestName('soap');
+    $testModel->testName = 'soap';
     $testModel->update(['test_name' => 'what']);
   }
   ```
@@ -300,20 +299,6 @@ Delete a row of the model table with current properties.
   ```
 </details>
 
-### `public function validateCriteria($criteria): bool`
-Make sure that any key in the criteria matches "dbProperties".
-<details>
-  <summary>Code Example</summary>
-
-  ```php
-  $testModel = new Test();
-  $testModel->validateCriteria([]); // true
-  $testModel->validateCriteria(['test_name' => null]); // true
-  $testModel->validateCriteria(['test_name' => 'soap']); // true
-  $testModel->validateCriteria(['test_non_existent' => 'soap']); // Throws DBException
-  ```
-</details>
-
 ### `protected function getProperties(): ExtendedArray`
 Get database available properties in an associative array manner.
 <details>
@@ -321,13 +306,15 @@ Get database available properties in an associative array manner.
 
   ```php
   $test = new Test();
-  $test->setTestName('soap');
+  $test->testName = 'soap';
   print($test->getProperties()); // {"test_name":"soap"}
   ```
 </details>
 
 ### `protected function bindIndexedParams(PDOStatement $statement, ExtendedArray $parameters): void`
 Binds parameters to indexed (?) placeholders in the prepared statement.
+
+_\* Specially useful to detect booleans and nulls and bind them properly._
 <details>
   <summary>Code Example</summary>
 
@@ -357,7 +344,7 @@ Binds parameters to indexed (?) placeholders in the prepared statement.
   ```
 </details>
 
-### `protected function findPrimaryKey(): string`
+### `protected function findPrimaryKey(): ExtendedArray`
 Get DB property set as 'PRIMARY KEY' (or the first index if not found).
 <details>
   <summary>Code Example</summary>
@@ -373,7 +360,7 @@ Get DB property set as 'PRIMARY KEY' (or the first index if not found).
     }
     public function test(): void
     {
-      $this->findPrimaryKey(); // 'test_name'
+      print($this->findPrimaryKey()); // {"as_db_field":"test_name","asProperty":"testName"}
     }
   }
   ```

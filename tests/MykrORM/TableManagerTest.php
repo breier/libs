@@ -64,8 +64,8 @@ class TableManagerTest extends TestCase
         $newModel->insertExtraIntoDBProperties('TEXT');
 
         $this->assertSame(
-            $newModel->getExtraProp(),
-            $this->testModel->getExtraProp()
+            $newModel->extraProp,
+            $this->testModel->extraProp
         );
     }
 

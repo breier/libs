@@ -15,7 +15,6 @@ namespace Test\MykrORM;
 
 use Breier\ExtendedArray\ExtendedArray;
 use Breier\MykrORM\MykrORM;
-use PDO;
 
 /**
  * MykrORM Test False Model class

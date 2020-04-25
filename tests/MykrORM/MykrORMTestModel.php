@@ -92,7 +92,7 @@ class MykrORMTestModel extends MykrORM
      */
     public function snake2camel(string $value): string
     {
-        return static::snakeToCamel($value);
+        return self::snakeToCamel($value);
     }
 
     /**
@@ -100,7 +100,7 @@ class MykrORMTestModel extends MykrORM
      */
     public function camel2snake(string $value): string
     {
-        return static::camelToSnake($value);
+        return self::camelToSnake($value);
     }
 
     /**
